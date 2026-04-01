@@ -1,0 +1,43 @@
+# db-query skill 配置文件
+# 配置优先级: 环境变量 > 配置文件 > 默认值
+
+# MySQL 配置 (只读权限)
+mysql:
+  host: '${MYSQL_HOST:-10.65.69.253}'
+  port: 3306
+  user: '${MYSQL_USER:-ro_ciawind_yanjiuzu@tn_pro_ciawind#cl_p_ob4_sj}'
+  password: '${MYSQL_PASSWORD:-Ro_Ci09a_Y6jz}'
+  database: '${MYSQL_DATABASE:-gildata}'
+  charset: 'utf8mb4'
+
+# Elasticsearch 配置
+elasticsearch:
+  host: '${ES_HOST:-http://es-cn-rno47k9y60019w4x9.elasticsearch.aliyuncs.com:9200}'
+  index: '${ES_INDEX:-gil_index_search_v0}'
+  username: '${ES_USERNAME:-elastic}'
+  password: '${ES_PASSWORD:-ela#test000}'
+  request_timeout: 20
+  retry_on_timeout: true
+  max_retries: 3
+
+# Embedding 接口配置
+embedding:
+  # 主接口
+  url: '${EMBEDDING_URL:-http://algoplatform.thfund.work/assistant/bge-m3-docsearch/get_embedding}'
+  # 备用接口 (主接口失败时使用)
+  fallback_url: '${EMBEDDING_FALLBACK_URL:-http://bge-m3-docsearch.ai-assistant.svc.cluster.local/assistant/bge-m3-docsearch/get_embedding}'
+  max_length: 512
+  batch_size: 32
+  timeout: 10
+  max_retries: 2
+
+# 检索配置
+search:
+  default_top_k: 20           # 默认返回数量
+  max_tables: 8               # 最多返回几张表
+  max_columns_per_table: 8    # 每张表最多返回几个字段
+
+# 索引构建配置
+index:
+  json_dir: 'output/'         # 表结构JSON文件目录
+  batch_size: 100             # ES批量写入大小

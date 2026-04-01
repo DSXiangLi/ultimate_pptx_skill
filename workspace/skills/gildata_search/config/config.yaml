@@ -1,0 +1,29 @@
+# gildata_search 配置文件
+# 所有配置项优先从环境变量读取，若环境变量未设置则使用默认值
+
+elasticsearch:
+  host: '${GIL_ES_HOST}'
+  index: '${GIL_ES_INDEX:-gil_index_v2}'
+  username: '${GIL_ES_USERNAME:-}'
+  password: '${GIL_ES_PASSWORD:-}'
+  request_timeout: 20
+
+embedding:
+  url: '${GIL_EMBEDDING_URL:-}'
+  max_length: 8192
+  batch_size: 32
+  timeout: 30
+
+search:
+  default_top_k: 20
+  max_tables: 8
+  max_columns_per_table: 8
+
+# MySQL 配置 (供快捷查询脚本使用)
+mysql:
+  host: '${GIL_MYSQL_HOST:-localhost}'
+  port: ${GIL_MYSQL_PORT:-3306}
+  user: '${GIL_MYSQL_USER:-root}'
+  password: '${GIL_MYSQL_PASSWORD:-}'
+  database: '${GIL_MYSQL_DATABASE:-gildata}'
+  charset: 'utf8mb4'

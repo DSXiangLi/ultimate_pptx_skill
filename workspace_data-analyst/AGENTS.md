@@ -207,14 +207,6 @@ Think of it like a human reviewing their journal and updating their mental model
 
 The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
 
-## 📁 文件输出规则
-
-**所有生成的文件默认保存到 `outputs/` 文件夹**
-
-- 报告、分析文档、脚本等输出文件统一存放于 `~/outputs/`
-- 在 `outputs/README.md` 中记录文件清单
-- 按日期和类型组织子文件夹（如需要）
-
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.

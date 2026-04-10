@@ -108,6 +108,12 @@
             "data-analyst",
             "industry_analyst"
           ]
+        },
+        "tools": {
+          "deny": [
+            "web_search",
+            "web_fetch"
+          ]
         }
       },
       {

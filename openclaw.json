@@ -113,7 +113,7 @@
       {
         "id": "industry_analyst",
         "name": "助理行业研究员",
-        "workspace": "~/.openclaw/workspace_industry_analyst",
+        "workspace": "~/.openclaw/workspace_industry-analyst",
         "agentDir": "~/.openclaw/agents/industry_analyst/agent",
         "fastModeDefault": false,
         "skills": ["*"],
@@ -125,7 +125,8 @@
         },
         "tools": {
           "deny": [
-            "web_search"
+            "web_search",
+            "web_fetch"
           ]
         }
       },
@@ -144,7 +145,8 @@
         },
         "tools": {
           "deny": [
-            "web_search"
+            "web_search",
+            "web_fetch"
           ]
         }
       }

@@ -1,13 +1,7 @@
 ---
 name: gildata_search
 description: "金融数据库查询工具。**优先用于：**查询股票/基金财务数据(营收/利润/ROE/毛利率)、财务报表(三大表)、行情数据、估值指标。提供一手原始数据，比研报更准确及时。**典型场景：**写公司分析报告、财报点评、估值分析、财务分析时需要具体数字和数据。"
-metadata:
-  {
-    "category": "data-query",
-    "database": "gildata",
-    "tables": 1372,
-    "fields": 37218,
-  }
+metadata: {"category":"data-query","database":"gildata","tables":1372,"fields":37218}
 ---
 
 # 恒生聚源数据库查询技能

@@ -1,7 +1,7 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.24",
-    "lastTouchedAt": "2026-04-09T06:36:23.152Z"
+    "lastTouchedAt": "2026-04-16T08:57:33.690Z"
   },
   "env": {
     "vars": {
@@ -41,13 +41,14 @@
         "apiKey": "40aac8112a41840c519669918eb745e0",
         "api": "openai-completions",
         "headers": {
-          "x-caller-app": "openclaw"
+          "x-caller-app": "openclaw",
+          "x-timeout": "6000"
         },
         "models": [
-	  {
-	    "id": "qwen36-plus",
-	    "name": "Qwen36-Plus"
-	  },
+          {
+            "id": "qwen36-plus",
+            "name": "Qwen36-Plus"
+          },
           {
             "id": "kimi-k25",
             "name": "Kimi"
@@ -71,15 +72,15 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "thai/qwen36-plus"
+        "primary": "thai/glm-5"
       },
       "imageModel": {
         "primary": "thai/qwen36-plus"
       },
       "models": {
-	"thai/qwen36-plus": {
+        "thai/qwen36-plus": {
           "alias": "Qwen36-Plus"
-	},
+        },
         "thai/kimi-k25": {
           "alias": "Kimi"
         },
@@ -102,10 +103,12 @@
       {
         "id": "main",
         "name": "小管家",
-        "workspace": "~/小管家的工作空间",
+        "workspace": "/home/jovyan/小管家的工作空间",
         "model": "thai/qwen36-plus",
         "fastModeDefault": false,
-        "skills": ["*"],
+        "skills": [
+          "*"
+        ],
         "memorySearch": {
           "enabled": false
         },
@@ -125,10 +128,12 @@
       {
         "id": "industry-analyst",
         "name": "助理行业研究员",
-        "workspace": "~/助理行业研究员的工作空间",
-        "agentDir": "~/.openclaw/agents/industry-analyst/agent",
+        "workspace": "/home/jovyan/助理行业研究员的工作空间",
+        "agentDir": "/home/jovyan/.openclaw/agents/industry-analyst/agent",
         "fastModeDefault": false,
-        "skills": ["*"],
+        "skills": [
+          "*"
+        ],
         "memorySearch": {
           "enabled": false
         },
@@ -146,10 +151,12 @@
       {
         "id": "data-analyst",
         "name": "数据分析师",
-        "workspace": "~/数据分析师的工作空间",
-        "agentDir": "~/.openclaw/agents/data-analyst/agent",
+        "workspace": "/home/jovyan/数据分析师的工作空间",
+        "agentDir": "/home/jovyan/.openclaw/agents/data-analyst/agent",
         "fastModeDefault": false,
-        "skills": ["*"],
+        "skills": [
+          "*"
+        ],
         "memorySearch": {
           "enabled": false
         },
@@ -163,6 +170,12 @@
             "x_search"
           ]
         }
+      },
+      {
+        "id": "test",
+        "name": "测试智能体",
+        "workspace": "/home/jovyan/.openclaw/workspace_test",
+        "agentDir": "/home/jovyan/.openclaw/agents/test/agent"
       }
     ]
   },

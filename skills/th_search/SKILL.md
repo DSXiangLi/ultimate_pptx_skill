@@ -1,14 +1,7 @@
 ---
 name: th_search
 description: "天弘搜索技能，提供多数据源统一搜索和URL内容获取能力。用于：金融信息检索、研报搜索、公告查询、新闻搜索、路演会议查询、公众号文章搜索、网页内容抓取。"
-metadata:
-  category: search
-  data_sources:
-    - research
-    - roadshow
-    - web
-    - wechat
-    - notice
+metadata: {"category":"search","data_sources":["research","roadshow","web","wechat","notice"]}
 ---
 
 # 天弘搜索技能

@@ -1,11 +1,7 @@
 ---
 name: stock_research_plan
 description: 个股调研规划师。**触发场景：**用户要求调研公司、规划调研问题、设计调研方案时使用。包括"调研XXX公司"、"帮我规划调研问题"、"生成调研方案"、"调研方向"等请求。**核心功能：**根据公司背景、近期电话会议、券商研报、市场观点等，设计一份优质的、具体的、有效的调研问题方案。
-compatibility:
-  tools:
-    - gildata_query
-    - th_search
-    - mcporter:roadshowQA
+metadata: {"compatibility":{"tools":["gildata_query","th_search","mcporter:roadshowQA"]}}
 ---
 
 # 目标

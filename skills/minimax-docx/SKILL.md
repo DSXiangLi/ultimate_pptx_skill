@@ -1,15 +1,6 @@
 ---
 name: minimax-docx
 license: MIT
-metadata:
-  version: "1.0.0"
-  category: document-processing
-  author: MiniMaxAI
-  sources:
-    - "ECMA-376 Office Open XML File Formats"
-    - "GB/T 9704-2012 Layout Standard for Official Documents"
-    - "IEEE / ACM / APA / MLA / Chicago / Turabian Style Guides"
-    - "Springer LNCS / Nature / HBR Document Templates"
 description: >
   Professional DOCX document creation, editing, and formatting using OpenXML SDK (.NET).
   Three pipelines: (A) create new documents from scratch, (B) fill/edit content in existing

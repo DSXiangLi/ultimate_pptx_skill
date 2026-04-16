@@ -1,10 +1,7 @@
 ---
 name: company_onepager
 description: 生成A股/港股公司一页纸分析报告，用于投资决策参考。**触发场景：**用户要求分析公司、写一页纸、生成投资报告、了解公司情况时使用。包括"帮我分析XXX公司"、"写一份XXX一页纸"、"生成XXX投资分析"、"XXX公司怎么样"等请求。**核心功能：**自动收集新闻、研报、财报数据，生成结构完整的10部分专业分析报告。
-compatibility:
-  tools:
-    - gildata_search
-    - th_search
+metadata: {"compatibility":{"tools":["gildata_search","th_search"]}}
 ---
 
 # 目标

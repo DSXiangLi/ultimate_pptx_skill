@@ -103,7 +103,7 @@
       {
         "id": "main",
         "name": "小管家",
-        "workspace": "/home/jovyan/小管家的工作空间",
+        "workspace": "~/小管家的工作空间",
         "model": "thai/qwen36-plus",
         "fastModeDefault": false,
         "skills": [
@@ -128,8 +128,8 @@
       {
         "id": "industry-analyst",
         "name": "助理行业研究员",
-        "workspace": "/home/jovyan/助理行业研究员的工作空间",
-        "agentDir": "/home/jovyan/.openclaw/agents/industry-analyst/agent",
+        "workspace": "~/助理行业研究员的工作空间",
+        "agentDir": "~/.openclaw/agents/industry-analyst/agent",
         "fastModeDefault": false,
         "skills": [
           "*"
@@ -151,8 +151,8 @@
       {
         "id": "data-analyst",
         "name": "数据分析师",
-        "workspace": "/home/jovyan/数据分析师的工作空间",
-        "agentDir": "/home/jovyan/.openclaw/agents/data-analyst/agent",
+        "workspace": "~/数据分析师的工作空间",
+        "agentDir": "~/.openclaw/agents/data-analyst/agent",
         "fastModeDefault": false,
         "skills": [
           "*"
@@ -174,8 +174,8 @@
       {
         "id": "test",
         "name": "测试智能体",
-        "workspace": "/home/jovyan/.openclaw/workspace_test",
-        "agentDir": "/home/jovyan/.openclaw/agents/test/agent"
+        "workspace": "~/.openclaw/workspace_test",
+        "agentDir": "~/.openclaw/agents/test/agent"
       }
     ]
   },

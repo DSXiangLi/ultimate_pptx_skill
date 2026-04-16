@@ -1,0 +1,16 @@
+{
+  "entries": {
+    "/home/jovyan/.openclaw/openclaw.json": {
+      "lastKnownGood": {
+        "hash": "1629536f04b4327a2576bcae3ad2ce45fc781a97eb0fca32a5160d4613aad25d",
+        "bytes": 5401,
+        "mtimeMs": 1776222601127.1594,
+        "ctimeMs": 1776222601127.1594,
+        "hasMeta": true,
+        "gatewayMode": "local",
+        "observedAt": "2026-04-15T03:17:25.100Z"
+      },
+      "lastObservedSuspiciousSignature": null
+    }
+  }
+}

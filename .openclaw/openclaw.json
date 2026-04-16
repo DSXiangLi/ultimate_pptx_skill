@@ -171,12 +171,6 @@
           ]
         }
       },
-      {
-        "id": "test",
-        "name": "测试智能体",
-        "workspace": "~/.openclaw/workspace_test",
-        "agentDir": "~/.openclaw/agents/test/agent"
-      }
     ]
   },
   "tools": {

@@ -106,9 +106,6 @@
         "workspace": "~/小管家的工作空间",
         "model": "thai/qwen36-plus",
         "fastModeDefault": false,
-        "skills": [
-          "*"
-        ],
         "memorySearch": {
           "enabled": false
         },
@@ -131,9 +128,6 @@
         "workspace": "~/助理行业研究员的工作空间",
         "agentDir": "~/.openclaw/agents/industry-analyst/agent",
         "fastModeDefault": false,
-        "skills": [
-          "*"
-        ],
         "memorySearch": {
           "enabled": false
         },
@@ -154,9 +148,6 @@
         "workspace": "~/数据分析师的工作空间",
         "agentDir": "~/.openclaw/agents/data-analyst/agent",
         "fastModeDefault": false,
-        "skills": [
-          "*"
-        ],
         "memorySearch": {
           "enabled": false
         },

@@ -10,9 +10,7 @@ import os
 
 import requests
 
-MCP_BASE_URL = os.environ.get(
-    "TH_MCP_BASE_URL")
-)
+MCP_BASE_URL = os.environ.get("TH_MCP_BASE_URL")
 
 
 def main():

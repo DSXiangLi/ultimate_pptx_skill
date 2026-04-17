@@ -14,12 +14,8 @@ import re
 
 import requests
 
-DOCSEARCH_URL = os.environ.get(
-    "TH_DOCSEARCH_URL")
-)
-MCP_BASE_URL = os.environ.get(
-    "TH_MCP_BASE_URL")
-)
+DOCSEARCH_URL = os.environ.get("TH_DOCSEARCH_URL")
+MCP_BASE_URL = os.environ.get("TH_MCP_BASE_URL")
 
 
 class THSearch:

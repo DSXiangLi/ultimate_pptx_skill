@@ -63,6 +63,26 @@ metadata: {"category":"data-query","database":"gildata","tables":1372,"fields":3
 
 ---
 
+## ⚠️ 配置读取原则
+
+**所有配置必须通过 `load_config` + `parse_env` 从 yaml 配置文件读取，禁止在代码中直接调用 `os.environ.get()`。**
+
+```
+✅ 正确:
+  config = load_config('config/config.yaml')
+  host = parse_env(config['mysql']['host'])   # yaml 中已写 ${GIL_MYSQL_HOST:-localhost}
+
+❌ 错误:
+  host = os.environ.get('GIL_MYSQL_HOST', 'localhost')   # 绕过配置文件
+```
+
+**原因**：
+- 配置文件统一使用 `${VAR:-default}` 占位符语法，环境变量由 `parse_env` 在读取时解析
+- 所有配置集中在 `config/config.yaml` 一处管理，便于维护和审计
+- 代码中直接读取环境变量会导致配置分散、难以追踪，且破坏了 yaml 作为唯一配置源的约定
+
+---
+
 ## ⚠️ 重要提醒
 
 ### 表不存在错误
@@ -210,8 +230,8 @@ def get_conn(config):
     """从配置文件获取数据库连接"""
     m = config.get('mysql', {})
     return pymysql.connect(
-        host=parse_env(m.get('host', os.environ.get('GIL_MYSQL_HOST', 'localhost'))),
-        port=m.get('port', 3306),
+        host=parse_env(m.get('host', 'localhost')),
+        port=int(m.get('port', 3306)),
         user=parse_env(m.get('user', 'root')),
         password=parse_env(m.get('password', '')),
         database=parse_env(m.get('database', 'gildata')),
@@ -374,13 +394,20 @@ font.sans-serif: Noto Sans CJK SC, SimHei, DejaVu Sans
 axes.unicode_minus: False
 ```
 
-### 5. pandas 频率参数
+### 5. 端口类型错误
+```
+错误: ValueError: port should be of type int
+原因: yaml.safe_load 将带 ${} 占位符的 port 解析为字符串
+解决: get_conn() 中 port=int(m.get('port', 3306))
+```
+
+### 6. pandas 频率参数
 ```
 错误: ValueError: 'M' is no longer supported
 解决: 使用 'ME' 代替 'M'
 ```
 
-### 6. 指数估值查询错误
+### 7. 指数估值查询错误
 ```
 错误: lc_dindicesforvaluation 无指数PE数据
 原因: lc_dindicesforvaluation 是股票估值表，不是指数估值表
@@ -390,14 +417,14 @@ axes.unicode_minus: False
   WHERE IndexCode = (SELECT InnerCode FROM secumain WHERE SecuCode='000300')
 ```
 
-### 7. 股票行情表不存在
+### 8. 股票行情表不存在
 ```
 错误: Table 'gildata.qt_stockquote' doesn't exist
 原因: qt_stockquote 表不存在
 解决: 使用 qt_stockperformance 代替
 ```
 
-### 8. 成分股权重表字段理解
+### 9. 成分股权重表字段理解
 ```
 lc_indexcomponentsweight 表:
 - IndexCode: 是指数的InnerCode，需要先从secumain获取
@@ -405,7 +432,7 @@ lc_indexcomponentsweight 表:
 - 查询最新成分股: WHERE EndDate = (SELECT MAX(EndDate) FROM lc_indexcomponentsweight WHERE IndexCode = ?)
 ```
 
-### 9. 风险指标表字段名
+### 10. 风险指标表字段名
 ```
 Index_RiskAnalysis 表:
 - 值字段: DataValueRM (近1月), DataValueRY (近1年), DataValueRW (近1周)

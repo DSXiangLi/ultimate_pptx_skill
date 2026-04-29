@@ -287,6 +287,9 @@
         "reminders.add",
         "sms.send"
       ]
+    },
+    "reload": {
+      "mode": "hot"
     }
   },
   "skills": {

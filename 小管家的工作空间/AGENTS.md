@@ -214,6 +214,7 @@ The goal: Be helpful without being annoying. Check in a few times a day, do usef
 - 报告、分析文档、脚本等输出文件统一存放于 `~/outputs/`
 - 在 `outputs/README.md` 中记录文件清单
 - 按日期和类型组织子文件夹（如需要）
+- 在回复里告知用户生成文件存放的绝对路径
 
 ## Make It Yours
 

@@ -220,74 +220,8 @@
             "小管家"
           ]
         }
-      },
-      {
-        "id": "industry-analyst",
-        "name": "助理行业研究员",
-        "workspace": "~/助理行业研究员的工作空间",
-        "agentDir": "~/.openclaw/agents/industry-analyst/agent",
-        "fastModeDefault": false,
-        "skills": [
-          "company_onepager",
-          "gildata_search",
-          "minimax-docx",
-          "minimax-pdf",
-          "minimax-xlsx",
-          "th_search",
-          "stock_research_plan",
-          "skill-creator",
-          "self-improvement",
-          "pptx",
-          "volcengine-artist"
-        ],
-        "memorySearch": {
-          "enabled": false
-        },
-        "subagents": {
-          "allowAgents": ["助理行业研究员"]
-        },
-        "tools": {
-          "deny": [
-            "web_search",
-            "web_fetch",
-            "x_search"
-          ]
-        }
-      },
-      {
-        "id": "data-analyst",
-        "name": "数据分析师",
-        "workspace": "~/数据分析师的工作空间",
-        "agentDir": "~/.openclaw/agents/data-analyst/agent",
-        "fastModeDefault": false,
-        "skills": [
-          "company_onepager",
-          "gildata_search",
-          "minimax-docx",
-          "minimax-pdf",
-          "minimax-xlsx",
-          "th_search",
-          "stock_research_plan",
-          "skill-creator",
-          "self-improvement",
-          "pptx",
-          "volcengine-artist"
-        ],
-        "memorySearch": {
-          "enabled": false
-        },
-        "subagents": {
-          "allowAgents": ["数据分析师"]
-        },
-        "tools": {
-          "deny": [
-            "web_search",
-            "web_fetch",
-            "x_search"
-          ]
-        }
       }
-    ]
+    ]  
   },
   "tools": {
     "profile": "full",

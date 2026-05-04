@@ -155,7 +155,7 @@
         "primary": "thai/qwen35-397b-a17b"
       },
       "imageModel": {
-        "primary": "thai/qwen35-397b-a17b"
+        "primary": "thai/qwen36-plus"
       },
       "models": {
         "thai/qwen36-plus": {

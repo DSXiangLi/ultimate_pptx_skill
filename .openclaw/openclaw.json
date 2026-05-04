@@ -41,7 +41,7 @@
         "apiKey": "40aac8112a41840c519669918eb745e0",
         "api": "openai-completions",
         "headers": {
-          "x-caller-app": "openclaw",
+          "x-caller-app": "thinkclaw",
           "x-timeout": "6000"
         },
         "models": [
@@ -128,7 +128,7 @@
             "contextWindow": 128000,
             "maxTokens": 8192
           },
-	  {
+          {
             "id": "qwen35-397b-a17b",
             "name": "Qwen35-397B-A17B",
             "api": "openai-completions",
@@ -173,7 +173,7 @@
         "thai/minimax-m25": {
           "alias": "MiniMax-M25"
         },
-	    "thai/qwen35-397b-a17b": {
+        "thai/qwen35-397b-a17b": {
           "alias": "Qwen35-397B-A17B"
         }
       },
@@ -209,7 +209,6 @@
           "stock_research_plan",
           "skill-creator",
           "self-improvement",
-          "pptx",
           "volcengine-artist"
         ],
         "memorySearch": {
@@ -221,7 +220,7 @@
           ]
         }
       }
-    ]  
+    ]
   },
   "tools": {
     "profile": "full",
@@ -287,6 +286,9 @@
         "reminders.add",
         "sms.send"
       ]
+    },
+    "reload": {
+      "mode": "hot"
     }
   },
   "skills": {
@@ -302,8 +304,6 @@
   "plugins": {
     "deny": [
       "acpx",
-      "bonjour",
-      "browser",
       "device-pair",
       "phone-control",
       "talk-voice"

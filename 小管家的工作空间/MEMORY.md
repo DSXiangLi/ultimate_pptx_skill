@@ -96,3 +96,45 @@ curl -s -X POST "${ARK_BASE_URL}/images/generations" \
 - 使用 `response_format: "b64_json"` 可直接获取base64数据，避免下载链接过期问题
 
 ---
+
+## PPT生成规则
+
+### 技术选型
+
+| 操作 | 工具 |
+|------|------|
+| 创建新 PPT / 复杂排版 | **pptxgenjs** (Node.js) |
+| 读/改文本、提取内容 | python-pptx |
+
+> ⚠️ **绝对不要用 python-pptx 创建新 PPT** — 三次重写全部排版错乱，根因是 EMU 坐标与文本渲染尺寸不可控。换 pptxgenjs 一次通过。
+
+```bash
+# pptxgenjs v4 已全局安装
+NODE_PATH=$(npm root -g) node script.js
+```
+
+### 字体/字号/布局/配色
+
+**每次制作 PPT 前，用 `ui-ux-pro-max` 技能查询设计系统：**
+
+```bash
+python3 ~/skills/ui-ux-pro-max/src/ui-ux-pro-max/scripts/search.py "产品类型/主题" --design-system -p "项目名" -f markdown
+```
+
+根据返回的 Style / Colors / Typography 决定本次的具体设计参数，不要复用上次的配色和字体。
+
+
+### 避坑清单
+
+- ❌ hex 颜色**不带 `#`**：`'FF0000'` ✅，`'#FF0000'` ❌
+- ❌ 不重用 option 对象（pptxgenjs 会原地修改），用工厂函数
+- ❌ 不加 `breakLine: true` 导致多行文本粘连
+- ❌ 在 ROUNDED_RECTANGLE 上叠加 accent 条（边角不齐）
+- ❌ 同一个 slide 放 >3 个图表（视觉噪音）
+- ❌ 标题下画装饰线（AI味太浓，用留白/颜色替代）
+- ❌ 正文居中（左对齐！居中只用于封面/评级页的标题）
+- ❌ 单系列图表保留 legend（`showLegend: false`）
+- ❌ 饼图/环形图不设 `showPercent: true`
+- ❌ 垂直网格线不关（`catGridLine: { style: 'none' }`）
+
+---

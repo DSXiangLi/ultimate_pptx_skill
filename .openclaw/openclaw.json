@@ -304,6 +304,8 @@
   "plugins": {
     "deny": [
       "acpx",
+      "bonjour",
+      "browser",
       "device-pair",
       "phone-control",
       "talk-voice",

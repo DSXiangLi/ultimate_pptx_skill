@@ -177,7 +177,7 @@
           "alias": "Qwen35-397B-A17B"
         }
       },
-      "workspace": "~/小管家的工作空间",
+      "workspace": "~/小弘同学的工作空间",
       "contextTokens": 128000,
       "compaction": {
         "mode": "safeguard",
@@ -196,8 +196,8 @@
     "list": [
       {
         "id": "main",
-        "name": "小管家",
-        "workspace": "~/小管家的工作空间",
+        "name": "小弘同学",
+        "workspace": "~/小弘同学的工作空间",
         "fastModeDefault": false,
         "skills": [
           "company_onepager",
@@ -216,7 +216,7 @@
         },
         "subagents": {
           "allowAgents": [
-            "小管家"
+            "小弘同学"
           ]
         }
       }

@@ -326,6 +326,17 @@
     }
   },
   "plugins": {
+    "entries": {
+      "openclaw-config-guard": {
+        "enabled": true
+      },
+      "openclaw-env-mask": {
+        "enabled": true
+      },
+      "openclaw-pii-filter": {
+        "enabled": true
+      }
+    },
     "deny": [
       "acpx",
       "bonjour",

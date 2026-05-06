@@ -175,7 +175,6 @@
         "primary": "thai/muitimodal"
       },
       "models": {
-
         "thai/default": {
           "alias": "DefaultModel"
         },

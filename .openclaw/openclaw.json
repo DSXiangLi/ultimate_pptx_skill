@@ -18,6 +18,9 @@
     }
   },
   "models": {
+    "pricing": {
+      "enabled": false
+    },
     "providers": {
       "thai": {
         "baseUrl": "http://model-server-http.ai-assistant.svc.cluster.local/v1",
@@ -308,11 +311,18 @@
     }
   },
   "plugins": {
+    "entries": {
+      "openclaw-config-guard": {
+        "enabled": true
+      },
+      "openclaw-env-mask": {
+        "enabled": true
+      },
+      "openclaw-pii-filter": {
+        "enabled": true
+      }
+    },
     "deny": [
-      "acpx",
-      "device-pair",
-      "phone-control",
-      "talk-voice"
     ]
   }
 }

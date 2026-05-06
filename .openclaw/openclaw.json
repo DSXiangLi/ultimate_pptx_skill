@@ -338,36 +338,6 @@
       }
     },
     "deny": [
-      "acpx",
-      "bonjour",
-      "browser",
-      "device-pair",
-      "phone-control",
-      "talk-voice",
-      "qqbot",
-      "discord",
-      "telegram",
-      "slack",
-      "whatsapp",
-      "signal",
-      "msteams",
-      "matrix",
-      "irc",
-      "feishu",
-      "line",
-      "nostr",
-      "twitch",
-      "googlechat",
-      "mattermost",
-      "nextcloud-talk",
-      "synology-chat",
-      "tlon",
-      "zalo",
-      "zalouser",
-      "imessage",
-      "bluebubbles",
-      "voice-call",
-      "xiaomi"
     ]
   }
 }

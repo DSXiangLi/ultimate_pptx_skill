@@ -138,3 +138,23 @@ python3 ~/skills/ui-ux-pro-max/src/ui-ux-pro-max/scripts/search.py "产品类型
 - ❌ 垂直网格线不关（`catGridLine: { style: 'none' }`）
 
 ---
+
+## 文档与图表生成规则
+
+### 中文字体检查（必做）
+
+生成图表、PDF、Word 文档时，**必须先检查系统中可用的中文字体**，使用对应字体避免乱码。
+
+**检查命令：**
+```bash
+fc-list :lang=zh
+```
+
+**Python 使用示例：**
+```python
+from PIL import ImageFont
+# 图表使用无衬线字体
+font = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc", 16)
+```
+
+---

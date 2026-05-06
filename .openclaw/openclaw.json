@@ -3,23 +3,6 @@
     "lastTouchedVersion": "2026.3.24",
     "lastTouchedAt": "2026-04-16T08:57:33.690Z"
   },
-  "env": {
-    "vars": {
-      "GIL_ES_HOST": "http://es-cn-rno47k9y60019w4x9.elasticsearch.aliyuncs.com:9200",
-      "GIL_ES_INDEX": "gil_index_v2_fast",
-      "GIL_ES_USERNAME": "elastic",
-      "GIL_ES_PASSWORD": "ela#test000",
-      "GIL_EMBEDDING_URL": "http://bge-m3-docsearch.ai-assistant.svc.cluster.local/get_embedding",
-      "GIL_MYSQL_HOST": "10.65.69.253",
-      "GIL_MYSQL_USER": "ro_ciawind_yanjiuzu@tn_pro_ciawind#cl_p_ob4_sj",
-      "GIL_MYSQL_PASSWORD": "Ro_Ci09a_Y6jz",
-      "GIL_MYSQL_DATABASE": "gildata",
-      "TH_DOCSEARCH_URL": "http://docsearch.ai-assistant.svc.cluster.local/smart_search",
-      "TH_MCP_BASE_URL": "http://batch-search-mcp.ai-assistant.svc.cluster.local",
-      "ARK_BASE_URL": "https://ark.cn-beijing.volces.com/api/v3",
-      "ARK_API_KEY": "2a5aace8-db28-4a6a-a4b2-3c053d3dc542"
-    }
-  },
   "wizard": {
     "lastRunAt": "2026-03-31T07:30:44.093Z",
     "lastRunVersion": "2026.3.23-2",
@@ -48,6 +31,23 @@
           {
             "id": "default",
             "name": "DefaultModel",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "muitimodal",
+            "name": "Muitimodal",
             "reasoning": false,
             "input": [
               "text",
@@ -172,29 +172,15 @@
         "primary": "thai/default"
       },
       "imageModel": {
-        "primary": "thai/qwen36-plus"
+        "primary": "thai/muitimodal"
       },
       "models": {
-        "thai/qwen36-plus": {
-          "alias": "Qwen36-Plus"
-        },
-        "thai/kimi-k25": {
-          "alias": "Kimi"
-        },
-        "thai/glm-5": {
-          "alias": "GLM-5"
-        },
-        "thai/qwen3-max": {
-          "alias": "Qwen3-Max"
-        },
-        "thai/minimax-m25": {
-          "alias": "MiniMax-M25"
-        },
-        "thai/qwen35-397b-a17b": {
-          "alias": "Qwen35-397B-A17B"
-        },
+
         "thai/default": {
           "alias": "DefaultModel"
+        },
+        "thai/muitimodal": {
+          "alias": "Muitimodal"
         }
       },
       "workspace": "~/小弘同学的工作空间",

@@ -35,6 +35,9 @@
     }
   },
   "models": {
+    "pricing": {
+      "enabled": false
+    },
     "providers": {
       "thai": {
         "baseUrl": "http://model-server-http.ai-assistant.svc.cluster.local/v1",

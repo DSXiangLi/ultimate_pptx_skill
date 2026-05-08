@@ -299,6 +299,11 @@
     }
   },
   "plugins": {
+	"allow": [
+      "openclaw-config-guard",
+      "openclaw-env-mask",
+      "openclaw-pii-filter"
+    ],
     "entries": {
       "openclaw-config-guard": {
         "enabled": true

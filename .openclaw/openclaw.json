@@ -207,19 +207,7 @@
         "name": "小弘同学",
         "workspace": "~/小弘同学的工作空间",
         "fastModeDefault": false,
-        "skills": [
-          "company_onepager",
-          "gildata_search",
-          "minimax-docx",
-          "minimax-pdf",
-          "minimax-xlsx",
-          "th_search",
-          "stock_research_plan",
-          "skill-creator",
-          "self-improvement",
-          "volcengine-artist",
-          "ui-ux-pro-max"
-        ],
+        "skills": [],
         "memorySearch": {
           "enabled": false
         },

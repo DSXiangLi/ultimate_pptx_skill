@@ -217,8 +217,9 @@
         "workspace": "~/小弘同学的工作空间",
         "fastModeDefault": false,
         "skills": [],
-        "memorySearch": {
-          "enabled": false
+        "identity": {
+          "name": "小弘同学",
+          "avatar": "./avatar.jpg"
         },
         "subagents": {
           "allowAgents": [

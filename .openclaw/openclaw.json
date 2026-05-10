@@ -199,7 +199,16 @@
       },
       "thinkingDefault": "low",
       "verboseDefault": "off",
-      "timeoutSeconds": 3600
+      "timeoutSeconds": 3600,
+      "memorySearch": {
+        "enabled": true,
+        "provider": "openai",
+        "model": "bge-m3-v2",
+        "remote": {
+          "baseUrl": "http://algoplatform.thfund.work/assistant/model-server-http/v1",
+          "apiKey": "40aac8112a41840c519669918eb745e0"
+        }
+      }
     },
     "list": [
       {

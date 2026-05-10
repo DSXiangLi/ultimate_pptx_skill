@@ -208,6 +208,9 @@
           "baseUrl": "http://algoplatform.thfund.work/assistant/model-server-http/v1",
           "apiKey": "40aac8112a41840c519669918eb745e0"
         }
+      },
+      "heartbeat": {
+        "every": "8h"
       }
     },
     "list": [

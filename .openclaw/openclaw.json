@@ -45,7 +45,7 @@
               "cacheRead": 0,
               "cacheWrite": 0
             },
-            "contextWindow": 128000,
+            "contextWindow": 118000,
             "maxTokens": 8192
           },
           {
@@ -62,7 +62,7 @@
               "cacheRead": 0,
               "cacheWrite": 0
             },
-            "contextWindow": 128000,
+            "contextWindow": 118000,
             "maxTokens": 8192
           },
           {
@@ -186,7 +186,7 @@
         }
       },
       "workspace": "~/小弘同学的工作空间",
-      "contextTokens": 128000,
+      "contextTokens": 118000,
       "compaction": {
         "mode": "safeguard",
         "reserveTokens": 4096,

@@ -64,106 +64,6 @@
             },
             "contextWindow": 118000,
             "maxTokens": 8192
-          },
-          {
-            "id": "qwen36-plus",
-            "name": "Qwen36-Plus",
-            "reasoning": false,
-            "input": [
-              "text",
-              "image"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "kimi-k25",
-            "name": "Kimi",
-            "reasoning": false,
-            "input": [
-              "text",
-              "image"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "glm-5",
-            "name": "GLM-5",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "qwen3-max",
-            "name": "Qwen3-Max",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "minimax-m25",
-            "name": "MiniMax-M25",
-            "reasoning": false,
-            "input": [
-              "text",
-              "image"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "qwen35-397b-a17b",
-            "name": "Qwen35-397B-A17B",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
           }
         ]
       }
@@ -254,7 +154,18 @@
     "ownerDisplay": "raw"
   },
   "session": {
-    "dmScope": "per-channel-peer"
+    "dmScope": "per-channel-peer",
+    "reset": {
+      "mode": "idle",
+      "idleMinutes": 2880
+    },
+    "maintenance": {
+      "mode": "enforce",
+      "pruneAfter": "90d",
+      "maxEntries": 500,
+      "maxDiskBytes": "2gb",
+      "resetArchiveRetention": "90d"
+     }
   },
   "gateway": {
     "port": 18789,
@@ -312,10 +223,11 @@
     }
   },
   "plugins": {
-	"allow": [
+    "allow": [
       "openclaw-config-guard",
       "openclaw-env-mask",
-      "openclaw-pii-filter"
+      "openclaw-pii-filter",
+      "memory-core"
     ],
     "entries": {
       "openclaw-config-guard": {

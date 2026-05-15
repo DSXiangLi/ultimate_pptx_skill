@@ -378,7 +378,7 @@ ${adjustedDeptPrompt}
  * 调整体系标题
  */
 function adjustSystemTitle(text) {
-  return text.replace(/^## 体系\(pdept\)和团队\(dept\)/gm, '## 数据查询权限体系\(pdept\)和团队\(dt\)');
+  return text.replace(/^## 体系\(pdept\)和团队\(dept\)/gm, '## 数据查询权限体系\(pdept\)和团队\(dept\)');
 }
 
 module.exports = async function(event) {

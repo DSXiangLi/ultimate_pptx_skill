@@ -110,8 +110,13 @@
         }
       },
       "heartbeat": {
-        "every": "8h"
-      }
+        "every": "24h",
+        "activeHours": {
+          "start": "00:00",
+          "end": "08:00",        
+          "timezone": "Asia/Shanghai"
+        }
+      }     
     },
     "list": [
       {

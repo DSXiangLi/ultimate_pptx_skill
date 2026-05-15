@@ -227,6 +227,16 @@
       "nodeManager": "npm"
     }
   },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "mars-fund-context-injector": {
+          "enabled": true
+        }
+      }
+    }
+  },
   "plugins": {
     "allow": [
       "openclaw-config-guard",

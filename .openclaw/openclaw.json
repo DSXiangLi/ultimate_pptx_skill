@@ -17,6 +17,14 @@
       }
     }
   },
+  "messages": {
+    "queue": {
+      "mode": "interrupt",
+      "debounceMs": 0,
+      "cap": 1,
+      "drop": "new"
+    }
+  },
   "models": {
     "pricing": {
       "enabled": false

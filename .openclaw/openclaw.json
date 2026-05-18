@@ -80,16 +80,16 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "thai/default"
+        "primary": "thai/thinkclaw-default"
       },
       "imageModel": {
-        "primary": "thai/muitimodal"
+        "primary": "thai/thinkclaw-muitimodal"
       },
       "models": {
-        "thai/default": {
+        "thai/thinkclaw-default": {
           "alias": "DefaultModel"
         },
-        "thai/muitimodal": {
+        "thai/thinkclaw-muitimodal": {
           "alias": "Muitimodal"
         }
       },
@@ -121,10 +121,10 @@
         "every": "24h",
         "activeHours": {
           "start": "00:00",
-          "end": "08:00",        
+          "end": "08:00",
           "timezone": "Asia/Shanghai"
         }
-      }     
+      }
     },
     "list": [
       {
@@ -178,7 +178,7 @@
       "maxEntries": 500,
       "maxDiskBytes": "2gb",
       "resetArchiveRetention": "90d"
-     }
+    }
   },
   "gateway": {
     "port": 18789,
@@ -263,7 +263,6 @@
         "enabled": true
       }
     },
-    "deny": [
-    ]
+    "deny": []
   }
 }

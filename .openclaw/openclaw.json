@@ -40,7 +40,7 @@
         },
         "models": [
           {
-            "id": "default",
+            "id": "thinkclaw-default",
             "name": "DefaultModel",
             "reasoning": false,
             "input": [
@@ -57,7 +57,7 @@
             "maxTokens": 8192
           },
           {
-            "id": "muitimodal",
+            "id": "thinkclaw-muitimodal",
             "name": "Muitimodal",
             "reasoning": false,
             "input": [

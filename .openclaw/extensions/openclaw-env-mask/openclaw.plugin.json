@@ -1,0 +1,16 @@
+{
+  "id": "openclaw-env-mask",
+  "name": "Env Mask",
+  "description": "Redact API keys, Bearer tokens, passwords, and other technical credentials from messages before sending to LLM",
+  "enabledByDefault": true,
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      }
+    }
+  }
+}

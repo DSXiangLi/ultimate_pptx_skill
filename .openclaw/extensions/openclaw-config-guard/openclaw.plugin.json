@@ -1,0 +1,21 @@
+{
+  "id": "openclaw-config-guard",
+  "name": "Config Guard",
+  "description": "Block LLM tools from reading sensitive config files like ~/.openclaw/openclaw.json, ~/.ssh, .env, etc.",
+  "enabledByDefault": true,
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "extraPaths": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Additional sensitive paths to block (e.g. ['~/my-secrets', '/etc/ssl'])"
+      }
+    }
+  }
+}

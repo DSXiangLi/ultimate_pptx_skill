@@ -1,0 +1,15 @@
+{
+  "name": "@openclaw/config-guard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Block LLM tools from reading sensitive config files",
+  "type": "module",
+  "devDependencies": {
+    "@openclaw/plugin-sdk": "workspace:*"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

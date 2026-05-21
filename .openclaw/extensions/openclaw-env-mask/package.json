@@ -1,0 +1,15 @@
+{
+  "name": "@openclaw/env-mask",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Redact API keys, tokens, passwords from messages",
+  "type": "module",
+  "devDependencies": {
+    "@openclaw/plugin-sdk": "workspace:*"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

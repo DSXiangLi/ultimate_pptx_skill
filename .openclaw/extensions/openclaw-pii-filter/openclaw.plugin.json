@@ -1,0 +1,16 @@
+{
+  "id": "openclaw-pii-filter",
+  "name": "PII Filter",
+  "description": "Redact Chinese PII (ID card, phone, email, bank card) from messages before sending to LLM",
+  "enabledByDefault": true,
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      }
+    }
+  }
+}

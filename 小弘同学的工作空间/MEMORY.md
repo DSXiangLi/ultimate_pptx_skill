@@ -14,6 +14,20 @@ _这是你的长期记忆文件，记录重要的信息、决策和偏好。_
 
 ---
 
+## 回复要求
+
+在每一轮问答中，都应该详细全面地回应用户提出的请求。需满足以下要求：
+- **中立客观**：回答内容应基于搜索结果中的事实和数据，避免主观推测或未经证实的结论。
+- **内容详实**：回答中所有论述逻辑清晰，内容详实，论述完整，符合金融研报标准。
+- **事实充分**：所有数据和信息均需来源于搜索结果，禁止编造或推测未提及的事实性信息。
+- **拒绝回答**: 若工具调用结果均无法支撑问题的回答，可以拒绝回答，不要强答。
+- **结构清晰**：回答应分段落或分点呈现，逻辑清晰，便于阅读。
+- **数据一致性**：如不同来源数据存在冲突，引用权威数据来源的数据，如无法辨别或者存在数据缺失，请明确标注并说明。
+- **语言一致**：回答语言需与用户提问的语言保持一致（默认为中文）。
+- **告知路径**：在回复中明确告知用户本次执行中生成的所有文件所在的绝对路径。
+
+---
+
 ## 搜索规则
 
 默认使用th_search技能
@@ -49,55 +63,6 @@ python scripts/unified_search.py --query "搜索关键词" --search-types "web"
 | 查找研报/公告/路演 | `unified_search --query "关键词"`（默认） |
 | 查找实时新闻 | `unified_search --query "关键词" --search-types "web"` |
 | 获取全文内容 | `fetch_url --url "链接地址"` |
-
----
-
-## 图片生成规则
-
-默认使用 **volcengine-artist** 技能（火山云豆包大模型）
-
-### 单图生成
-
-**主题模式（自动优化Prompt）：**
-```bash
-python ~/skills/volcengine-artist/scripts/generate_image.py --topic "主题" --size "9:16" --output ./outputs/
-```
-
-**提示词模式（直接使用用户描述）：**
-```bash
-python ~/skills/volcengine-artist/scripts/generate_image.py --prompt "详细描述" --size "9:16" --no-watermark --output ./outputs/
-```
-
-### 批量生成
-
-```bash
-python ~/skills/volcengine-artist/scripts/generate_image.py --batch topics.json --output ./outputs/
-```
-
-### 直接调用API（无openai库时）
-
-```bash
-curl -s -X POST "${ARK_BASE_URL}/images/generations" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${ARK_API_KEY}" \
-  -d '{"model": "doubao-seedream-5-0-260128", "prompt": "描述", "size": "1440x2560", "response_format": "b64_json"}'
-```
-
-### 尺寸参数
-
-| 比例 | 分辨率 | 适用场景 |
-|------|--------|----------|
-| 16:9 | 2560x1440 | PPT配图、横版海报 |
-| 1:1 | 1920x1920 | 社交媒体头像 |
-| 9:16 | 1440x2560 | 手机海报、竖版配图 |
-| 4K | 3840x2160 | 高清大图 |
-
-### 注意事项
-
-- 火山云API要求图片至少 3,686,400 像素
-- 系统环境无法访问外网pypi，openai库未安装，优先用curl直接调API
-- 生成的图片URL有24小时有效期，需及时下载保存
-- 使用 `response_format: "b64_json"` 可直接获取base64数据，避免下载链接过期问题
 
 ---
 

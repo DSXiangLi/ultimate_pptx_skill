@@ -42,7 +42,7 @@
 | BODY·parallel/contrast（N6/N5） | 浅豆卡片网格/左右分场（两半各用一明度层级区分） | 卡正文 40-80 字 |
 | VOICE | 下中浅豆区 25-30% 宽，左 3-4 豆宽 info 竖条 | kicker 7pt；引文 8-9pt 行距 1.6，**80-120 字**；emphasis warning 色；署名 6-7pt |
 | LIST | 底横条浅豆区，1 豆竖线分隔 | header 8pt Bold；name 7pt；tag 8-9pt Mono info 色；status 5×5 豆箭头；note 6pt |
-| 图例（本风格特有，建议保留） | 左下浅豆区，渲染真实 3×3 豆样本+标签 | 题 7pt Bold 标签 6pt |
+| 图例（本风格内部参考，**不出现在最终绘图指令中**） | 左下浅豆区，渲染真实 3×3 豆样本+标签 | 题 7pt Bold 标签 6pt |
 | CAUTION | 页脚上方独立行，前置 3×3 warning 豆块 | 6-7pt；**周边禁止装饰豆侵入** |
 | META | 最底 2-3% 浅豆条 | 6pt #505050 |
 

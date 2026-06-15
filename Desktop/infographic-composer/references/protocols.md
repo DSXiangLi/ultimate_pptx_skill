@@ -89,3 +89,87 @@ character_card:
 来源：<日期>，<内容领域>项目沉淀
 ```
 归档时将领域专有数值泛化为 `<HERO数值>`、`<POINTS[01]概念>` 等占位符，使卡片可跨领域复用。
+
+---
+
+## §5 排版力量协议（magazine-editorial 使用；无场景隐喻时的视觉冲击来源）
+
+当视觉冲击**不来自插画/隐喻，而来自版式张力本身**时使用本协议。magazine-editorial 是天然载体，其他 style 在 N2/N3 模式下也可借用。
+
+### 三个核心张力轴
+1. **字号跨度**：同一版面最小字（6pt 页脚）与最大字（超大 Display 标题）≥8× 差距。填写字号规划表：
+   - hero_size: （数据展示，如 120pt）
+   - headline_size: （封面大标题，如 60-80pt）
+   - section_size: （栏标签，如 14pt 全大写）
+   - body_size: （正文，如 10pt）
+   - caption_size: （标注/页脚，如 6-7pt）
+2. **字重对比**：同族字体 font-weight 100（极细）与 900（极粗）并置；或衬线细笔画与无衬线粗黑并置。明确写出哪两处字重对比是视觉锚点。
+3. **留白比例**：明确规划负空间——某列/某区域的**留白面积**（不是剩余面积，是主动设计的呼吸带），写出"XX 区域留白率约 Y%"。留白率 <30% 的版面须在 must_avoid 中标注"禁止再加任何装饰"。
+
+### 产出字段（magazine-editorial 的"隐喻卡"替代品）
+```yaml
+typography_impact_card:
+  font_size_plan:
+    hero: Xpt    headline: Xpt    section: Xpt    body: Xpt    caption: Xpt
+  weight_contrast_anchors: ["<处1，如'标题 font-weight 100 极细衬线'>", "<处2>"]
+  whitespace_plan: ["<区域> 留白率约 X%", ...]
+  asymmetry_rule: # 打破对称的具体方式（如"正文栏占宽 60%，右侧 40% 全部留白"）
+  accent_discipline: # accent 色的唯一用途声明（如"仅用于数据数字与金属细分隔线"）
+  must_avoid: ["不得填满每个栏位", "不得用插画填补留白（留白就是设计）", ...]
+```
+
+---
+
+## §6 UI 隐喻协议（pixel-game 使用；界面即叙事容器）
+
+当内容装入一个**虚构界面系统**（游戏/终端/操作系统/仪表盘）时使用。界面的 UI 元数据（血量条/对话框/物品栏）本身承担信息结构，而非单纯装饰。
+
+### UI 系统选择（为当次内容推理，不从库中硬套）
+推理步骤：
+1. 内容性质 → 匹配界面类型：解读/分析→RPG任务日志或指挥控制台；陪伴→聊天界面或信件系统；投教→教程关卡或图鉴系统；宣传→商店/展示厅界面
+2. 受众气质 → 选 UI 年代感：怀旧向→FC/Game Boy（16色，5px字）；现代向→像素 indie（32色，流畅像素）；赛博向→终端黑屏绿字
+
+### 契约概念 → UI 元件映射（必须填满）
+```yaml
+ui_metaphor_card:
+  system_name: # 虚构界面名，如"MARKET_OS v2.42" / "基金图鉴" / "投资副本"
+  ui_era: fc_8bit | indie_16bit | cyberpunk_terminal  
+  interface_type: # 具体界面类型（RPG对话/物品栏/任务日志/商店/HUD）
+  concept_to_ui_mapping:
+    - concept: <TITLE>              ui_element: 游戏窗口标题栏（带最小化/关闭像素按钮）
+    - concept: <DATA>               ui_element: RPG属性条（████░░ XX%格式）or 数字跳动框
+    - concept: <BODY节点×N>         ui_element: 任务日志条目/NPC对话框/物品说明框/商店条目
+    - concept: <VOICE>              ui_element: NPC 头像框（32×32 像素）+ 对话框（三角指向）
+    - concept: <LIST>               ui_element: 物品栏格子（3×N 网格，稀有度彩色边框）
+    - concept: <CAUTION>            ui_element: 系统警告框（红色边框闪烁）或滚动公告栏
+    - concept: <META>               ui_element: 底部系统消息框（半透明黑底+小号像素字）
+  ui_chrome_elements: # 纯装饰性 UI 元件（不承载内容）
+    - 公告滚动栏（header 下）
+    - CRT 扫描线纹理覆盖（10% 透明度）
+    - 像素光标图标（在关键位置）
+    - 像素分隔线（分节用，3 种图案选一）
+  must_avoid: ["不得让 UI 框架喧宾夺主（装饰面积 ≤ 30%）", "中文必须用点阵字体（不得模糊）", ...]
+```
+
+---
+
+## §7 光效协议（blueprint-system 使用；光效是工艺约束的一部分）
+
+当风格的视觉冲击来自**发光/光效本身**（而非色彩、插画或版式）时，光效必须系统化规划，否则全画面发光 = 没有发光。
+
+### 光效层级（必须明确）
+```yaml
+glow_hierarchy_card:
+  level_1_hero_glow:  # 最强：HERO 数值/中心主体，outer glow 6-10px blur 15px opacity 90%
+  level_2_structure_glow:  # 中强：结构线/框架，outer glow 3-5px blur 10px opacity 70%
+  level_3_label_glow:  # 弱：标注线/次要文字，outer glow 1-2px blur 5px opacity 40%
+  level_4_ambient:  # 极弱：背景网格，无发光，只靠颜色与背景区分
+  glow_color_per_element: # 哪个内容层用哪个发光色（从 palette 的 extras.glow 取）
+  must_avoid: ["全画面等强度发光（视觉噪声）", "发光色超过3种（palette extras.glow 约束）", "发光盖过文字可读性"]
+```
+
+### 光效辅助元素（blueprint 特有）
+- 背景网格：主网格 50px opacity 20%，细网格 10px opacity 8%（**不发光，靠微弱颜色区分**）
+- 测量刻度：画面边缘标尺（顶/左），刻度线 0.5px，数字 6pt；比例参考 scale bar
+- 坐标标注：callout 细线 0.5px + 箭头，指向场景关键节点，文字 6-7pt 等宽
+- 等轴测剖面（causal 拓扑专用）：30° 等轴测投影，层间距均等，每层半透明填充 10-20%，边缘 structure_glow

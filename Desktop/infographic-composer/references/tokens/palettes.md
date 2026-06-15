@@ -57,3 +57,43 @@ classical-oil 专属，递减彩度体系（米白紫灰底→焦棕黑字→古
 2. 自查：text_primary 在 base 与 surface 上对比度充分；accent 与 warning 可区分
 3. 注明适配 nature 与适配 style（须通过目标 style 的准入规则）
 4. 命名 P13 起递增，存入本文件
+
+### P13 editorial-luxury（杂志奢华）— nature: any / 高端向
+base #FFFFFF | surface #FFFFFF | text_primary #000000 / text_secondary #6B6B6B | primary #000000 | secondary #722F37 | accent #D4AF37 | accent_alt #D4AF37 | warning #722F37 | line #000000
+extras.metallic: 香槟金#D4AF37 / 银#C0C0C0 / 玫瑰金#B76E79（三选一，同版只用一种）
+extras.rules: base=大量留白承载；字号跨度≥8×（最小/最大）；accent仅用于数字与金属线
+
+### P14 editorial-minimal（杂志极简）— nature: steady/complex
+base #F8F8F5 | surface #F8F8F5 | text_primary #2C2C2C / text_secondary #7A7A7A | primary #2C2C2C | secondary #A45A52 | accent #6B705C | accent_alt #A45A52 | warning #A45A52 | line #2C2C2C
+extras.rules: 同 P13 字号跨度规则；accent 仅装饰线与引文
+
+### P15 editorial-avant（杂志先锋）— nature: complex/突破
+base #FAFAFA | surface #FAFAFA | text_primary #1A1D2E / text_secondary #6B6B8A | primary #1A1D2E | secondary #FF006E | accent #00D9FF | accent_alt #FF006E | warning #FF006E | line #1A1D2E
+extras.rules: 仅 avant 氛围允许 accent+accent_alt 双色同时出现；文字才是主视觉
+
+### P16 pixel-retro（像素复古）— nature: positive/steady
+base #E8DCD0 | surface #3B2D1F | text_primary #E8DCD0 / text_secondary #A09080 | primary #3B2D1F | secondary #1A1423 | accent #E63946 | accent_alt #06FFA5 | warning #E63946 | line #3B2D1F
+extras.crt_scanline: 深色横线 10% 透明度覆盖全画面；色数上限 32 色
+
+### P17 pixel-cyber（像素赛博）— nature: complex/adverse
+base #0D0D1E | surface #1A1030 | text_primary #00FFFF / text_secondary #FF00FF | primary #00FFFF | secondary #FF00FF | accent #FFFF00 | accent_alt #FF00FF | warning #FF0000 | line #00FFFF
+extras.crt_scanline: 同 P16；neon_glow: 文字与线条带 4-6px 外发光
+
+### P18 pixel-pastel（像素马卡龙）— nature: positive/投教
+base #FFF8E7 | surface #3D2E4F | text_primary #FFF8E7 / text_secondary #C8A8C8 | primary #5C4A72 | secondary #3D2E4F | accent #F4A261 | accent_alt #8BD3DD | warning #E63946 | line #5C4A72
+
+### P19 blueprint-dark（蓝图暗色发光）— nature: complex/causal
+base #0D1117 | surface #1A1F2E@80% | text_primary #F0F0F0 / text_secondary #9CA3AF | primary #00D9FF | secondary #A78BFA | accent #FFD700 | accent_alt #39FF14 | warning #FF3B30 | line #1F2937
+extras.glow: 结构线外发光 3-5px blur 10px opacity 70%；grid: 50px主/10px细 opacity 20%/8%
+
+### P20 blueprint-classic（蓝图经典）— nature: complex/causal
+base #003A70 | surface #00508C@80% | text_primary #FFFFFF / text_secondary #B0E0E6 | primary #FFFFFF | secondary #00CED1 | accent #FFEB3B | accent_alt #00CED1 | warning #FF6B35 | line #FFFFFF
+extras.grid: 同 P19 比例，白线
+
+### P21 blueprint-light（蓝图浅色）— nature: complex/steady
+base #F5F5F5 | surface #FFFFFF | text_primary #2C2C2C / text_secondary #7F8C8D | primary #2C3E50 | secondary #3498DB | accent #E67E22 | accent_alt #3498DB | warning #E74C3C | line #CCCCCC
+extras.grid: 同 P19，灰线
+
+### P22 blueprint-cyber（蓝图赛博）— nature: complex/adverse
+base #0A0E1A | surface #1A1533@80% | text_primary #E0E7FF / text_secondary #A78BFA | primary #A78BFA | secondary #00FFFF | accent #FF006E | accent_alt #39FF14 | warning #FF006E | line #1E1B3C
+extras.glow: 多色叠加外发光；grid: 同 P19

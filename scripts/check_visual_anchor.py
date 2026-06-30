@@ -11,6 +11,32 @@ import argparse
 import json
 import sys
 
+
+
+EXPECTED_VARIANT_GRAMMAR = {
+    "sober-committee": {
+        "motif": "strict-grid",
+        "panel_material": "matte-glass",
+        "metric_style": "formal-compact",
+        "risk_rail_treatment": "committee-footer",
+        "required_roles": {"committee-gridline", "committee-ruler"},
+    },
+    "luminous-strategy": {
+        "motif": "spotlight-orb",
+        "panel_material": "luminous-glass",
+        "metric_style": "hero-kpi",
+        "risk_rail_treatment": "presentation-footer",
+        "required_roles": {"luminous-ribbon", "spotlight-orb"},
+    },
+    "dense-risk-review": {
+        "motif": "terminal-grid",
+        "panel_material": "dense-cockpit",
+        "metric_style": "status-chip",
+        "risk_rail_treatment": "monitoring-status-bar",
+        "required_roles": {"terminal-gridline", "status-chip"},
+    },
+}
+
 DNA_ROLE_EVIDENCE = {
     "dark institutional finance surface": {"background"},
     "translucent glass panels": {"glass-panel", "metric-card", "risk-rail"},
@@ -51,6 +77,32 @@ def check_anchor_schema(anchor_doc):
         issues.append(issue("WEAK_MUTABLE_COORDINATES", "Anchor needs at least three mutable coordinates."))
     if len(anchor.get("mutation_operators", [])) < 3:
         issues.append(issue("WEAK_MUTATION_OPERATORS", "Anchor needs at least three mutation operators."))
+    return issues
+
+
+
+def check_variant_grammar(deck, roles):
+    issues = []
+    variant = deck.get("visual_variant")
+    if not variant or variant == "default":
+        return issues
+    expected = EXPECTED_VARIANT_GRAMMAR.get(variant)
+    grammar = deck.get("visual_grammar") or {}
+    if not expected:
+        if not grammar:
+            issues.append(issue("WEAK_COORDINATE_REALIZATION", f"Variant {variant!r} declares a visual variant but no visual_grammar."))
+        return issues
+    for key in ["motif", "panel_material", "metric_style", "risk_rail_treatment"]:
+        if grammar.get(key) != expected[key]:
+            issues.append(issue("WEAK_COORDINATE_REALIZATION", f"Variant {variant} visual_grammar.{key}={grammar.get(key)!r}; expected {expected[key]!r}."))
+    missing = sorted(expected["required_roles"] - roles)
+    if missing:
+        issues.append(issue("COMPONENT_GRAMMAR_UNCHANGED", f"Variant {variant} missing variant-specific visible roles: {', '.join(missing)}."))
+    # Decorative-only changes are not enough: each controlled variant must alter
+    # at least one content-bearing component role, not just background glow.
+    content_variant_roles = roles & {"status-chip", "luminous-ribbon", "committee-ruler"}
+    if not content_variant_roles:
+        issues.append(issue("VISUAL_VARIANT_DISTANCE_TOO_LOW", f"Variant {variant} lacks visible grammar roles beyond generic glass objects."))
     return issues
 
 
@@ -95,6 +147,7 @@ def check_ir(anchor, ir):
         issues.append(issue("TEMPLATE_SMELL", "Slide role signatures are too repetitive for an anchor family."))
     if not ({"native", "native-vector-group"} <= render_policies or "native-vector-group" in render_policies):
         issues.append(issue("WEAK_MATERIAL_POLICY", "IR should include native and/or editable vector-group material evidence."))
+    issues.extend(check_variant_grammar(deck, roles))
     return issues
 
 

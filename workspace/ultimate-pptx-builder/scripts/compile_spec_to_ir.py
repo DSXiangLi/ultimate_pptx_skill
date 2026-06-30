@@ -21,7 +21,7 @@ VARIANT_PROFILES = {
             "motif": "orb",
             "panel_material": "balanced-glass",
             "metric_style": "standard-kpi",
-            "risk_rail_treatment": "standard-footer",
+            "footer_treatment": "standard-footer",
             "layout_rhythm": "balanced-dashboard",
             "chart_treatment": "balanced-vector",
         },
@@ -41,17 +41,17 @@ VARIANT_PROFILES = {
         "extra_grid": False,
         "gold_orb": False,
     },
-    "sober-committee": {
-        "name": "sober-committee",
+    "matte-institutional": {
+        "name": "matte-institutional",
         "visual_grammar": {
             "motif": "strict-grid",
             "panel_material": "matte-glass",
             "metric_style": "formal-compact",
-            "risk_rail_treatment": "committee-footer",
+            "footer_treatment": "formal-source-band",
             "layout_rhythm": "strict-institutional-grid",
             "chart_treatment": "subdued-grid-vector",
         },
-        "palette": {"background": "06101A", "panel": "101D2B", "panel_alt": "142334", "stroke": "6EC6E8", "stroke_soft": "34546A", "accent": "64748B", "warning": "D6A94D", "muted": "B8C2CC"},
+        "palette": {"background": "08111A", "panel": "111B25", "panel_alt": "151F2B", "stroke": "83B7CC", "stroke_soft": "2E4758", "accent": "5F6F80", "warning": "B9964B", "muted": "B8C2CC", "text": "E6EEF5"},
         "orb_cyan": {"x": 928, "y": -42, "w": 260, "h": 260, "opacity": 0.055, "role": "decorative-glow"},
         "orb_violet": {"x": -72, "y": 482, "w": 220, "h": 220, "opacity": 0.035, "role": "decorative-glow"},
         "ghost_opacity": 0.010,
@@ -67,13 +67,13 @@ VARIANT_PROFILES = {
         "extra_grid": True,
         "gold_orb": False,
     },
-    "luminous-strategy": {
-        "name": "luminous-strategy",
+    "luminous-glass": {
+        "name": "luminous-glass",
         "visual_grammar": {
             "motif": "spotlight-orb",
             "panel_material": "luminous-glass",
             "metric_style": "hero-kpi",
-            "risk_rail_treatment": "presentation-footer",
+            "footer_treatment": "presentation-source-band",
             "layout_rhythm": "asymmetric-presentation-flow",
             "chart_treatment": "spotlight-chart-vector",
         },
@@ -93,19 +93,19 @@ VARIANT_PROFILES = {
         "extra_grid": False,
         "gold_orb": True,
     },
-    "dense-risk-review": {
-        "name": "dense-risk-review",
+    "terminal-cockpit": {
+        "name": "terminal-cockpit",
         "visual_grammar": {
             "motif": "terminal-grid",
             "panel_material": "dense-cockpit",
             "metric_style": "status-chip",
-            "risk_rail_treatment": "monitoring-status-bar",
-            "layout_rhythm": "dense-risk-cockpit",
+            "footer_treatment": "monitoring-status-bar",
+            "layout_rhythm": "dense-operational-cockpit",
             "chart_treatment": "monitoring-grid-vector",
         },
-        "palette": {"background": "050D15", "panel": "0D1A27", "panel_alt": "102538", "stroke": "38BDF8", "stroke_soft": "1D4E63", "accent": "22C55E", "warning": "F59E0B", "positive": "10B981", "muted": "A7B6C5"},
-        "orb_cyan": {"x": 980, "y": -26, "w": 230, "h": 230, "opacity": 0.08, "role": "decorative-glow"},
-        "orb_violet": {"x": -48, "y": 492, "w": 210, "h": 210, "opacity": 0.055, "role": "decorative-glow"},
+        "palette": {"background": "020806", "panel": "07130F", "panel_alt": "0A1C16", "stroke": "22D3A6", "stroke_soft": "13543F", "accent": "7DD3FC", "warning": "F59E0B", "positive": "22C55E", "muted": "9DB9AE", "text": "D8FFF2"},
+        "orb_cyan": {"x": 1030, "y": -18, "w": 170, "h": 170, "opacity": 0.035, "role": "decorative-glow"},
+        "orb_violet": {"x": -42, "y": 520, "w": 160, "h": 160, "opacity": 0.018, "role": "decorative-glow"},
         "ghost_opacity": 0.018,
         "ghost_size": 30,
         "hairline_opacity": 0.68,
@@ -123,8 +123,8 @@ VARIANT_PROFILES = {
 
 
 def variant_profile(contract):
-    variant = contract.get("visual_variant") or contract.get("variant") or "default"
-    return VARIANT_PROFILES.get(variant, VARIANT_PROFILES["default"])
+    language = contract.get("visual_language") or contract.get("visual_variant") or contract.get("variant") or "default"
+    return VARIANT_PROFILES.get(language, VARIANT_PROFILES["default"])
 
 
 
@@ -208,8 +208,8 @@ def chart_obj(oid, chart, x, y, w, h, z, profile=None):
             "grid_color": pal(profile, "stroke_soft"),
             "panel_fill": pal(profile, "panel"),
             "panel_stroke": pal(profile, "stroke_soft"),
-            "opacity": 0.42 if profile.get("name") == "sober-committee" else (0.58 if profile.get("name") == "luminous-strategy" else 0.54),
-            "stroke_opacity": 0.62 if profile.get("name") == "sober-committee" else (0.90 if profile.get("name") == "luminous-strategy" else 0.82),
+            "opacity": 0.42 if profile.get("name") == "matte-institutional" else (0.58 if profile.get("name") == "luminous-glass" else 0.54),
+            "stroke_opacity": 0.62 if profile.get("name") == "matte-institutional" else (0.90 if profile.get("name") == "luminous-glass" else 0.82),
             "chart_treatment": profile.get("visual_grammar", {}).get("chart_treatment"),
         },
         "editability": edit("vector-chart", 5, ["data", "text", "position", "style"]),
@@ -236,10 +236,10 @@ def table_obj(oid, table, x, y, w, h, z, profile=None):
             "label_color": pal(profile, "muted"),
             "header_fill": pal(profile, "panel_alt"),
             "row_fill": pal(profile, "panel"),
-            "row_alt_fill": "0B1A28" if profile.get("name") == "dense-risk-review" else "102135",
+            "row_alt_fill": "0B1A28" if profile.get("name") == "terminal-cockpit" else "102135",
             "stroke": pal(profile, "stroke_soft"),
-            "opacity": 0.48 if profile.get("name") == "sober-committee" else (0.58 if profile.get("name") == "dense-risk-review" else 0.54),
-            "stroke_opacity": 0.82 if profile.get("name") in {"sober-committee", "dense-risk-review"} else 0.75,
+            "opacity": 0.48 if profile.get("name") == "matte-institutional" else (0.58 if profile.get("name") == "terminal-cockpit" else 0.54),
+            "stroke_opacity": 0.82 if profile.get("name") in {"matte-institutional", "terminal-cockpit"} else 0.75,
             "panel_material": profile.get("visual_grammar", {}).get("panel_material"),
         },
         "editability": edit("vector-table", 5, ["data", "text", "position", "style"]),
@@ -271,7 +271,7 @@ def add_process(objects, sid, steps, x, y, w, h, z, profile=None):
     for i, step in enumerate(steps, start=1):
         sx = x + (i - 1) * (step_w + gap)
         tone = [PALETTE["positive"], PALETTE["accent"], PALETTE["warning"], PALETTE["stroke"]][(i - 1) % 4]
-        objects.append(shape_obj("%s_process_%d_card" % (sid, i), "process-step", sx, y, step_w, h, z + i * 10, fill=PALETTE["panel_alt"], stroke=tone, opacity=0.56, stroke_opacity=0.9, shadow=True))
+        objects.append(shape_obj("%s_process_%d_card" % (sid, i), "process-step", sx, y, step_w, h, z + i * 10, fill=pal(profile, "panel_alt"), stroke=tone, opacity=0.56, stroke_opacity=0.9, shadow=True))
         objects.append(text_obj("%s_process_%d_num" % (sid, i), "process-step", step.get("step", "%02d" % i), sx + 18, y + 16, 54, 30, z + i * 10 + 1, 18, color=tone, bold=True, priority=5))
         objects.append(text_obj("%s_process_%d_title" % (sid, i), "process-step", step.get("title", ""), sx + 18, y + 54, step_w - 36, 30, z + i * 10 + 2, 18, color=pal(profile, "text"), bold=True, priority=5))
         objects.append(text_obj("%s_process_%d_text" % (sid, i), "process-step", step.get("text", ""), sx + 18, y + 94, step_w - 36, h - 108, z + i * 10 + 3, 13, color=pal(profile, "muted"), priority=5))
@@ -298,7 +298,7 @@ def add_matrix(objects, sid, matrix, x, y, w, h, z, profile=None):
             stroke = [PALETTE["positive"], PALETTE["accent"], PALETTE["warning"]][min(c, 2)]
             cx = x + label_w + c * cell_w
             cy = y + label_h + r * cell_h
-            objects.append(shape_obj("%s_matrix_%d_%d_cell" % (sid, r, c), "matrix-cell", cx + 4, cy + 4, cell_w - 8, cell_h - 8, z + 40 + r * cols + c, fill=PALETTE["panel_alt"], stroke=stroke, opacity=intensity, stroke_opacity=0.75, shadow=False))
+            objects.append(shape_obj("%s_matrix_%d_%d_cell" % (sid, r, c), "matrix-cell", cx + 4, cy + 4, cell_w - 8, cell_h - 8, z + 40 + r * cols + c, fill=pal(profile, "panel_alt"), stroke=stroke, opacity=intensity, stroke_opacity=0.75, shadow=False))
             objects.append(text_obj("%s_matrix_%d_%d_text" % (sid, r, c), "matrix-cell", txt, cx + 18, cy + 18, cell_w - 36, cell_h - 24, z + 80 + r * cols + c, 14, color=pal(profile, "text"), priority=5))
 
 
@@ -306,7 +306,7 @@ def add_timeline(objects, sid, timeline, x, y, w, h, z, profile=None):
     profile = profile or VARIANT_PROFILES["default"]
     if not timeline:
         return
-    objects.append(shape_obj(sid + "_timeline_line", "timeline-step", x + 28, y + h / 2, w - 56, 2, z, fill=PALETTE["stroke"], stroke=PALETTE["stroke"], shape="rect", priority=2, opacity=0.65, stroke_opacity=0))
+    objects.append(shape_obj(sid + "_timeline_line", "timeline-step", x + 28, y + h / 2, w - 56, 2, z, fill=pal(profile, "stroke"), stroke=pal(profile, "stroke"), shape="rect", priority=2, opacity=0.65, stroke_opacity=0))
     gap = w / len(timeline)
     for i, item in enumerate(timeline, start=1):
         cx = x + (i - 0.5) * gap
@@ -326,7 +326,7 @@ def add_scenarios(objects, sid, scenarios, x, y, w, h, z, profile=None):
     for i, sc in enumerate(scenarios, start=1):
         sx = x + (i-1)*(card_w+gap)
         tone = [PALETTE["positive"], PALETTE["warning"], PALETTE["accent"]][(i-1)%3]
-        objects.append(shape_obj("%s_scenario_%d_card" % (sid, i), "scenario-card", sx, y, card_w, h, z+i*10, fill=PALETTE["panel_alt"], stroke=tone, opacity=0.56, stroke_opacity=0.86, shadow=True))
+        objects.append(shape_obj("%s_scenario_%d_card" % (sid, i), "scenario-card", sx, y, card_w, h, z+i*10, fill=pal(profile, "panel_alt"), stroke=tone, opacity=0.56, stroke_opacity=0.86, shadow=True))
         objects.append(text_obj("%s_scenario_%d_name" % (sid, i), "body", sc.get("name", ""), sx+24, y+24, card_w-48, 32, z+i*10+1, 20, color=tone, bold=True, priority=5))
         objects.append(text_obj("%s_scenario_%d_impact" % (sid, i), "metric", sc.get("impact", ""), sx+24, y+76, card_w-48, 42, z+i*10+2, 26, color=pal(profile, "text"), bold=True, priority=5))
         objects.append(text_obj("%s_scenario_%d_action" % (sid, i), "body", sc.get("action", ""), sx+24, y+138, card_w-48, 60, z+i*10+3, 15, color=pal(profile, "muted"), priority=5))
@@ -412,16 +412,18 @@ def add_metric(objects, prefix, metric, x, y, w, h, z, profile=None):
     if metric_style == "status-chip":
         card_role = "status-chip"
     card_fill = pal(profile, "panel_alt")
-    card_stroke = c if name != "sober-committee" else pal(profile, "stroke_soft")
+    card_stroke = c if name != "matte-institutional" else pal(profile, "stroke_soft")
     card_opacity = profile.get("metric_card_opacity", 0.58)
-    stroke_opacity = 0.74 if name == "sober-committee" else (0.96 if name == "luminous-strategy" else 0.88)
-    objects.append(shape_obj(prefix + "_card", card_role, x, y, w, h, z, fill=card_fill, stroke=card_stroke, opacity=card_opacity, stroke_opacity=stroke_opacity, shadow=(name != "sober-committee")))
+    stroke_opacity = 0.74 if name == "matte-institutional" else (0.96 if name == "luminous-glass" else 0.88)
+    card_shape = "rect" if metric_style == "status-chip" else "roundRect"
+    card_shadow = True if name == "luminous-glass" else False
+    objects.append(shape_obj(prefix + "_card", card_role, x, y, w, h, z, fill=card_fill, stroke=card_stroke, shape=card_shape, opacity=card_opacity, stroke_opacity=stroke_opacity, shadow=card_shadow))
     if metric_style == "hero-kpi":
         objects.append(shape_obj(prefix + "_hero_bar", "luminous-ribbon", x, y, max(5, w), 5, z + 1, fill=c, stroke=c, shape="rect", priority=1, opacity=0.88, stroke_opacity=0.0))
     elif metric_style == "status-chip":
         objects.append(shape_obj(prefix + "_status_dot", "status-chip", x + 14, y + 14, 12, 12, z + 1, fill=c, stroke=c, shape="ellipse", priority=2, opacity=0.96, stroke_opacity=0.0))
     elif metric_style == "formal-compact":
-        objects.append(shape_obj(prefix + "_ruler", "committee-ruler", x + 16, y + h - 14, max(20, w - 32), 1, z + 1, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.55, stroke_opacity=0.0))
+        objects.append(shape_obj(prefix + "_ruler", "institutional-ruler", x + 16, y + h - 14, max(20, w - 32), 1, z + 1, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.55, stroke_opacity=0.0))
     # Intrinsic metric-card layout. Never position value and delta by fixed
     # absolute offsets; allocate a vertical text stack that fits the card.
     compact = h < 100 or metric_style in {"formal-compact", "status-chip"}
@@ -467,28 +469,32 @@ def glass_frame(objects, slide_id, profile=None):
     objects.append(shape_obj(slide_id + "_orb_violet", violet.get("role", "decorative-glow"), violet["x"], violet["y"], violet["w"], violet["h"], 2, fill=pal(profile, "accent"), stroke=pal(profile, "accent"), shape="ellipse", priority=1, opacity=violet["opacity"], stroke_opacity=0.0))
     if profile.get("gold_orb"):
         objects.append(shape_obj(slide_id + "_orb_gold", "spotlight-orb", 1000, 392, 260, 260, 3, fill=pal(profile, "warning"), stroke=pal(profile, "warning"), shape="ellipse", priority=1, opacity=0.16, stroke_opacity=0.0))
-    if name == "luminous-strategy":
+    if name == "luminous-glass":
         objects.append(shape_obj(slide_id + "_luminous_ribbon", "luminous-ribbon", 64, 50, 520, 8, 5, fill=pal(profile, "warning"), stroke=pal(profile, "warning"), shape="rect", priority=1, opacity=0.72, stroke_opacity=0.0))
         objects.append(shape_obj(slide_id + "_luminous_sweep", "luminous-ribbon", 820, 104, 310, 14, 6, fill=pal(profile, "stroke"), stroke=pal(profile, "stroke"), shape="roundRect", priority=1, opacity=0.34, stroke_opacity=0.0))
-    if name == "sober-committee":
+    if name == "matte-institutional":
         for gi, gx in enumerate([224, 384, 544, 704, 864, 1024], start=1):
-            objects.append(shape_obj("%s_grid_v_%d" % (slide_id, gi), "committee-gridline", gx, 64, 1, 520, 4 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.12, stroke_opacity=0.0))
+            objects.append(shape_obj("%s_grid_v_%d" % (slide_id, gi), "institutional-gridline", gx, 64, 1, 520, 4 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.12, stroke_opacity=0.0))
         for gi, gy in enumerate([188, 332, 476], start=1):
-            objects.append(shape_obj("%s_grid_h_%d" % (slide_id, gi), "committee-ruler", 64, gy, 1152, 1, 12 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.14, stroke_opacity=0.0))
-    elif name == "dense-risk-review":
-        for gi, gx in enumerate(range(104, 1200, 96), start=1):
-            objects.append(shape_obj("%s_terminal_v_%d" % (slide_id, gi), "terminal-gridline", gx, 56, 1, 538, 4 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.16, stroke_opacity=0.0))
-        for gi, gy in enumerate(range(112, 592, 72), start=1):
-            objects.append(shape_obj("%s_terminal_h_%d" % (slide_id, gi), "terminal-gridline", 64, gy, 1152, 1, 30 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.14, stroke_opacity=0.0))
+            objects.append(shape_obj("%s_grid_h_%d" % (slide_id, gi), "institutional-ruler", 64, gy, 1152, 1, 12 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.14, stroke_opacity=0.0))
+    elif name == "terminal-cockpit":
+        objects.append(shape_obj(slide_id + "_terminal_top_status", "terminal-status-bar", 64, 48, 1152, 26, 72, fill="04100C", stroke=pal(profile, "stroke_soft"), shape="rect", priority=2, opacity=0.92, stroke_opacity=0.75))
+        objects.append(text_obj(slide_id + "_terminal_path", "terminal-status-bar", "SYS / ALLOCATION / LIVE SIGNAL", 82, 53, 420, 18, 73, 10, color=pal(profile, "stroke"), bold=True, priority=2, opacity=0.9))
+        objects.append(shape_obj(slide_id + "_terminal_left_rail", "terminal-status-bar", 48, 88, 6, 500, 74, fill=pal(profile, "stroke"), stroke=pal(profile, "stroke"), shape="rect", priority=1, opacity=0.42, stroke_opacity=0.0))
+        for gi, gx in enumerate(range(88, 1216, 64), start=1):
+            objects.append(shape_obj("%s_terminal_v_%d" % (slide_id, gi), "terminal-gridline", gx, 80, 1, 506, 4 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.26, stroke_opacity=0.0))
+        for gi, gy in enumerate(range(104, 600, 48), start=1):
+            objects.append(shape_obj("%s_terminal_h_%d" % (slide_id, gi), "terminal-gridline", 64, gy, 1152, 1, 30 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.22, stroke_opacity=0.0))
         for ci, (cx, tone) in enumerate([(82, "positive"), (112, "warning"), (142, "accent")], start=1):
-            objects.append(shape_obj("%s_status_chip_%d" % (slide_id, ci), "status-chip", cx, 626, 18, 10, 82 + ci, fill=pal(profile, tone), stroke=pal(profile, tone), shape="roundRect", priority=2, opacity=0.88, stroke_opacity=0.0))
+            objects.append(shape_obj("%s_status_chip_%d" % (slide_id, ci), "status-chip", cx, 626, 18, 10, 82 + ci, fill=pal(profile, tone), stroke=pal(profile, tone), shape="rect", priority=2, opacity=0.96, stroke_opacity=0.0))
     elif profile.get("extra_grid"):
         for gi, gx in enumerate([320, 640, 960], start=1):
             objects.append(shape_obj("%s_grid_v_%d" % (slide_id, gi), "divider", gx, 48, 1, 548, 4 + gi, fill=pal(profile, "stroke_soft"), stroke=pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.10, stroke_opacity=0.0))
     objects.append(shape_obj(slide_id + "_top_hairline", "divider", 64, 42, 1152, 2, 70, fill=pal(profile, "stroke"), stroke=pal(profile, "stroke"), shape="rect", priority=2, opacity=profile.get("hairline_opacity", 0.85), stroke_opacity=0.0))
     risk_h = profile.get("risk_height", 30)
     risk_y = 648 - risk_h
-    objects.append(shape_obj(slide_id + "_risk_rail", "risk-rail", 64, risk_y, 1152, risk_h, 80, fill=profile.get("risk_fill", "0B1828"), stroke=pal(profile, "stroke_soft"), shape="roundRect", priority=3, opacity=profile.get("risk_opacity", 0.58), stroke_opacity=profile.get("risk_stroke_opacity", 0.62), shadow=False))
+    risk_shape = "rect" if name == "terminal-cockpit" else "roundRect"
+    objects.append(shape_obj(slide_id + "_risk_rail", "risk-rail", 64, risk_y, 1152, risk_h, 80, fill=profile.get("risk_fill", "0B1828"), stroke=pal(profile, "stroke_soft"), shape=risk_shape, priority=3, opacity=profile.get("risk_opacity", 0.58), stroke_opacity=profile.get("risk_stroke_opacity", 0.62), shadow=False))
 
 
 def compile_glass_slide(slide, index, profile=None):
@@ -500,7 +506,13 @@ def compile_glass_slide(slide, index, profile=None):
     body = slide.get("body", [])
     glass_frame(objects, sid, profile)
     objects.append(text_obj(sid + "_kicker", "kicker", slide.get("kicker", ""), 80, 58, 560, 30, 10, 13, color=pal(profile, "stroke"), bold=True, priority=4))
-    objects.append(text_obj(sid + "_ghost_num", "decorative-ghost-number", "%02d" % index, 1110, 54, 96, 52, 11, 38, color=pal(profile, "white"), bold=True, priority=1, opacity=profile.get("ghost_opacity", 0.026)))
+    name = profile.get("name", "default")
+    if name == "terminal-cockpit":
+        objects.append(text_obj(sid + "_terminal_page", "terminal-page-node", "NODE-%02d" % index, 1030, 53, 150, 22, 11, 14, color=pal(profile, "stroke"), bold=True, priority=2, opacity=0.96))
+    elif name == "matte-institutional":
+        objects.append(text_obj(sid + "_folio", "institutional-folio", "%02d" % index, 1130, 62, 58, 30, 11, 22, color=pal(profile, "muted"), bold=True, priority=1, opacity=0.55))
+    else:
+        objects.append(text_obj(sid + "_ghost_num", "decorative-ghost-number", "%02d" % index, 1110, 54, 96, 52, 11, 38, color=pal(profile, "white"), bold=True, priority=1, opacity=profile.get("ghost_opacity", 0.026)))
     title_w = 720 if topology in {"glass-cover", "glass-hero"} else 960
     content_heavy = {"glass-dashboard", "glass-table", "glass-chart-focus", "glass-matrix", "glass-scenario", "glass-process", "glass-timeline", "glass-compliance", "glass-quote", "glass-action-rail"}
     preferred_title_size = 30 if topology in {"glass-cover", "glass-hero"} else (28 if topology in content_heavy or len(slide.get("title", "")) > 30 else 32)
@@ -514,13 +526,13 @@ def compile_glass_slide(slide, index, profile=None):
         objects.append(text_obj(sid + "_subtitle", "body", slide["subtitle"], 84, subtitle_y, 760, subtitle_h, 21, 15, color=pal(profile, "muted"), priority=5))
 
     if topology in {"glass-cover", "glass-hero"}:
-        objects.append(shape_obj(sid + "_hero_panel", "glass-panel", 64, 78, 744, 262, 15, fill=PALETTE["panel"], stroke=PALETTE["stroke"], opacity=0.52, stroke_opacity=0.7, shadow=True))
-        objects.append(shape_obj(sid + "_body_panel", "glass-panel", 64, 386, 744, 204, 30, fill=PALETTE["panel"], stroke=PALETTE["stroke_soft"], opacity=0.52, stroke_opacity=0.8, shadow=True))
+        objects.append(shape_obj(sid + "_hero_panel", "glass-panel", 64, 78, 744, 262, 15, fill=pal(profile, "panel"), stroke=pal(profile, "stroke"), opacity=0.52, stroke_opacity=0.7, shadow=True))
+        objects.append(shape_obj(sid + "_body_panel", "glass-panel", 64, 386, 744, 204, 30, fill=pal(profile, "panel"), stroke=pal(profile, "stroke_soft"), opacity=0.52, stroke_opacity=0.8, shadow=True))
         add_body_paragraphs(objects, sid, body, 96, 420, 674, 50, 35, 17, 2, profile=profile)
         for i, metric in enumerate(metrics[:3], start=1):
             add_metric(objects, "%s_metric_%d" % (sid, i), metric, 850, 118 + (i - 1) * 152, 330, 126, 40 + (i - 1) * 10, profile)
     elif topology == "glass-dashboard":
-        objects.append(shape_obj(sid + "_left_panel", "glass-panel", 64, 236, 520, 140, 30, fill=PALETTE["panel"], stroke=PALETTE["stroke_soft"], opacity=0.52, stroke_opacity=0.8, shadow=True))
+        objects.append(shape_obj(sid + "_left_panel", "glass-panel", 64, 236, 520, 140, 30, fill=pal(profile, "panel"), stroke=pal(profile, "stroke_soft"), opacity=0.52, stroke_opacity=0.8, shadow=True))
         add_body_paragraphs(objects, sid, body, 96, 266, 448, 38, 35, 15, 2, profile=profile)
         if slide.get("chart"):
             objects.append(chart_obj(sid + "_chart", slide["chart"], 96, 396, 448, 180, 39, profile))
@@ -529,7 +541,7 @@ def compile_glass_slide(slide, index, profile=None):
             x, y0 = positions[i - 1]
             add_metric(objects, "%s_metric_%d" % (sid, i), metric, x, y0, 246, 126, 45 + (i - 1) * 10, profile)
     elif topology == "glass-chart-focus":
-        objects.append(shape_obj(sid + "_note_panel", "glass-panel", 64, 232, 360, 240, 30, fill=PALETTE["panel"], stroke=PALETTE["stroke_soft"], opacity=0.52, stroke_opacity=0.75, shadow=True))
+        objects.append(shape_obj(sid + "_note_panel", "glass-panel", 64, 232, 360, 240, 30, fill=pal(profile, "panel"), stroke=pal(profile, "stroke_soft"), opacity=0.52, stroke_opacity=0.75, shadow=True))
         add_body_paragraphs(objects, sid, body, 92, 264, 306, 48, 35, 14, 3, profile=profile)
         if slide.get("chart"):
             objects.append(chart_obj(sid + "_chart", slide["chart"], 462, 232, 716, 240, 44, profile))
@@ -543,7 +555,7 @@ def compile_glass_slide(slide, index, profile=None):
         for i, metric in enumerate(metrics[:3], start=1):
             add_metric(objects, "%s_metric_%d" % (sid, i), metric, 88 + (i - 1) * 370, 166, 320, 86, 55 + i * 10, profile)
     elif topology == "glass-matrix":
-        objects.append(shape_obj(sid + "_matrix_panel", "glass-panel", 64, 250, 760, 342, 30, fill=PALETTE["panel"], stroke=PALETTE["stroke_soft"], opacity=0.48, stroke_opacity=0.75, shadow=True))
+        objects.append(shape_obj(sid + "_matrix_panel", "glass-panel", 64, 250, 760, 342, 30, fill=pal(profile, "panel"), stroke=pal(profile, "stroke_soft"), opacity=0.48, stroke_opacity=0.75, shadow=True))
         add_matrix(objects, sid, slide.get("matrix", {}), 92, 302, 704, 258, 40, profile=profile)
         for i, metric in enumerate(metrics[:3], start=1):
             add_metric(objects, "%s_metric_%d" % (sid, i), metric, 870, 176 + (i-1)*140, 306, 124, 80+i*10, profile)
@@ -564,7 +576,7 @@ def compile_glass_slide(slide, index, profile=None):
             add_metric(objects, "%s_metric_%d" % (sid, i), metric, 88 + (i - 1) * 370, 504, 320, 90, 110 + i * 10, profile)
     elif topology == "glass-quote":
         q = slide.get("quote", {})
-        objects.append(shape_obj(sid + "_quote_panel", "glass-panel", 122, 256, 1036, 228, 30, fill=PALETTE["panel"], stroke=PALETTE["stroke"], opacity=0.52, stroke_opacity=0.8, shadow=True))
+        objects.append(shape_obj(sid + "_quote_panel", "glass-panel", 122, 256, 1036, 228, 30, fill=pal(profile, "panel"), stroke=pal(profile, "stroke"), opacity=0.52, stroke_opacity=0.8, shadow=True))
         objects.append(text_obj(sid + "_quote_mark", "quote-mark", "“", 150, 256, 90, 80, 40, 72, color=pal(profile, "stroke"), bold=True, priority=2, opacity=0.8))
         objects.append(text_obj(sid + "_quote_text", "quote", q.get("text", body[0] if body else ""), 230, 304, 850, 78, 42, 32, color=pal(profile, "text"), bold=True, priority=5))
         objects.append(text_obj(sid + "_quote_author", "quote", q.get("author", ""), 234, 410, 620, 30, 43, 15, color=pal(profile, "muted"), priority=5))
@@ -581,7 +593,7 @@ def compile_glass_slide(slide, index, profile=None):
         # behind both reads as cards pressing into another container.
         for i, metric in enumerate(metrics[:3], start=1):
             add_metric(objects, "%s_metric_%d" % (sid, i), metric, 64 + (i - 1) * 392, 278, 368, 132, 42 + (i - 1) * 10, profile)
-        objects.append(shape_obj(sid + "_body_panel", "glass-panel", 64, 428, 1152, 96, 70, fill=PALETTE["panel"], stroke=PALETTE["stroke_soft"], opacity=0.44, stroke_opacity=0.65, shadow=True))
+        objects.append(shape_obj(sid + "_body_panel", "glass-panel", 64, 428, 1152, 96, 70, fill=pal(profile, "panel"), stroke=pal(profile, "stroke_soft"), opacity=0.44, stroke_opacity=0.65, shadow=True))
         add_body_paragraphs(objects, sid, body, 112, 450, 1040, 34, 75, 16, 2, profile=profile)
     if slide.get("risk_note"):
         objects.append(text_obj(sid + "_risk_note", "risk", slide["risk_note"], 88, 623, 1090, 22, 900, 10, color=pal(profile, "muted"), priority=5))
@@ -596,7 +608,8 @@ def compile_glass_contract(contract):
             "size": contract.get("size", DEFAULT_SIZE),
             "style_program": contract.get("style_program"),
             "visual_anchor": contract.get("visual_anchor", contract.get("style_program")),
-            "visual_variant": contract.get("visual_variant", profile.get("name", "default")),
+            "visual_language": contract.get("visual_language", profile.get("name", "default")),
+            "narrative_intent": contract.get("narrative_intent"),
             "visual_coordinates": contract.get("visual_coordinates", {}),
             "visual_grammar": profile.get("visual_grammar", {}),
             "slides": [compile_glass_slide(s, i, profile) for i, s in enumerate(contract["slides"], start=1)],

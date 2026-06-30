@@ -43,6 +43,7 @@ REQUIRED = [
     "references/narrative-visual-expansion-roadmap.md",
     "references/narrative-kernel.md",
     "references/visual-anchor-system.md",
+    "references/visual-variant-distinctiveness.md",
     "docs/learning/README.md",
     "docs/learning/phase4b-visual-rendering.md",
     "docs/learning/glass-fintech-showcase.md",
@@ -60,9 +61,10 @@ REQUIRED = [
     "examples/glass-fintech-benchmark.contract.json",
     "examples/narrative-kernel.finance.json",
     "examples/visual-anchors/glass-fintech-pptx.anchor.json",
-    "examples/variants/glass-fintech-sober-committee.contract.json",
-    "examples/variants/glass-fintech-luminous-strategy.contract.json",
-    "examples/variants/glass-fintech-dense-risk-review.contract.json",
+    "examples/variants/glass-fintech-matte-institutional.contract.json",
+    "examples/variants/glass-fintech-luminous-glass.contract.json",
+    "examples/variants/glass-fintech-terminal-cockpit.contract.json",
+    "examples/variants/glass-fintech-visual-language-base.contract.json",
     "scripts/compile_spec_to_ir.py",
     "scripts/render_ir_html.py",
     "scripts/export_ir_pptx.py",
@@ -74,6 +76,7 @@ REQUIRED = [
     "scripts/check_layout_safety.py",
     "scripts/check_narrative_safety.py",
     "scripts/check_visual_anchor.py",
+    "scripts/check_narrative_visual_orthogonality.py",
     "scripts/validate_glass_variants.py",
     "scripts/validate_glass_showcase.py",
     "scripts/validate_glass_benchmark.py",
@@ -128,6 +131,7 @@ def check_acceptance_language():
     "references/narrative-visual-expansion-roadmap.md",
     "references/narrative-kernel.md",
     "references/visual-anchor-system.md",
+    "references/visual-variant-distinctiveness.md",
         "references/qa-loop.md",
         "references/editability-policy.md",
     ]
@@ -493,14 +497,24 @@ def check_glass_benchmark():
 
 
 
+
+def check_narrative_visual_orthogonality():
+    cmd = [sys.executable, str(ROOT / "scripts" / "check_narrative_visual_orthogonality.py")]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("narrative/visual orthogonality failed: " + (proc.stderr or proc.stdout))
+    if "PASS narrative/visual orthogonality" not in proc.stdout:
+        fail("narrative/visual orthogonality checker did not report PASS")
+    print("PASS narrative/visual orthogonality")
+
 def check_glass_variants():
     cmd = [sys.executable, str(ROOT / "scripts" / "validate_glass_variants.py")]
     proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
     if proc.returncode != 0:
         fail("glass-fintech controlled variants failed: " + (proc.stderr or proc.stdout))
-    if "PASS glass variants" not in proc.stdout:
-        fail("glass-fintech variants validator did not report PASS")
-    print("PASS glass-fintech controlled variants")
+    if "PASS glass visual languages" not in proc.stdout:
+        fail("glass-fintech visual-language validator did not report PASS")
+    print("PASS glass-fintech controlled visual languages")
 
 def main():
     check_required_files()
@@ -516,6 +530,7 @@ def main():
     check_phase4_qa_report()
     check_glass_showcase()
     check_glass_benchmark()
+    check_narrative_visual_orthogonality()
     check_glass_variants()
     print("ALL CHECKS PASSED")
 

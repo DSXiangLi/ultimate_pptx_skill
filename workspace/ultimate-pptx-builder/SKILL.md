@@ -138,6 +138,27 @@ python3 scripts/validate_glass_benchmark.py
 - [ ] Visual fidelity score is >= 88 and QA editability score is >= 95.
 - [ ] A visual QA fix-and-reverify cycle is recorded in `verification/glass-fintech-benchmark-validation.md`.
 
+
+### Step 2C-V — Controlled Visual-Language Variants
+
+Before declaring a visual anchor extensible, prove it with controlled visual languages that are visibly different **at grammar level**, not merely by decoration tuning or business-scenario changes. Read `references/visual-anchor-system.md` and `references/visual-variant-distinctiveness.md`, then run:
+
+```bash
+python3 scripts/check_narrative_visual_orthogonality.py
+python3 scripts/validate_glass_variants.py
+```
+
+**Acceptance Gate 2C-V: Visual-Language Distinctiveness**
+
+- [ ] `visual_language` and `narrative_intent` are separate fields; legacy `visual_variant` is not used for controlled visual-language validation.
+- [ ] Controlled visual-language validation uses `examples/variants/glass-fintech-visual-language-base.contract.json` as the same-content base.
+- [ ] The same slides and same `narrative_intent` compile under at least three visual languages.
+- [ ] Only visual coordinates change across the controlled visual-language runs.
+- [ ] Coordinate changes materialize into PPTX object evidence, not just JSON declarations.
+- [ ] Pairwise visual languages differ in motif roles, panel material, metric grammar, footer/source-band treatment, layout rhythm, or chart/table treatment.
+- [ ] The gate blocks weak variants with `WEAK_COORDINATE_REALIZATION`, `COMPONENT_GRAMMAR_UNCHANGED`, `VISUAL_VARIANT_DISTANCE_TOO_LOW`, `VISUAL_NARRATIVE_COUPLING`, or `LEGACY_VISUAL_VARIANT`.
+- [ ] Rendered contact sheets are reviewed; if they look nearly identical, treat it as a generation bug even if schema/fidelity/editability scores pass.
+
 ### Step 2D — Layout and Text Safety Gate
 
 Before calling any long-form PPTX deck accepted, run the executable layout/typesetting gate:

@@ -6,18 +6,32 @@
   "properties": {
     "visual_anchor": {
       "type": "object",
-      "required": ["id", "immutable_dna", "mutable_coordinates", "mutation_operators", "page_role_variants", "density_modes", "pptx_material_policy", "anti_drift", "qa_rubric"],
+      "required": [
+        "id",
+        "immutable_dna",
+        "mutable_coordinates",
+        "controlled_visual_languages",
+        "mutation_operators",
+        "page_role_variants",
+        "density_modes",
+        "pptx_material_policy",
+        "anti_drift",
+        "qa_rubric"
+      ],
       "properties": {
         "id": {"type": "string"},
+        "purpose": {"type": "string"},
         "immutable_dna": {"type": "array", "items": {"type": "string"}, "minItems": 4},
         "mutable_coordinates": {"type": "object", "minProperties": 3},
+        "controlled_visual_languages": {"type": "object", "minProperties": 1},
         "mutation_operators": {"type": "array", "items": {"type": "string"}, "minItems": 3},
         "page_role_variants": {"type": "object", "minProperties": 3},
         "density_modes": {"type": "array", "items": {"type": "string"}, "minItems": 2},
         "pptx_material_policy": {"type": "object"},
         "anti_drift": {"type": "array", "items": {"type": "string"}, "minItems": 3},
         "qa_rubric": {"type": "object"}
-      }
+      },
+      "additionalProperties": true
     }
   }
 }

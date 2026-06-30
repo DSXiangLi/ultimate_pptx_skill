@@ -1,0 +1,43 @@
+{
+  "id": "market-atlas-infographic",
+  "type": "style_program",
+  "purpose": "Modular market-map / data-atlas visual system for editable finance PPTX decks.",
+  "base_dna": [
+    "atlas canvas",
+    "modular map tiles",
+    "route/flow connectors",
+    "compact data labels",
+    "spatial market segmentation"
+  ],
+  "sota_dna": [
+    "small-multiple market tiles",
+    "coordinate-grid evidence mapping",
+    "route-line narrative path"
+  ],
+  "pptx_material_strategy": {
+    "native": [
+      "title",
+      "body",
+      "risk",
+      "source",
+      "shape",
+      "metric tile"
+    ],
+    "vector": [
+      "chart",
+      "map tile",
+      "route line"
+    ],
+    "raster": [
+      "none in MVP"
+    ]
+  },
+  "visual_languages": {
+    "modular-market-map": {
+      "palette": "atlas mint sand ink",
+      "typography": "compact data labels",
+      "container": "tiles and route lines",
+      "light": "flat cartographic"
+    }
+  }
+}

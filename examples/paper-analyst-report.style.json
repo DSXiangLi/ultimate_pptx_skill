@@ -1,0 +1,43 @@
+{
+  "id": "paper-analyst-report",
+  "type": "style_program",
+  "purpose": "Light editorial institutional research memo for editable finance PPTX decks.",
+  "base_dna": [
+    "warm paper surface",
+    "ink-first typography",
+    "editorial report grid",
+    "source-heavy footer",
+    "low-saturation chart palette"
+  ],
+  "sota_dna": [
+    "marginalia-style evidence tags",
+    "ledger metric strips",
+    "print-friendly table/chart treatments"
+  ],
+  "pptx_material_strategy": {
+    "native": [
+      "title",
+      "body",
+      "risk",
+      "source",
+      "shape",
+      "metric card"
+    ],
+    "vector": [
+      "chart",
+      "table",
+      "rules"
+    ],
+    "raster": [
+      "optional paper texture only"
+    ]
+  },
+  "visual_languages": {
+    "editorial-ledger": {
+      "palette": "warm-paper-ink",
+      "typography": "editorial sans + tabular numerals",
+      "container": "thin ink rules and ledger cards",
+      "light": "flat print light"
+    }
+  }
+}

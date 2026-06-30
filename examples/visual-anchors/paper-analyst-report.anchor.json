@@ -1,0 +1,48 @@
+{
+  "visual_anchor": {
+    "id": "paper-analyst-report",
+    "purpose": "Editable light editorial institutional research visual family.",
+    "immutable_dna": [
+      "warm paper canvas",
+      "ink-first hierarchy",
+      "thin editorial rules",
+      "ledger metric strips",
+      "print/PDF friendly low-glow design",
+      "persistent source/risk footer"
+    ],
+    "mutable_coordinates": {
+      "paper_tone": [
+        "warm-white",
+        "cool-white"
+      ],
+      "rule_density": [
+        "sparse",
+        "medium",
+        "dense"
+      ],
+      "accent_temperature": [
+        "blue-gray",
+        "burgundy",
+        "sage"
+      ],
+      "data_mode": [
+        "ledger",
+        "chart",
+        "table"
+      ]
+    },
+    "controlled_visual_languages": {
+      "editorial-ledger": {
+        "paper_tone": "warm-white",
+        "rule_density": "medium",
+        "accent_temperature": "blue-gray",
+        "data_mode": "ledger"
+      }
+    },
+    "qa_rubric": {
+      "same_anchor_dna_min": 4,
+      "editability_min": 95,
+      "visual_fidelity_min": 86
+    }
+  }
+}

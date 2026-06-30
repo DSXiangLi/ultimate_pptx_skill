@@ -13,6 +13,51 @@ TEXT_RENDER_SCALE = 1.30
 DEFAULT_SIZE = {"w": 1280, "h": 720}
 FONT = "Microsoft YaHei"
 
+
+VARIANT_PROFILES = {
+    "default": {
+        "name": "default",
+        "orb_cyan": {"x": 870, "y": -70, "w": 360, "h": 360, "opacity": 0.16},
+        "orb_violet": {"x": -120, "y": 410, "w": 330, "h": 330, "opacity": 0.13},
+        "ghost_opacity": 0.026,
+        "hairline_opacity": 0.85,
+        "extra_grid": False,
+        "gold_orb": False,
+    },
+    "sober-committee": {
+        "name": "sober-committee",
+        "orb_cyan": {"x": 900, "y": -48, "w": 300, "h": 300, "opacity": 0.09},
+        "orb_violet": {"x": -88, "y": 470, "w": 260, "h": 260, "opacity": 0.06},
+        "ghost_opacity": 0.014,
+        "hairline_opacity": 0.62,
+        "extra_grid": True,
+        "gold_orb": False,
+    },
+    "luminous-strategy": {
+        "name": "luminous-strategy",
+        "orb_cyan": {"x": 820, "y": -92, "w": 430, "h": 430, "opacity": 0.22},
+        "orb_violet": {"x": -145, "y": 375, "w": 390, "h": 390, "opacity": 0.18},
+        "ghost_opacity": 0.042,
+        "hairline_opacity": 0.95,
+        "extra_grid": False,
+        "gold_orb": True,
+    },
+    "dense-risk-review": {
+        "name": "dense-risk-review",
+        "orb_cyan": {"x": 930, "y": -40, "w": 260, "h": 260, "opacity": 0.12},
+        "orb_violet": {"x": -70, "y": 460, "w": 260, "h": 260, "opacity": 0.10},
+        "ghost_opacity": 0.018,
+        "hairline_opacity": 0.75,
+        "extra_grid": True,
+        "gold_orb": False,
+    },
+}
+
+
+def variant_profile(contract):
+    variant = contract.get("visual_variant") or contract.get("variant") or "default"
+    return VARIANT_PROFILES.get(variant, VARIANT_PROFILES["default"])
+
 PALETTE = {
     "background": "07111F",
     "panel": "13243A",
@@ -306,23 +351,32 @@ def add_metric(objects, prefix, metric, x, y, w, h, z):
     objects.append(shape_obj(prefix + "_glow", "decorative-glow", x + w - 48, y + 18, 24, 24, z + 4, fill=c, stroke=c, shape="ellipse", priority=1, opacity=0.42, stroke_opacity=0.0))
 
 
-def glass_frame(objects, slide_id):
+def glass_frame(objects, slide_id, profile=None):
+    profile = profile or VARIANT_PROFILES["default"]
+    cyan = profile["orb_cyan"]
+    violet = profile["orb_violet"]
     objects.append(shape_obj(slide_id + "_bg", "background", 0, 0, 1280, 720, 0, fill=PALETTE["background"], stroke=PALETTE["background"], shape="rect", priority=2))
-    objects.append(shape_obj(slide_id + "_orb_cyan", "decorative-glow", 870, -70, 360, 360, 1, fill=PALETTE["stroke"], stroke=PALETTE["stroke"], shape="ellipse", priority=1, opacity=0.16, stroke_opacity=0.0))
-    objects.append(shape_obj(slide_id + "_orb_violet", "decorative-glow", -120, 410, 330, 330, 2, fill=PALETTE["accent"], stroke=PALETTE["accent"], shape="ellipse", priority=1, opacity=0.13, stroke_opacity=0.0))
-    objects.append(shape_obj(slide_id + "_top_hairline", "divider", 64, 42, 1152, 2, 3, fill=PALETTE["stroke"], stroke=PALETTE["stroke"], shape="rect", priority=2, opacity=0.85, stroke_opacity=0.0))
+    objects.append(shape_obj(slide_id + "_orb_cyan", "decorative-glow", cyan["x"], cyan["y"], cyan["w"], cyan["h"], 1, fill=PALETTE["stroke"], stroke=PALETTE["stroke"], shape="ellipse", priority=1, opacity=cyan["opacity"], stroke_opacity=0.0))
+    objects.append(shape_obj(slide_id + "_orb_violet", "decorative-glow", violet["x"], violet["y"], violet["w"], violet["h"], 2, fill=PALETTE["accent"], stroke=PALETTE["accent"], shape="ellipse", priority=1, opacity=violet["opacity"], stroke_opacity=0.0))
+    if profile.get("gold_orb"):
+        objects.append(shape_obj(slide_id + "_orb_gold", "decorative-glow", 1010, 420, 210, 210, 3, fill=PALETTE["warning"], stroke=PALETTE["warning"], shape="ellipse", priority=1, opacity=0.12, stroke_opacity=0.0))
+    if profile.get("extra_grid"):
+        for gi, gx in enumerate([320, 640, 960], start=1):
+            objects.append(shape_obj("%s_grid_v_%d" % (slide_id, gi), "divider", gx, 48, 1, 548, 4 + gi, fill=PALETTE["stroke_soft"], stroke=PALETTE["stroke_soft"], shape="rect", priority=1, opacity=0.10, stroke_opacity=0.0))
+    objects.append(shape_obj(slide_id + "_top_hairline", "divider", 64, 42, 1152, 2, 8, fill=PALETTE["stroke"], stroke=PALETTE["stroke"], shape="rect", priority=2, opacity=profile.get("hairline_opacity", 0.85), stroke_opacity=0.0))
     objects.append(shape_obj(slide_id + "_risk_rail", "risk-rail", 64, 618, 1152, 30, 80, fill="0B1828", stroke=PALETTE["stroke_soft"], shape="roundRect", priority=3, opacity=0.58, stroke_opacity=0.62, shadow=False))
 
 
-def compile_glass_slide(slide, index):
+def compile_glass_slide(slide, index, profile=None):
+    profile = profile or VARIANT_PROFILES["default"]
     sid = slide["id"]
     objects = []
     topology = slide.get("topology", "glass-dashboard")
     metrics = slide.get("metrics", [])
     body = slide.get("body", [])
-    glass_frame(objects, sid)
+    glass_frame(objects, sid, profile)
     objects.append(text_obj(sid + "_kicker", "kicker", slide.get("kicker", ""), 80, 58, 560, 30, 10, 13, color=PALETTE["stroke"], bold=True, priority=4))
-    objects.append(text_obj(sid + "_ghost_num", "decorative-ghost-number", "%02d" % index, 1110, 54, 96, 52, 11, 38, color=PALETTE["white"], bold=True, priority=1, opacity=0.026))
+    objects.append(text_obj(sid + "_ghost_num", "decorative-ghost-number", "%02d" % index, 1110, 54, 96, 52, 11, 38, color=PALETTE["white"], bold=True, priority=1, opacity=profile.get("ghost_opacity", 0.026)))
     title_w = 720 if topology in {"glass-cover", "glass-hero"} else 960
     content_heavy = {"glass-dashboard", "glass-table", "glass-chart-focus", "glass-matrix", "glass-scenario", "glass-process", "glass-timeline", "glass-compliance", "glass-quote", "glass-action-rail"}
     preferred_title_size = 30 if topology in {"glass-cover", "glass-hero"} else (28 if topology in content_heavy or len(slide.get("title", "")) > 30 else 32)
@@ -411,12 +465,16 @@ def compile_glass_slide(slide, index):
 
 
 def compile_glass_contract(contract):
+    profile = variant_profile(contract)
     return {
         "deck": {
             "id": contract.get("deck_id", "glass-fintech-showcase"),
             "size": contract.get("size", DEFAULT_SIZE),
             "style_program": contract.get("style_program"),
-            "slides": [compile_glass_slide(s, i) for i, s in enumerate(contract["slides"], start=1)],
+            "visual_anchor": contract.get("visual_anchor", contract.get("style_program")),
+            "visual_variant": contract.get("visual_variant", profile.get("name", "default")),
+            "visual_coordinates": contract.get("visual_coordinates", {}),
+            "slides": [compile_glass_slide(s, i, profile) for i, s in enumerate(contract["slides"], start=1)],
         }
     }
 

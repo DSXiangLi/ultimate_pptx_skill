@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ultimate PPTX Narrative Kernel",
+  "type": "object",
+  "required": ["id", "audience_job", "kernel_principles", "rules", "acceptance"],
+  "properties": {
+    "id": {"type": "string"},
+    "audience_job": {
+      "type": "object",
+      "required": ["audience", "scenario", "desired_after_state"],
+      "properties": {
+        "audience": {"type": "string"},
+        "scenario": {"type": "string"},
+        "desired_after_state": {"type": "string"}
+      }
+    },
+    "kernel_principles": {"type": "array", "items": {"type": "string"}, "minItems": 8},
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "level", "description"],
+        "properties": {
+          "id": {"type": "string"},
+          "level": {"enum": ["blocking", "warning"]},
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "acceptance": {"type": "object"}
+  }
+}

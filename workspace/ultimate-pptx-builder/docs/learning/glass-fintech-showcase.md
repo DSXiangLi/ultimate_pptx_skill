@@ -400,3 +400,47 @@ python3 scripts/validate_skill.py
 ### Prevention Rule
 
 For Chinese finance decks, do not accept a box-level text-capacity pass as typography acceptance. Treat Office-rendered CJK widths, protected-term wrapping, title orphan lines, and component-grid alignment as executable gates plus rendered contact-sheet review.
+
+
+---
+
+## Problem 13: A visual anchor must prove variation, not just declare coordinates
+
+### Symptom
+
+The first controlled-variant validation failed with:
+
+```text
+TEMPLATE_SMELL: Slide role signatures are too repetitive for an anchor family.
+```
+
+`sober-committee` originally selected two table-heavy pages plus an action fallback page; `luminous-strategy` originally selected cover/hero/action plus two similar chart pages. Both were valid decks, but their slide-role signatures were too repetitive to prove that `glass-fintech-pptx` is a reusable visual anchor rather than a one-off template.
+
+### Root Cause
+
+Visual-anchor coordinates such as luminosity, accent energy, motif, and compliance tone are insufficient if the underlying page-role sequence repeats the same object grammar. A style anchor must preserve immutable DNA while varying page roles and rhythm; otherwise it becomes a template with parameter changes.
+
+### Fix
+
+- Added `references/visual-anchor-system.md` and `schemas/visual-anchor.schema.json`.
+- Added `examples/visual-anchors/glass-fintech-pptx.anchor.json` with immutable DNA, mutable coordinates, mutation operators, page-role variants, material policy, and anti-drift rules.
+- Added `scripts/check_visual_anchor.py` to block weak DNA evidence, critical rasterization, missing risk/data DNA, and repeated slide-role signatures.
+- Added three controlled variants under `examples/variants/`:
+  - `sober-committee`
+  - `luminous-strategy`
+  - `dense-risk-review`
+- Revised variant slide selections so each mini deck includes distinct roles such as cover, chart/dashboard, table/matrix/scenario/compliance, and process/action instead of repeating the same page grammar.
+- Added `scripts/validate_glass_variants.py` and integrated it into `scripts/validate_skill.py`.
+
+### Verification
+
+```bash
+python3 scripts/validate_glass_variants.py
+# PASS glass variants count=3 sober-committee score=95.75 edit=100.00; luminous-strategy score=95.70 edit=100.00; dense-risk-review score=95.60 edit=100.00
+python3 scripts/validate_skill.py
+# ALL CHECKS PASSED
+```
+
+### Prevention Rule
+
+Do not accept a new visual anchor or variant by visual-token changes alone. Each anchor family must prove: immutable DNA evidence, bounded coordinate variation, page-role rhythm variation, no critical rasterization, narrative/layout safety, and no `TEMPLATE_SMELL` blocker.

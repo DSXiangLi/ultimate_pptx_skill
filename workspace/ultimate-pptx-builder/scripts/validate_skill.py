@@ -40,6 +40,9 @@ REQUIRED = [
     "references/phase4-qa-report.md",
     "references/phase4b-visual-fidelity.md",
     "references/style-glass-fintech-pptx.md",
+    "references/narrative-visual-expansion-roadmap.md",
+    "references/narrative-kernel.md",
+    "references/visual-anchor-system.md",
     "docs/learning/README.md",
     "docs/learning/phase4b-visual-rendering.md",
     "docs/learning/glass-fintech-showcase.md",
@@ -47,12 +50,19 @@ REQUIRED = [
     "schemas/slide-ir.schema.json",
     "schemas/style-program.schema.json",
     "schemas/qa-report.schema.json",
+    "schemas/narrative-kernel.schema.json",
+    "schemas/visual-anchor.schema.json",
     "examples/minimal-deck.ir.json",
     "examples/swiss-grid-pptx.style.json",
     "examples/glass-fintech-pptx.style.json",
     "examples/content-contract.sample.json",
     "examples/glass-fintech-showcase.contract.json",
     "examples/glass-fintech-benchmark.contract.json",
+    "examples/narrative-kernel.finance.json",
+    "examples/visual-anchors/glass-fintech-pptx.anchor.json",
+    "examples/variants/glass-fintech-sober-committee.contract.json",
+    "examples/variants/glass-fintech-luminous-strategy.contract.json",
+    "examples/variants/glass-fintech-dense-risk-review.contract.json",
     "scripts/compile_spec_to_ir.py",
     "scripts/render_ir_html.py",
     "scripts/export_ir_pptx.py",
@@ -62,6 +72,9 @@ REQUIRED = [
     "scripts/compare_slide_images.py",
     "scripts/run_visual_fidelity.py",
     "scripts/check_layout_safety.py",
+    "scripts/check_narrative_safety.py",
+    "scripts/check_visual_anchor.py",
+    "scripts/validate_glass_variants.py",
     "scripts/validate_glass_showcase.py",
     "scripts/validate_glass_benchmark.py",
 ]
@@ -112,6 +125,9 @@ def check_acceptance_language():
         "references/layout-text-safety.md",
         "references/phase4b-visual-fidelity.md",
         "references/style-glass-fintech-pptx.md",
+    "references/narrative-visual-expansion-roadmap.md",
+    "references/narrative-kernel.md",
+    "references/visual-anchor-system.md",
         "references/qa-loop.md",
         "references/editability-policy.md",
     ]
@@ -476,6 +492,16 @@ def check_glass_benchmark():
     print("PASS glass-fintech benchmark")
 
 
+
+def check_glass_variants():
+    cmd = [sys.executable, str(ROOT / "scripts" / "validate_glass_variants.py")]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("glass-fintech controlled variants failed: " + (proc.stderr or proc.stdout))
+    if "PASS glass variants" not in proc.stdout:
+        fail("glass-fintech variants validator did not report PASS")
+    print("PASS glass-fintech controlled variants")
+
 def main():
     check_required_files()
     check_skill_frontmatter()
@@ -490,6 +516,7 @@ def main():
     check_phase4_qa_report()
     check_glass_showcase()
     check_glass_benchmark()
+    check_glass_variants()
     print("ALL CHECKS PASSED")
 
 if __name__ == "__main__":

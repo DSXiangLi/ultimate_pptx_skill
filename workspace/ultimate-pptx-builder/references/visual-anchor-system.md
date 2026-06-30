@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A visual anchor is not a one-off template and not a business-scenario preset. It is a bounded generative **visual region**: one recognizable style family that can produce many decks without collapsing into sameness or drifting into another style.
+A visual anchor is not a one-off template, not a business-scenario preset, and not a background/palette skin. It is a bounded generative **visual region**: one recognizable style family that can produce many decks without collapsing into sameness or drifting into another style.
 
 ```text
 Immutable DNA + Mutable Coordinates + Mutation Operators + PPTX Material Policy + Anti-Drift Rules
@@ -18,6 +18,8 @@ Narrative Intent × Visual Language → Deck
 - `visual_language` answers: what does the deck look and feel like?
 
 ## Anchor Fields
+
+For the full DNA layer model, read `references/visual-dna-model.md`. A mature anchor must define more than surface and color: palette logic, typography system, surface/texture, light physics, layout archetypes, container grammar, component grammar, data-viz grammar, ornament/motif system, flow metaphor, density rhythm, and PPTX material translation.
 
 | Field | Purpose |
 |---|---|

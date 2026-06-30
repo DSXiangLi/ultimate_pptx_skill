@@ -287,6 +287,7 @@ Run all five QA gates:
 - [ ] `references/finance-benchmark-decks.md` is used when creating or evaluating long-form finance benchmarks; do not rely on pixel/editability scores alone.
 - [ ] `references/phase4b-visual-fidelity.md` defines the render/diff loop.
 - [ ] `references/style-glass-fintech-pptx.md` defines the first deep style anchor and acceptance target.
+- [ ] `references/visual-dna-model.md` is consulted before accepting a visual anchor; first-glance difference is insufficient if chart grammar, typography, card/component geometry, and page-role layout skeleton remain the same.
 - [ ] `scripts/check_layout_safety.py` enforces 64px bottom safe zone, 16px footer separation, CJK-aware text capacity, explicit multi-line leading budget, pairwise text collision checks, metric-card internal stack gaps/padding, visual container overlap/nesting rules, title-to-content gaps, table density/readability limits, compliance density rules, and anti-template page-number checks.
 - [ ] `scripts/validate_glass_showcase.py` passes before adding another style preset.
 - [ ] `scripts/validate_glass_benchmark.py` passes for the 15-slide narrative benchmark before expanding style presets.

@@ -45,6 +45,7 @@ REQUIRED = [
     "references/visual-anchor-system.md",
     "references/visual-variant-distinctiveness.md",
     "references/visual-system-generalization.md",
+    "references/visual-dna-model.md",
     "docs/learning/README.md",
     "docs/learning/phase4b-visual-rendering.md",
     "docs/learning/glass-fintech-showcase.md",
@@ -139,6 +140,7 @@ def check_acceptance_language():
     "references/visual-anchor-system.md",
     "references/visual-variant-distinctiveness.md",
     "references/visual-system-generalization.md",
+    "references/visual-dna-model.md",
         "references/qa-loop.md",
         "references/editability-policy.md",
     ]

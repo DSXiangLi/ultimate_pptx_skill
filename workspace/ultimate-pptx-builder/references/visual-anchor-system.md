@@ -44,3 +44,24 @@ glass-fintech-pptx
 ```
 
 The family should remain recognizable while avoiding repeated template smell.
+
+## Grammar-Level Distinctiveness
+
+Coordinate variation is not accepted unless it is realized in visible PPTX grammar. A controlled variant must change more than decorative glow parameters. At minimum, the compiler should materialize differences in several of these dimensions:
+
+- motif roles, e.g. `committee-gridline`, `spotlight-orb`, `terminal-gridline`;
+- panel material, e.g. matte glass vs luminous glass vs dense cockpit panels;
+- metric grammar, e.g. formal compact KPI vs hero KPI vs status chip;
+- chart/table treatment, e.g. subdued grid vs spotlight chart vs monitoring grid;
+- risk/footer treatment, e.g. committee footer vs presentation footer vs monitoring status bar;
+- layout rhythm and density.
+
+Executable gates should block:
+
+```text
+WEAK_COORDINATE_REALIZATION
+COMPONENT_GRAMMAR_UNCHANGED
+VISUAL_VARIANT_DISTANCE_TOO_LOW
+```
+
+A variant is only accepted when rendered PPTX contact sheets are visually distinguishable while still preserving immutable anchor DNA.

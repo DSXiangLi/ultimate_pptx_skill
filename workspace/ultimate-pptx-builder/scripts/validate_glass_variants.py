@@ -22,6 +22,74 @@ VARIANTS = [
 THRESHOLD = 88.0
 
 
+EXPECTED_VISUAL_GRAMMAR = {
+    "sober-committee": {
+        "motif": "strict-grid",
+        "panel_material": "matte-glass",
+        "metric_style": "formal-compact",
+        "risk_rail_treatment": "committee-footer",
+        "required_roles": {"committee-gridline", "committee-ruler"},
+    },
+    "luminous-strategy": {
+        "motif": "spotlight-orb",
+        "panel_material": "luminous-glass",
+        "metric_style": "hero-kpi",
+        "risk_rail_treatment": "presentation-footer",
+        "required_roles": {"luminous-ribbon", "spotlight-orb"},
+    },
+    "dense-risk-review": {
+        "motif": "terminal-grid",
+        "panel_material": "dense-cockpit",
+        "metric_style": "status-chip",
+        "risk_rail_treatment": "monitoring-status-bar",
+        "required_roles": {"terminal-gridline", "status-chip"},
+    },
+}
+
+
+def check_visual_grammar_realization(ir, variant):
+    """Block variants that only declare coordinates but do not alter visual grammar.
+
+    This is intentionally stricter than role-signature checks. It requires the
+    compiler to materialize variant-specific grammar in IR fields and object
+    roles that will survive PPTX export/rendering.
+    """
+    deck = ir.get("deck") or {}
+    grammar = deck.get("visual_grammar") or {}
+    expected = EXPECTED_VISUAL_GRAMMAR[variant]
+    for key in ["motif", "panel_material", "metric_style", "risk_rail_treatment"]:
+        if grammar.get(key) != expected[key]:
+            fail("variant %s has weak coordinate realization: visual_grammar.%s=%r expected %r" % (variant, key, grammar.get(key), expected[key]))
+    roles = {obj.get("role") for _, obj in iter_objects(ir)}
+    missing = sorted(expected["required_roles"] - roles)
+    if missing:
+        fail("variant %s missing variant-specific visual roles: %s" % (variant, ", ".join(missing)))
+
+
+def check_cross_variant_distance(results):
+    signatures = {}
+    for result in results:
+        variant = result["variant"]
+        ir = load_json(ROOT / "build" / ("glass-fintech-%s" % variant) / ("glass-fintech-%s.ir.json" % variant))
+        grammar = ir.get("deck", {}).get("visual_grammar") or {}
+        signatures[variant] = (
+            grammar.get("motif"),
+            grammar.get("panel_material"),
+            grammar.get("metric_style"),
+            grammar.get("risk_rail_treatment"),
+            grammar.get("layout_rhythm"),
+        )
+    values = list(signatures.values())
+    if len(set(values)) != len(values):
+        fail("visual variants have duplicate visual grammar signatures: %s" % signatures)
+    variants = list(signatures)
+    for i, a in enumerate(variants):
+        for b in variants[i+1:]:
+            distance = sum(1 for x, y in zip(signatures[a], signatures[b]) if x != y)
+            if distance < 4:
+                fail("VISUAL_VARIANT_DISTANCE_TOO_LOW between %s and %s: distance=%d signatures=%s" % (a, b, distance, signatures))
+
+
 def fail(msg: str) -> None:
     print("FAIL glass variants: " + msg)
     sys.exit(1)
@@ -106,6 +174,7 @@ def validate_variant(variant: str) -> dict:
     run([sys.executable, str(ROOT / "scripts" / "compile_spec_to_ir.py"), str(contract_path), str(ir_path)])
     ir = load_json(ir_path)
     check_ir(ir, variant)
+    check_visual_grammar_realization(ir, variant)
     run([sys.executable, str(ROOT / "scripts" / "check_layout_safety.py"), str(ir_path), "--report", str(layout_path)])
     layout = load_json(layout_path)
     if layout.get("release_decision") != "pass" or layout.get("blocking_count", 0):
@@ -138,6 +207,7 @@ def validate_variant(variant: str) -> dict:
 
 def main():
     results = [validate_variant(v) for v in VARIANTS]
+    check_cross_variant_distance(results)
     out = ROOT / "build" / "glass-fintech-variants-summary.json"
     out.write_text(json.dumps({"release_decision": "pass", "variants": results}, ensure_ascii=False, indent=2), encoding="utf-8")
     summary = "; ".join("%s score=%.2f edit=%.2f" % (r["variant"], r["score"], r["editability"]) for r in results)

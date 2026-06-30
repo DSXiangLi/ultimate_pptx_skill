@@ -444,3 +444,46 @@ python3 scripts/validate_skill.py
 ### Prevention Rule
 
 Do not accept a new visual anchor or variant by visual-token changes alone. Each anchor family must prove: immutable DNA evidence, bounded coordinate variation, page-role rhythm variation, no critical rasterization, narrative/layout safety, and no `TEMPLATE_SMELL` blocker.
+
+---
+
+## Problem 14: Visual variants can pass structural gates while remaining visually underpowered
+
+### Symptom
+
+Rendered controlled variants passed narrative, layout, editability, visual-fidelity, and role-signature checks, but human review found that `sober-committee`, `luminous-strategy`, and `dense-risk-review` still looked almost identical. The visible differences were mostly content selection, small layout changes, orb position/opacity, hairline opacity, and a few decorative toggles.
+
+### Root Cause
+
+The compiler realized visual coordinates only at the decoration layer. Variant profiles changed glow/orb parameters and page selections, but did not materially alter visual grammar: typography scale, panel material, metric-card grammar, chart/table treatment, footer/risk-rail behavior, or motif roles. The old gate checked structural distinctiveness but not grammar-level visual distinctiveness.
+
+### Fix
+
+- Upgraded `VARIANT_PROFILES` in `scripts/compile_spec_to_ir.py` from decorative settings to grammar-bearing profiles:
+  - `sober-committee`: `strict-grid`, `matte-glass`, `formal-compact`, `committee-footer`.
+  - `luminous-strategy`: `spotlight-orb`, `luminous-glass`, `hero-kpi`, `presentation-footer`.
+  - `dense-risk-review`: `terminal-grid`, `dense-cockpit`, `status-chip`, `monitoring-status-bar`.
+- Added visible variant-specific PPTX roles such as `committee-gridline`, `committee-ruler`, `luminous-ribbon`, `spotlight-orb`, `terminal-gridline`, and `status-chip`.
+- Added `visual_grammar` to compiled IR deck metadata.
+- Upgraded `scripts/validate_glass_variants.py` with grammar realization and cross-variant distance checks.
+- Upgraded `scripts/check_visual_anchor.py` to block `WEAK_COORDINATE_REALIZATION`, `COMPONENT_GRAMMAR_UNCHANGED`, and `VISUAL_VARIANT_DISTANCE_TOO_LOW` for controlled variants.
+- Re-rendered the three PPTX variants and reviewed contact sheets. The updated variants are now visually distinct while retaining glass-fintech DNA.
+
+### Verification
+
+```bash
+python3 scripts/validate_glass_variants.py
+# PASS glass variants count=3 sober-committee score=95.96 edit=100.00; luminous-strategy score=95.56 edit=100.00; dense-risk-review score=95.72 edit=100.00
+python3 scripts/validate_skill.py
+# ALL CHECKS PASSED
+```
+
+Rendered contact sheets:
+
+- `build/glass-fintech-sober-committee/contact-sheet-sober-committee.png`
+- `build/glass-fintech-luminous-strategy/contact-sheet-luminous-strategy.png`
+- `build/glass-fintech-dense-risk-review/contact-sheet-dense-risk-review.png`
+
+### Prevention Rule
+
+Do not accept a visual-anchor variant because it declares coordinates or passes role-signature variation. A variant must materialize coordinate changes into grammar-level visible differences: motif, material, component grammar, layout rhythm, risk/footer treatment, and content-bearing PPTX roles. Automated gates must fail variants that only alter decoration.

@@ -525,3 +525,38 @@ Rendered same-content comparison:
 ### Prevention Rule
 
 Never validate a visual language by giving it its own narrative skeleton. Visual-language acceptance must hold content and `narrative_intent` fixed; otherwise, the test proves scenario-template diversity, not visual-language extensibility.
+
+---
+
+## Problem 16: Multi-visual-system validation must include full-size visual review
+
+### Symptom
+
+The new multi-visual-system validator passed for `glass-fintech-pptx`, `paper-analyst-report`, and `market-atlas-infographic`, but full-size review of `market-atlas-infographic` Slide 05 revealed a visible overlap between the right-side `对冲 / 再平衡（月度）` metric tile and the fourth process card.
+
+### Root Cause
+
+Automated layout and fidelity gates estimate object geometry and rendered similarity, but they do not fully capture perceived collisions between dense visual-system decorations, route lines, metric tiles, and process-card clusters. Contact-sheet thumbnails can also hide subtle overlap; full-size slide review is still required for dense pages.
+
+### Fix
+
+- Adjusted `market-atlas-infographic` process-page metric tile positions in `scripts/compile_spec_to_ir.py` so the third/right metric tile no longer overlaps the fourth process card.
+- Regenerated `build/visual-system-same-content-comparison.png` with wider/wrapped left labels so the validation artifact itself does not introduce misleading truncation.
+- Re-ran `scripts/validate_visual_systems.py` and full-size visual review for `build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-05.png`.
+
+### Verification
+
+```bash
+python3 -m py_compile scripts/compile_spec_to_ir.py scripts/validate_visual_systems.py
+python3 scripts/validate_visual_systems.py
+# PASS visual systems same_content=1 count=3 glass-fintech-pptx score=96.15 edit=100.00; paper-analyst-report score=96.58 edit=100.00; market-atlas-infographic score=96.74 edit=100.00
+```
+
+Rendered review artifacts:
+
+- `build/visual-system-same-content-comparison.png`
+- `build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-05.png`
+
+### Prevention Rule
+
+Do not accept a new visual system solely because automated gates pass. For each new visual system, review at least the densest full-size rendered page plus the contact sheet. If full-size review finds overlap, treat it as a generation/layout bug even when layout safety, visual fidelity, and editability scores pass.

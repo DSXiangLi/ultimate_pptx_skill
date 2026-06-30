@@ -44,6 +44,7 @@ REQUIRED = [
     "references/narrative-kernel.md",
     "references/visual-anchor-system.md",
     "references/visual-variant-distinctiveness.md",
+    "references/visual-system-generalization.md",
     "docs/learning/README.md",
     "docs/learning/phase4b-visual-rendering.md",
     "docs/learning/glass-fintech-showcase.md",
@@ -56,11 +57,15 @@ REQUIRED = [
     "examples/minimal-deck.ir.json",
     "examples/swiss-grid-pptx.style.json",
     "examples/glass-fintech-pptx.style.json",
+    "examples/paper-analyst-report.style.json",
+    "examples/market-atlas-infographic.style.json",
     "examples/content-contract.sample.json",
     "examples/glass-fintech-showcase.contract.json",
     "examples/glass-fintech-benchmark.contract.json",
     "examples/narrative-kernel.finance.json",
     "examples/visual-anchors/glass-fintech-pptx.anchor.json",
+    "examples/visual-anchors/paper-analyst-report.anchor.json",
+    "examples/visual-anchors/market-atlas-infographic.anchor.json",
     "examples/variants/glass-fintech-matte-institutional.contract.json",
     "examples/variants/glass-fintech-luminous-glass.contract.json",
     "examples/variants/glass-fintech-terminal-cockpit.contract.json",
@@ -78,6 +83,7 @@ REQUIRED = [
     "scripts/check_visual_anchor.py",
     "scripts/check_narrative_visual_orthogonality.py",
     "scripts/validate_glass_variants.py",
+    "scripts/validate_visual_systems.py",
     "scripts/validate_glass_showcase.py",
     "scripts/validate_glass_benchmark.py",
 ]
@@ -132,6 +138,7 @@ def check_acceptance_language():
     "references/narrative-kernel.md",
     "references/visual-anchor-system.md",
     "references/visual-variant-distinctiveness.md",
+    "references/visual-system-generalization.md",
         "references/qa-loop.md",
         "references/editability-policy.md",
     ]
@@ -516,6 +523,16 @@ def check_glass_variants():
         fail("glass-fintech visual-language validator did not report PASS")
     print("PASS glass-fintech controlled visual languages")
 
+
+def check_visual_systems():
+    cmd = [sys.executable, str(ROOT / "scripts" / "validate_visual_systems.py")]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("multi-visual-system validation failed: " + (proc.stderr or proc.stdout))
+    if "PASS visual systems" not in proc.stdout:
+        fail("multi-visual-system validator did not report PASS")
+    print("PASS multi-visual-system generalization")
+
 def main():
     check_required_files()
     check_skill_frontmatter()
@@ -532,6 +549,7 @@ def main():
     check_glass_benchmark()
     check_narrative_visual_orthogonality()
     check_glass_variants()
+    check_visual_systems()
     print("ALL CHECKS PASSED")
 
 if __name__ == "__main__":

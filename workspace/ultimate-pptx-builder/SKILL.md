@@ -159,6 +159,25 @@ python3 scripts/validate_glass_variants.py
 - [ ] The gate blocks weak variants with `WEAK_COORDINATE_REALIZATION`, `COMPONENT_GRAMMAR_UNCHANGED`, `VISUAL_VARIANT_DISTANCE_TOO_LOW`, `VISUAL_NARRATIVE_COUPLING`, or `LEGACY_VISUAL_VARIANT`.
 - [ ] Rendered contact sheets are reviewed; if they look nearly identical, treat it as a generation bug even if schema/fidelity/editability scores pass.
 
+### Step 2E — Multi-Visual-System Generalization
+
+After one visual anchor proves internal visual-language extensibility, prove the architecture is not trapped in a single local optimum. Compile the same content contract and same `narrative_intent` through multiple full visual systems:
+
+```bash
+python3 scripts/validate_visual_systems.py
+```
+
+**Acceptance Gate 2E: Cross-Visual-System Generalization**
+
+- [ ] Validation uses one same-content base contract and keeps `narrative_intent` fixed.
+- [ ] At least three full style anchors compile through the same IR → PPTX → render → QA pipeline.
+- [ ] The baseline dark glass anchor remains valid, but at least two additional anchors are visually distant from it.
+- [ ] Each style anchor declares `visual_system_grammar` including surface, composition, material, chromatic mode, and container grammar.
+- [ ] Each style system preserves critical business text as native editable text; missing native content is blocking.
+- [ ] Pairwise visual-system grammar distance is checked so a new anchor cannot be a shallow recolor.
+- [ ] Real `.pptx` files are exported and rendered; layout safety, editability, and visual fidelity must pass for every system.
+
+
 ### Step 2D — Layout and Text Safety Gate
 
 Before calling any long-form PPTX deck accepted, run the executable layout/typesetting gate:

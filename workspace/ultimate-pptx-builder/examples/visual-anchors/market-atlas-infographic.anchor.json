@@ -1,0 +1,47 @@
+{
+  "visual_anchor": {
+    "id": "market-atlas-infographic",
+    "purpose": "Editable modular data-atlas visual family for finance and strategy decks.",
+    "immutable_dna": [
+      "map-like canvas",
+      "modular market tiles",
+      "route/flow line narrative",
+      "compact data labels",
+      "legend-driven semantics",
+      "source/risk strip"
+    ],
+    "mutable_coordinates": {
+      "canvas_tone": [
+        "dark-atlas",
+        "light-atlas"
+      ],
+      "tile_geometry": [
+        "rectangular",
+        "offset",
+        "banded"
+      ],
+      "route_energy": [
+        "quiet",
+        "balanced",
+        "active"
+      ],
+      "density": [
+        "executive",
+        "dense"
+      ]
+    },
+    "controlled_visual_languages": {
+      "modular-market-map": {
+        "canvas_tone": "light-atlas",
+        "tile_geometry": "offset",
+        "route_energy": "balanced",
+        "density": "executive"
+      }
+    },
+    "qa_rubric": {
+      "same_anchor_dna_min": 4,
+      "editability_min": 95,
+      "visual_fidelity_min": 86
+    }
+  }
+}

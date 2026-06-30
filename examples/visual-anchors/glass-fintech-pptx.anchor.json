@@ -1,0 +1,86 @@
+{
+  "visual_anchor": {
+    "id": "glass-fintech-pptx",
+    "purpose": "Finance-grade dark glass visual family for editable institutional PPTX decks.",
+    "immutable_dna": [
+      "dark institutional finance surface",
+      "translucent glass panels",
+      "cyan/violet/gold accent system",
+      "native editable title/body/risk text",
+      "editable vector chart/table where data matters",
+      "persistent source/risk rail",
+      "data-first financial credibility"
+    ],
+    "mutable_coordinates": {
+      "luminosity": ["sober", "balanced", "luminous"],
+      "panel_density": ["sparse", "medium", "dense"],
+      "accent_energy": ["quiet", "balanced", "high"],
+      "data_prominence": ["metric-led", "chart-led", "table-led"],
+      "motif_variation": ["orb", "gridline", "terminal", "constellation"],
+      "compliance_tone": ["presentation", "committee", "formal"]
+    },
+    "mutation_operators": [
+      "swap panel split direction",
+      "vary accent orb placement and scale",
+      "alternate metric band/card treatment",
+      "shift between chart-led and table-led layouts",
+      "use stricter compliance mode on formal pages",
+      "change rhythm between hero, data, appendix, and closing sections"
+    ],
+    "page_role_variants": {
+      "cover": "large thesis card, atmospheric but readable glow",
+      "summary": "claim-first headline with metric cards",
+      "data": "chart/table body dominates; decoration recedes",
+      "matrix": "segmentation grid with stable labels and safe CJK terms",
+      "compliance": "formal, low-decoration, risk/source dominant",
+      "closing": "action path with controlled energy"
+    },
+    "density_modes": ["executive", "dashboard", "risk-review", "appendix"],
+    "pptx_material_policy": {
+      "native": ["title", "body", "risk", "source", "shape", "metric card"],
+      "vector": ["chart", "table", "simple diagram", "process", "timeline"],
+      "raster": ["decorative background texture only"],
+      "forbidden": ["priority>=4 text as raster", "finance table as screenshot", "chart without editable data sidecar"]
+    },
+    "anti_drift": [
+      "no random neon poster look",
+      "no unreadable tiny finance text",
+      "no screenshot-based critical data",
+      "no same glass-card motif repeated on every page",
+      "no over-decoration on compliance/table-heavy pages"
+    ],
+    "qa_rubric": {
+      "same_anchor_dna_min": 4,
+      "variant_distinctiveness_min": 4,
+      "editability_min": 95,
+      "visual_fidelity_min": 90,
+      "template_smell_blocking": true
+    },
+    "controlled_variants": {
+      "sober-committee": {
+        "luminosity": "sober",
+        "panel_density": "medium",
+        "accent_energy": "quiet",
+        "data_prominence": "table-led",
+        "motif_variation": "gridline",
+        "compliance_tone": "formal"
+      },
+      "luminous-strategy": {
+        "luminosity": "luminous",
+        "panel_density": "medium",
+        "accent_energy": "high",
+        "data_prominence": "chart-led",
+        "motif_variation": "orb",
+        "compliance_tone": "presentation"
+      },
+      "dense-risk-review": {
+        "luminosity": "balanced",
+        "panel_density": "dense",
+        "accent_energy": "quiet",
+        "data_prominence": "table-led",
+        "motif_variation": "terminal",
+        "compliance_tone": "committee"
+      }
+    }
+  }
+}

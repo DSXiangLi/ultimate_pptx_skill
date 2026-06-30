@@ -1,0 +1,35 @@
+{
+  "id": "finance-deck-narrative-kernel-v1",
+  "audience_job": {
+    "audience": "投委会、投资经理、风控与产品负责人",
+    "scenario": "季度策略会、组合复盘、风险预算评审、产品路演",
+    "desired_after_state": "受众理解核心判断、证据链、风险约束和下一步行动"
+  },
+  "kernel_principles": [
+    "audience_job",
+    "one_slide_one_job",
+    "claim_before_evidence",
+    "attention_path",
+    "cognitive_load_budget",
+    "evidence_sufficiency",
+    "contrast_or_turn",
+    "arc_continuity",
+    "formal_credibility",
+    "memorable_closure"
+  ],
+  "rules": [
+    {"id": "MISSING_AUDIENCE_JOB", "level": "blocking", "description": "Deck lacks audience, scenario, or desired after-state."},
+    {"id": "MISSING_NARRATIVE_JOB", "level": "blocking", "description": "Slide lacks a primary narrative job."},
+    {"id": "TITLE_NOT_CLAIM", "level": "blocking", "description": "Key slide title is only a topic label, not a claim or action."},
+    {"id": "CLAIM_WITHOUT_EVIDENCE", "level": "blocking", "description": "A claim title has no evidence object, body interpretation, or source/risk note."},
+    {"id": "EVIDENCE_WITHOUT_TAKEAWAY", "level": "blocking", "description": "Chart/table/metric page lacks interpretation text."},
+    {"id": "ARC_GAP", "level": "blocking", "description": "Deck arc lacks opening, evidence, risk/turn, or action/closure."},
+    {"id": "WEAK_CLOSURE", "level": "blocking", "description": "Final slide does not leave action, decision, or monitoring path."},
+    {"id": "MISSING_RISK_OR_SOURCE", "level": "blocking", "description": "Finance slide lacks risk/source rail."}
+  ],
+  "acceptance": {
+    "release_decision": "pass",
+    "blocking_count": 0,
+    "required_arc": ["opening", "evidence", "risk_or_turn", "action"]
+  }
+}

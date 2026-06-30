@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ultimate PPTX Visual Anchor",
+  "type": "object",
+  "required": ["visual_anchor"],
+  "properties": {
+    "visual_anchor": {
+      "type": "object",
+      "required": ["id", "immutable_dna", "mutable_coordinates", "mutation_operators", "page_role_variants", "density_modes", "pptx_material_policy", "anti_drift", "qa_rubric"],
+      "properties": {
+        "id": {"type": "string"},
+        "immutable_dna": {"type": "array", "items": {"type": "string"}, "minItems": 4},
+        "mutable_coordinates": {"type": "object", "minProperties": 3},
+        "mutation_operators": {"type": "array", "items": {"type": "string"}, "minItems": 3},
+        "page_role_variants": {"type": "object", "minProperties": 3},
+        "density_modes": {"type": "array", "items": {"type": "string"}, "minItems": 2},
+        "pptx_material_policy": {"type": "object"},
+        "anti_drift": {"type": "array", "items": {"type": "string"}, "minItems": 3},
+        "qa_rubric": {"type": "object"}
+      }
+    }
+  }
+}

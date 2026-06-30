@@ -159,7 +159,13 @@ def main():
     export_report_path = BUILD / "glass-fintech-benchmark-export-report.json"
     visual_report_path = BUILD / "glass-fintech-benchmark-visual-fidelity-report.json"
     layout_report_path = BUILD / "glass-fintech-benchmark-layout-safety-report.json"
+    narrative_report_path = BUILD / "glass-fintech-benchmark-narrative-safety-report.json"
     qa_report_path = BUILD / "glass-fintech-benchmark-qa-report.json"
+    anchor_report_path = BUILD / "glass-fintech-benchmark-visual-anchor-report.json"
+    run([sys.executable, str(ROOT / "scripts" / "check_narrative_safety.py"), str(CONTRACT), "--report", str(narrative_report_path)])
+    narrative = load_json(narrative_report_path)
+    if narrative.get("release_decision") != "pass" or narrative.get("blocking_count", 0):
+        fail("narrative safety gate failed")
     run([sys.executable, str(ROOT / "scripts" / "compile_spec_to_ir.py"), str(CONTRACT), str(ir_path)])
     ir = load_json(ir_path)
     check_ir(ir)
@@ -167,6 +173,10 @@ def main():
     layout = load_json(layout_report_path)
     if layout.get("release_decision") != "pass" or layout.get("blocking_count", 0):
         fail("layout/text safety gate failed")
+    run([sys.executable, str(ROOT / "scripts" / "check_visual_anchor.py"), str(ROOT / "examples" / "visual-anchors" / "glass-fintech-pptx.anchor.json"), str(ir_path), "--report", str(anchor_report_path)])
+    anchor = load_json(anchor_report_path)
+    if anchor.get("release_decision") != "pass" or anchor.get("blocking_count", 0):
+        fail("visual anchor gate failed")
     run([sys.executable, str(ROOT / "scripts" / "render_ir_html.py"), str(ir_path), str(html_path)])
     check_html_trace(ir, html_path)
     run([sys.executable, str(ROOT / "scripts" / "export_ir_pptx.py"), str(ir_path), str(pptx_path), "--report", str(export_report_path)])

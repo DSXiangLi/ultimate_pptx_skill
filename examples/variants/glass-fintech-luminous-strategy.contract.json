@@ -1,0 +1,334 @@
+{
+  "deck_id": "glass-fintech-luminous-strategy-variant",
+  "style_program": "glass-fintech-pptx",
+  "size": {
+    "w": 1280,
+    "h": 720
+  },
+  "simulated_user_input": {
+    "raw_user_request": "请生成面向策略会展示的资产配置PPT短版，保持机构可信度，同时提升视觉能量和图表驱动的表达。",
+    "audience": "公募/资管机构投委会，含投资总监、组合经理、风控与产品负责人",
+    "scenario": "策略会展示；需要更强注意力路径、更明显的图表主视觉和更鲜明的策略节奏。",
+    "data_assumptions": [
+      "名义增长温和修复，库存周期处于主动去库尾段",
+      "国内流动性维持合理充裕，资金利率低位震荡",
+      "海外利率高位回落节奏慢于市场预期",
+      "权益市场估值分化，红利/高股息拥挤度上升",
+      "成长风格在盈利确认后具备右侧配置价值",
+      "信用利差处于历史偏低分位，票息策略性价比下降",
+      "商品与黄金承担尾部风险对冲功能",
+      "组合最大回撤预算控制在4.5%以内",
+      "权益风险预算从32%提升至44%，但单一赛道暴露受限",
+      "组合执行分三阶段：观察、加仓、再平衡"
+    ],
+    "desired_after_state": "受众能够理解核心判断、证据链、风险约束，并确认下一步执行/评审动作。"
+  },
+  "slides": [
+    {
+      "id": "ls01",
+      "topology": "glass-cover",
+      "kicker": "投委会策略 / 2026Q3 / luminous-strategy",
+      "title": "三季度资产配置建议：从防守确定性转向有纪律的风险再配置",
+      "subtitle": "模拟真实用户输入的15页端到端 benchmark deck",
+      "narrative_job": "建立主论点与会议语境。",
+      "body": [
+        "核心判断：宏观尾部风险下降，但盈利确认仍需等待；组合从纯防守转向结构性风险再配置。",
+        "目标：在不突破回撤预算的前提下，提高权益与商品对组合弹性的贡献。"
+      ],
+      "metrics": [
+        {
+          "label": "组合目标波动",
+          "value": "6.8%",
+          "delta": "年化预算",
+          "tone": "positive"
+        },
+        {
+          "label": "最大回撤预算",
+          "value": "4.5%",
+          "delta": "硬约束",
+          "tone": "warning"
+        },
+        {
+          "label": "权益风险预算",
+          "value": "44%",
+          "delta": "逐步提升",
+          "tone": "accent"
+        }
+      ],
+      "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
+    },
+    {
+      "id": "ls02",
+      "topology": "glass-dashboard",
+      "kicker": "Macro Dashboard / luminous-strategy",
+      "title": "三类宏观信号共同决定下半年风险预算路径",
+      "subtitle": "增长修复不强，流动性宽松仍是资产再定价的核心缓冲。",
+      "narrative_job": "dashboard页，测试指标卡+堆叠柱图。",
+      "body": [
+        "权益风险预算向盈利确定性集中，固收维持中性久期，另类配置保持稳定。",
+        "风险预算随增长、流动性与政策信号动态再平衡。"
+      ],
+      "metrics": [
+        {
+          "label": "增长动能",
+          "value": "中性+",
+          "delta": "PMI边际修复",
+          "tone": "positive"
+        },
+        {
+          "label": "流动性",
+          "value": "宽松",
+          "delta": "资金利率低位",
+          "tone": "positive"
+        },
+        {
+          "label": "估值拥挤",
+          "value": "偏高",
+          "delta": "红利拥挤",
+          "tone": "warning"
+        },
+        {
+          "label": "政策扰动",
+          "value": "可控",
+          "delta": "窗口期观察",
+          "tone": "accent"
+        }
+      ],
+      "chart": {
+        "title": "下半年风险预算路径，占总风险预算比例",
+        "kind": "stacked-bar",
+        "unit": "%",
+        "categories": [
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月"
+        ],
+        "series": [
+          {
+            "name": "权益",
+            "values": [
+              32,
+              35,
+              38,
+              41,
+              44
+            ],
+            "tone": "accent"
+          },
+          {
+            "name": "固收",
+            "values": [
+              46,
+              44,
+              42,
+              41,
+              40
+            ],
+            "tone": "positive"
+          },
+          {
+            "name": "另类",
+            "values": [
+              22,
+              21,
+              20,
+              18,
+              16
+            ],
+            "tone": "warning"
+          }
+        ],
+        "source": "来源：投研系统、Wind、Bloomberg 与内部风险模型模拟测算；数据截止2026-06-30。"
+      },
+      "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
+    },
+    {
+      "id": "ls03",
+      "topology": "glass-chart-focus",
+      "kicker": "Asset Allocation / luminous-strategy",
+      "title": "资产配置建议：提高权益弹性，但保留固收稳定器",
+      "subtitle": "从仓位表述转向风险贡献表述，避免单一资产波动掩盖组合真实风险。",
+      "narrative_job": "图表焦点页，测试大图表+结论旁注。",
+      "body": [
+        "权益主要来自成长与出海，红利转为稳定配置。",
+        "固收不追久期；商品与黄金用于尾部对冲。"
+      ],
+      "metrics": [
+        {
+          "label": "权益",
+          "value": "55%",
+          "delta": "+5pct",
+          "tone": "accent"
+        },
+        {
+          "label": "固收",
+          "value": "32%",
+          "delta": "-4pct",
+          "tone": "positive"
+        },
+        {
+          "label": "另类现金",
+          "value": "13%",
+          "delta": "-1pct",
+          "tone": "warning"
+        }
+      ],
+      "chart": {
+        "title": "建议配置比例，%",
+        "kind": "stacked-bar",
+        "unit": "%",
+        "categories": [
+          "当前",
+          "建议",
+          "上限"
+        ],
+        "series": [
+          {
+            "name": "权益",
+            "values": [
+              50,
+              55,
+              62
+            ],
+            "tone": "accent"
+          },
+          {
+            "name": "固收",
+            "values": [
+              36,
+              32,
+              30
+            ],
+            "tone": "positive"
+          },
+          {
+            "name": "另类现金",
+            "values": [
+              14,
+              13,
+              8
+            ],
+            "tone": "warning"
+          }
+        ],
+        "source": "来源：投研系统、Wind、Bloomberg 与内部风险模型模拟测算；数据截止2026-06-30。"
+      },
+      "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
+    },
+    {
+      "id": "ls04",
+      "topology": "glass-scenario",
+      "kicker": "Scenario Stress / luminous-strategy",
+      "title": "三种情景压力测试：核心不是预测，而是准备触发器",
+      "subtitle": "测试情景卡片和压力测试数字的呈现。",
+      "narrative_job": "情景压力页。",
+      "body": [
+        "基准情景下权益贡献上升；紧缩情景下黄金和现金缓冲回撤；衰退情景下减少权益贝塔。"
+      ],
+      "metrics": [
+        {
+          "label": "基准概率",
+          "value": "55%",
+          "delta": "温和修复",
+          "tone": "positive"
+        },
+        {
+          "label": "紧缩概率",
+          "value": "25%",
+          "delta": "海外利率扰动",
+          "tone": "warning"
+        },
+        {
+          "label": "衰退概率",
+          "value": "20%",
+          "delta": "盈利下修",
+          "tone": "accent"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "基准",
+          "impact": "组合收益 +3.8%",
+          "action": "权益分层加仓"
+        },
+        {
+          "name": "紧缩",
+          "impact": "回撤 -3.2%",
+          "action": "黄金+现金对冲"
+        },
+        {
+          "name": "衰退",
+          "impact": "回撤 -4.4%",
+          "action": "降贝塔回久期"
+        }
+      ],
+      "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
+    },
+    {
+      "id": "ls05",
+      "topology": "glass-process",
+      "kicker": "Execution Path / luminous-strategy",
+      "title": "执行路径四步：观察、加仓、对冲、再平衡",
+      "subtitle": "每一步绑定触发条件、风险预算和复盘节奏，避免把观点直接等同于交易。",
+      "narrative_job": "流程页。",
+      "body": [
+        "每一步都必须绑定触发条件，避免把观点直接等同于交易。"
+      ],
+      "metrics": [
+        {
+          "label": "观察期",
+          "value": "2周",
+          "delta": "PMI/社融/盈利验证",
+          "tone": "positive"
+        },
+        {
+          "label": "加仓期",
+          "value": "4周",
+          "delta": "单周风险预算≤8%",
+          "tone": "accent"
+        },
+        {
+          "label": "对冲/再平衡",
+          "value": "月度",
+          "delta": "偏离阈值即调整",
+          "tone": "warning"
+        }
+      ],
+      "process": [
+        {
+          "step": "01",
+          "title": "观察",
+          "text": "PMI连续两月>50、社融增速回升、盈利预告上修比例改善。"
+        },
+        {
+          "step": "02",
+          "title": "加仓",
+          "text": "盈利确认后分批加仓，单周新增风险预算不超过8%。"
+        },
+        {
+          "step": "03",
+          "title": "对冲",
+          "text": "美元利率/政策扰动触发时，用黄金和现金缓冲组合回撤。"
+        },
+        {
+          "step": "04",
+          "title": "再平衡",
+          "text": "月度检查风险贡献，单资产偏离目标5ppt即再平衡。"
+        }
+      ],
+      "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
+    }
+  ],
+  "visual_anchor": "glass-fintech-pptx",
+  "visual_variant": "luminous-strategy",
+  "visual_coordinates": {
+    "luminosity": "luminous",
+    "panel_density": "medium",
+    "accent_energy": "high",
+    "data_prominence": "chart-led",
+    "motif_variation": "orb",
+    "compliance_tone": "presentation"
+  }
+}

@@ -12,12 +12,41 @@
       "data-first financial credibility"
     ],
     "mutable_coordinates": {
-      "luminosity": ["sober", "balanced", "luminous"],
-      "panel_density": ["sparse", "medium", "dense"],
-      "accent_energy": ["quiet", "balanced", "high"],
-      "data_prominence": ["metric-led", "chart-led", "table-led"],
-      "motif_variation": ["orb", "gridline", "terminal", "constellation"],
-      "compliance_tone": ["presentation", "committee", "formal"]
+      "luminosity": [
+        "dim",
+        "sober",
+        "balanced",
+        "luminous"
+      ],
+      "panel_density": [
+        "sparse",
+        "medium",
+        "dense"
+      ],
+      "accent_energy": [
+        "quiet",
+        "balanced",
+        "high",
+        "signal-coded"
+      ],
+      "data_prominence": [
+        "metric-led",
+        "chart-led",
+        "table-led",
+        "matrix-led"
+      ],
+      "motif_variation": [
+        "precision-rules",
+        "orb",
+        "terminal-grid",
+        "constellation"
+      ],
+      "formality": [
+        "editorial",
+        "presentation",
+        "formal",
+        "operational"
+      ]
     },
     "mutation_operators": [
       "swap panel split direction",
@@ -35,12 +64,36 @@
       "compliance": "formal, low-decoration, risk/source dominant",
       "closing": "action path with controlled energy"
     },
-    "density_modes": ["executive", "dashboard", "risk-review", "appendix"],
+    "density_modes": [
+      "executive",
+      "dashboard",
+      "high-density",
+      "appendix"
+    ],
     "pptx_material_policy": {
-      "native": ["title", "body", "risk", "source", "shape", "metric card"],
-      "vector": ["chart", "table", "simple diagram", "process", "timeline"],
-      "raster": ["decorative background texture only"],
-      "forbidden": ["priority>=4 text as raster", "finance table as screenshot", "chart without editable data sidecar"]
+      "native": [
+        "title",
+        "body",
+        "risk",
+        "source",
+        "shape",
+        "metric card"
+      ],
+      "vector": [
+        "chart",
+        "table",
+        "simple diagram",
+        "process",
+        "timeline"
+      ],
+      "raster": [
+        "decorative background texture only"
+      ],
+      "forbidden": [
+        "priority>=4 text as raster",
+        "finance table as screenshot",
+        "chart without editable data sidecar"
+      ]
     },
     "anti_drift": [
       "no random neon poster look",
@@ -56,30 +109,30 @@
       "visual_fidelity_min": 90,
       "template_smell_blocking": true
     },
-    "controlled_variants": {
-      "sober-committee": {
+    "controlled_visual_languages": {
+      "matte-institutional": {
         "luminosity": "sober",
         "panel_density": "medium",
         "accent_energy": "quiet",
         "data_prominence": "table-led",
-        "motif_variation": "gridline",
-        "compliance_tone": "formal"
+        "motif_variation": "precision-rules",
+        "formality": "formal"
       },
-      "luminous-strategy": {
+      "luminous-glass": {
         "luminosity": "luminous",
         "panel_density": "medium",
         "accent_energy": "high",
         "data_prominence": "chart-led",
-        "motif_variation": "orb",
-        "compliance_tone": "presentation"
+        "motif_variation": "spotlight-orb",
+        "formality": "presentation"
       },
-      "dense-risk-review": {
-        "luminosity": "balanced",
+      "terminal-cockpit": {
+        "luminosity": "dim",
         "panel_density": "dense",
-        "accent_energy": "quiet",
-        "data_prominence": "table-led",
-        "motif_variation": "terminal",
-        "compliance_tone": "committee"
+        "accent_energy": "signal-coded",
+        "data_prominence": "matrix-led",
+        "motif_variation": "terminal-grid",
+        "formality": "operational"
       }
     }
   }

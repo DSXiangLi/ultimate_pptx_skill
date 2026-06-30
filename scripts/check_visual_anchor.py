@@ -14,25 +14,25 @@ import sys
 
 
 EXPECTED_VARIANT_GRAMMAR = {
-    "sober-committee": {
+    "matte-institutional": {
         "motif": "strict-grid",
         "panel_material": "matte-glass",
         "metric_style": "formal-compact",
-        "risk_rail_treatment": "committee-footer",
-        "required_roles": {"committee-gridline", "committee-ruler"},
+        "footer_treatment": "formal-source-band",
+        "required_roles": {"institutional-gridline", "institutional-ruler"},
     },
-    "luminous-strategy": {
+    "luminous-glass": {
         "motif": "spotlight-orb",
         "panel_material": "luminous-glass",
         "metric_style": "hero-kpi",
-        "risk_rail_treatment": "presentation-footer",
+        "footer_treatment": "presentation-source-band",
         "required_roles": {"luminous-ribbon", "spotlight-orb"},
     },
-    "dense-risk-review": {
+    "terminal-cockpit": {
         "motif": "terminal-grid",
         "panel_material": "dense-cockpit",
         "metric_style": "status-chip",
-        "risk_rail_treatment": "monitoring-status-bar",
+        "footer_treatment": "monitoring-status-bar",
         "required_roles": {"terminal-gridline", "status-chip"},
     },
 }
@@ -67,7 +67,7 @@ def iter_objects(ir):
 def check_anchor_schema(anchor_doc):
     issues=[]
     anchor=anchor_doc.get("visual_anchor") or {}
-    required=["id","immutable_dna","mutable_coordinates","mutation_operators","page_role_variants","density_modes","pptx_material_policy","anti_drift","qa_rubric"]
+    required=["id","immutable_dna","mutable_coordinates","controlled_visual_languages","mutation_operators","page_role_variants","density_modes","pptx_material_policy","anti_drift","qa_rubric"]
     for k in required:
         if not anchor.get(k):
             issues.append(issue("ANCHOR_FIELD_MISSING", f"visual_anchor missing {k}"))
@@ -83,7 +83,7 @@ def check_anchor_schema(anchor_doc):
 
 def check_variant_grammar(deck, roles):
     issues = []
-    variant = deck.get("visual_variant")
+    variant = deck.get("visual_language") or deck.get("visual_variant")
     if not variant or variant == "default":
         return issues
     expected = EXPECTED_VARIANT_GRAMMAR.get(variant)
@@ -92,7 +92,7 @@ def check_variant_grammar(deck, roles):
         if not grammar:
             issues.append(issue("WEAK_COORDINATE_REALIZATION", f"Variant {variant!r} declares a visual variant but no visual_grammar."))
         return issues
-    for key in ["motif", "panel_material", "metric_style", "risk_rail_treatment"]:
+    for key in ["motif", "panel_material", "metric_style", "footer_treatment"]:
         if grammar.get(key) != expected[key]:
             issues.append(issue("WEAK_COORDINATE_REALIZATION", f"Variant {variant} visual_grammar.{key}={grammar.get(key)!r}; expected {expected[key]!r}."))
     missing = sorted(expected["required_roles"] - roles)
@@ -100,7 +100,7 @@ def check_variant_grammar(deck, roles):
         issues.append(issue("COMPONENT_GRAMMAR_UNCHANGED", f"Variant {variant} missing variant-specific visible roles: {', '.join(missing)}."))
     # Decorative-only changes are not enough: each controlled variant must alter
     # at least one content-bearing component role, not just background glow.
-    content_variant_roles = roles & {"status-chip", "luminous-ribbon", "committee-ruler"}
+    content_variant_roles = roles & {"status-chip", "luminous-ribbon", "institutional-ruler"}
     if not content_variant_roles:
         issues.append(issue("VISUAL_VARIANT_DISTANCE_TOO_LOW", f"Variant {variant} lacks visible grammar roles beyond generic glass objects."))
     return issues

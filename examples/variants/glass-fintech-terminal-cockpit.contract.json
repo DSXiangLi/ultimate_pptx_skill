@@ -1,14 +1,14 @@
 {
-  "deck_id": "glass-fintech-luminous-strategy-variant",
+  "deck_id": "glass-fintech-terminal-cockpit-risk_review",
   "style_program": "glass-fintech-pptx",
   "size": {
     "w": 1280,
     "h": 720
   },
   "simulated_user_input": {
-    "raw_user_request": "请生成面向策略会展示的资产配置PPT短版，保持机构可信度，同时提升视觉能量和图表驱动的表达。",
+    "raw_user_request": "请生成面向风险复盘会的资产配置PPT短版，强调风险预算、压力测试、风格暴露和执行复核。",
     "audience": "公募/资管机构投委会，含投资总监、组合经理、风控与产品负责人",
-    "scenario": "策略会展示；需要更强注意力路径、更明显的图表主视觉和更鲜明的策略节奏。",
+    "scenario": "风险复盘会；需要高信息密度、矩阵/情景导向、装饰收敛和明确监控动作。",
     "data_assumptions": [
       "名义增长温和修复，库存周期处于主动去库尾段",
       "国内流动性维持合理充裕，资金利率低位震荡",
@@ -25,9 +25,9 @@
   },
   "slides": [
     {
-      "id": "ls01",
+      "id": "drr01",
       "topology": "glass-cover",
-      "kicker": "投委会策略 / 2026Q3 / luminous-strategy",
+      "kicker": "投委会策略 / 2026Q3 / terminal-cockpit",
       "title": "三季度资产配置建议：从防守确定性转向有纪律的风险再配置",
       "subtitle": "模拟真实用户输入的15页端到端 benchmark deck",
       "narrative_job": "建立主论点与会议语境。",
@@ -58,9 +58,9 @@
       "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
     },
     {
-      "id": "ls02",
+      "id": "drr02",
       "topology": "glass-dashboard",
-      "kicker": "Macro Dashboard / luminous-strategy",
+      "kicker": "Macro Dashboard / terminal-cockpit",
       "title": "三类宏观信号共同决定下半年风险预算路径",
       "subtitle": "增长修复不强，流动性宽松仍是资产再定价的核心缓冲。",
       "narrative_job": "dashboard页，测试指标卡+堆叠柱图。",
@@ -145,82 +145,71 @@
       "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
     },
     {
-      "id": "ls03",
-      "topology": "glass-chart-focus",
-      "kicker": "Asset Allocation / luminous-strategy",
-      "title": "资产配置建议：提高权益弹性，但保留固收稳定器",
-      "subtitle": "从仓位表述转向风险贡献表述，避免单一资产波动掩盖组合真实风险。",
-      "narrative_job": "图表焦点页，测试大图表+结论旁注。",
+      "id": "drr03",
+      "topology": "glass-matrix",
+      "kicker": "Style Matrix / terminal-cockpit",
+      "title": "风格暴露矩阵：从红利拥挤切向盈利质量和现金流",
+      "subtitle": "风格分类矩阵：按盈利确定性与拥挤度定位增配、降权和观察区域。",
+      "narrative_job": "矩阵页，测试多单元格热力图。",
       "body": [
-        "权益主要来自成长与出海，红利转为稳定配置。",
-        "固收不追久期；商品与黄金用于尾部对冲。"
+        "横轴为估值拥挤度，纵轴为盈利修复确定性；优先配置低拥挤、高确定性象限。"
       ],
       "metrics": [
         {
-          "label": "权益",
-          "value": "55%",
-          "delta": "+5pct",
-          "tone": "accent"
-        },
-        {
-          "label": "固收",
-          "value": "32%",
-          "delta": "-4pct",
+          "label": "优先增配",
+          "value": "2组",
+          "delta": "现金流/出口链",
           "tone": "positive"
         },
         {
-          "label": "另类现金",
-          "value": "13%",
-          "delta": "-1pct",
+          "label": "谨慎降权",
+          "value": "2组",
+          "delta": "红利/周期交易",
           "tone": "warning"
+        },
+        {
+          "label": "继续观察",
+          "value": "3组",
+          "delta": "AI/医药/消费",
+          "tone": "accent"
         }
       ],
-      "chart": {
-        "title": "建议配置比例，%",
-        "kind": "stacked-bar",
-        "unit": "%",
-        "categories": [
-          "当前",
-          "建议",
-          "上限"
+      "matrix": {
+        "title": "风格暴露定位矩阵（确定性 × 拥挤度）",
+        "x_labels": [
+          "低拥挤",
+          "中拥挤",
+          "高拥挤"
         ],
-        "series": [
-          {
-            "name": "权益",
-            "values": [
-              50,
-              55,
-              62
-            ],
-            "tone": "accent"
-          },
-          {
-            "name": "固收",
-            "values": [
-              36,
-              32,
-              30
-            ],
-            "tone": "positive"
-          },
-          {
-            "name": "另类现金",
-            "values": [
-              14,
-              13,
-              8
-            ],
-            "tone": "warning"
-          }
+        "y_labels": [
+          "高确定",
+          "中确定",
+          "低确定"
         ],
-        "source": "来源：投研系统、Wind、Bloomberg 与内部风险模型模拟测算；数据截止2026-06-30。"
+        "cells": [
+          [
+            "核心增配：高股息",
+            "优选：出口链龙头",
+            "降权：红利"
+          ],
+          [
+            "机会：制造",
+            "确认：AI",
+            "继续观察：医药"
+          ],
+          [
+            "跟踪：消费复苏",
+            "谨慎交易：周期",
+            "回避：纯主题交易"
+          ]
+        ]
       },
       "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
     },
     {
-      "id": "ls04",
+      "id": "drr04",
       "topology": "glass-scenario",
-      "kicker": "Scenario Stress / luminous-strategy",
+      "kicker": "Scenario Stress / terminal-cockpit",
       "title": "三种情景压力测试：核心不是预测，而是准备触发器",
       "subtitle": "测试情景卡片和压力测试数字的呈现。",
       "narrative_job": "情景压力页。",
@@ -267,9 +256,9 @@
       "risk_note": "风险提示：本页观点基于当前宏观、估值、流动性及政策假设形成，不构成收益承诺；市场波动、政策变化、海外利率路径及模型参数变化可能导致配置建议调整。"
     },
     {
-      "id": "ls05",
+      "id": "drr05",
       "topology": "glass-process",
-      "kicker": "Execution Path / luminous-strategy",
+      "kicker": "Execution Path / terminal-cockpit",
       "title": "执行路径四步：观察、加仓、对冲、再平衡",
       "subtitle": "每一步绑定触发条件、风险预算和复盘节奏，避免把观点直接等同于交易。",
       "narrative_job": "流程页。",
@@ -322,13 +311,14 @@
     }
   ],
   "visual_anchor": "glass-fintech-pptx",
-  "visual_variant": "luminous-strategy",
   "visual_coordinates": {
-    "luminosity": "luminous",
-    "panel_density": "medium",
-    "accent_energy": "high",
-    "data_prominence": "chart-led",
-    "motif_variation": "orb",
-    "compliance_tone": "presentation"
-  }
+    "luminosity": "dim",
+    "panel_density": "dense",
+    "accent_energy": "signal-coded",
+    "data_prominence": "matrix-led",
+    "motif_variation": "terminal-grid",
+    "formality": "operational"
+  },
+  "visual_language": "terminal-cockpit",
+  "narrative_intent": "risk_review"
 }

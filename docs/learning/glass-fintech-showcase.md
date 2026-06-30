@@ -487,3 +487,41 @@ Rendered contact sheets:
 ### Prevention Rule
 
 Do not accept a visual-anchor variant because it declares coordinates or passes role-signature variation. A variant must materialize coordinate changes into grammar-level visible differences: motif, material, component grammar, layout rhythm, risk/footer treatment, and content-bearing PPTX roles. Automated gates must fail variants that only alter decoration.
+
+---
+
+## Problem 15: Visual-language proof requires same content, not just separate fields
+
+### Symptom
+
+After splitting `visual_language` from `narrative_intent`, rendered comparisons still partially reflected different business/narrative skeletons. A reviewer could still read the variants as meeting/scenario presets rather than pure visual-language programs.
+
+### Root Cause
+
+Field-level orthogonality is necessary but insufficient. If each visual language is validated with a different contract, slide sequence, topology, or business use case, narrative differences can still create perceived visual differences. The validation sample itself couples visual proof to narrative content.
+
+### Fix
+
+- Added `examples/variants/glass-fintech-visual-language-base.contract.json` as the same-content validation base.
+- Reworked `scripts/validate_glass_variants.py` so every controlled visual-language run uses the same slides, same text, same charts, and the same `narrative_intent=strategy_update`.
+- The validator now changes only `visual_language` and visual coordinates, then checks identical compiled native-text fingerprints across visual languages.
+- Strengthened component-level grammar so `terminal-cockpit` is not just a darker `matte-institutional`: terminal status bar, NODE page label, rectangular status chips, stronger grid/rail treatment, and profile-driven panel palette.
+
+### Verification
+
+```bash
+python3 scripts/check_narrative_visual_orthogonality.py
+# PASS narrative/visual orthogonality visual_languages=3 narrative_intents=3
+python3 scripts/validate_glass_variants.py
+# PASS glass visual languages same_content=1 count=3 matte-institutional score=96.15 edit=100.00; luminous-glass score=95.55 edit=100.00; terminal-cockpit score=95.79 edit=100.00
+python3 scripts/validate_skill.py
+# ALL CHECKS PASSED
+```
+
+Rendered same-content comparison:
+
+- `build/visual-language-same-content-comparison.png`
+
+### Prevention Rule
+
+Never validate a visual language by giving it its own narrative skeleton. Visual-language acceptance must hold content and `narrative_intent` fixed; otherwise, the test proves scenario-template diversity, not visual-language extensibility.

@@ -213,6 +213,139 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     return {"style_program": style_program, "score": float(score), "editability": float(edit_score)}
 
 
+
+def obj_box(obj: dict) -> dict:
+    return obj.get("box", {}) or {}
+
+
+def rounded_ratio(value: float) -> float:
+    return round(float(value), 2)
+
+
+def visual_dna_signature(ir: dict) -> dict:
+    """Extract visual DNA from actual IR objects, not declarations.
+
+    This intentionally inspects charts, typography, cards/components, and layout
+    skeletons so style systems cannot pass by changing only background/surface.
+    """
+    title_sizes = []
+    title_widths = []
+    body_sizes = []
+    metric_sizes = []
+    fonts = set()
+    chart_styles = []
+    chart_boxes = []
+    card_shapes = []
+    card_boxes = []
+    role_counts = {}
+    title_xs = []
+    metric_xs = []
+    process_xs = []
+    for slide in ir.get("deck", {}).get("slides", []):
+        for obj in slide.get("objects", []):
+            role = obj.get("role", "")
+            role_counts[role] = role_counts.get(role, 0) + 1
+            box = obj_box(obj)
+            if obj.get("type") == "text":
+                style = obj.get("style", {})
+                if style.get("font"):
+                    fonts.add(style.get("font"))
+                if role == "title":
+                    title_sizes.append(style.get("size"))
+                    title_widths.append(box.get("w"))
+                    title_xs.append(box.get("x"))
+                elif role in {"body", "risk", "kicker"}:
+                    body_sizes.append(style.get("size"))
+                elif role in {"metric", "metric-label", "metric-note"}:
+                    metric_sizes.append(style.get("size"))
+            elif obj.get("type") == "chart":
+                st = obj.get("style", {})
+                chart_styles.append((
+                    st.get("font"),
+                    st.get("title_color"),
+                    st.get("label_color"),
+                    st.get("grid_color"),
+                    st.get("panel_fill"),
+                    st.get("panel_stroke"),
+                    st.get("chart_treatment"),
+                    tuple(st.get("series_palette", [])),
+                    st.get("axis_style"),
+                    st.get("legend_style"),
+                    st.get("marker_style"),
+                ))
+                chart_boxes.append((box.get("x"), box.get("y"), box.get("w"), box.get("h")))
+            elif obj.get("type") == "shape" and role in {"glass-panel", "ledger-metric", "map-tile", "supporting-card", "process-step"}:
+                card_shapes.append((role, obj.get("shape"), obj.get("fill"), obj.get("stroke"), obj.get("opacity"), obj.get("stroke_opacity"), bool(obj.get("shadow"))))
+                card_boxes.append((role, box.get("w"), box.get("h")))
+                if role in {"ledger-metric", "map-tile"}:
+                    metric_xs.append(box.get("x"))
+                if role == "process-step":
+                    process_xs.append(box.get("x"))
+    def avg(vals):
+        vals = [v for v in vals if isinstance(v, (int, float))]
+        return rounded_ratio(sum(vals) / len(vals)) if vals else None
+    return {
+        "font_set": tuple(sorted(fonts)),
+        "title_size_avg": avg(title_sizes),
+        "title_width_avg": avg(title_widths),
+        "body_size_avg": avg(body_sizes),
+        "metric_size_avg": avg(metric_sizes),
+        "chart_styles": tuple(sorted(set(chart_styles))),
+        "chart_boxes": tuple(sorted(set(chart_boxes))),
+        "card_shapes": tuple(sorted(set(card_shapes))),
+        "card_boxes": tuple(sorted(set(card_boxes))),
+        "role_counts": tuple(sorted(role_counts.items())),
+        "layout_signature": (
+            avg(title_xs),
+            avg(metric_xs),
+            avg(process_xs),
+            len(set(chart_boxes)),
+            len(set(card_boxes)),
+        ),
+    }
+
+
+def dna_distance(a: dict, b: dict) -> int:
+    keys = [
+        "font_set",
+        "title_size_avg",
+        "title_width_avg",
+        "body_size_avg",
+        "metric_size_avg",
+        "chart_styles",
+        "chart_boxes",
+        "card_shapes",
+        "card_boxes",
+        "layout_signature",
+    ]
+    return sum(1 for key in keys if a.get(key) != b.get(key))
+
+
+def check_visual_dna_depth(results: list[dict]):
+    signatures = {}
+    for result in results:
+        style_program = result["style_program"]
+        ir = load_json(ROOT / "build" / ("visual-system-%s" % style_program) / ("%s.ir.json" % style_program))
+        sig = visual_dna_signature(ir)
+        signatures[style_program] = sig
+        chart_styles = sig.get("chart_styles", ())
+        if not chart_styles:
+            fail("%s missing chart DNA evidence" % style_program)
+        if all(len(style) >= 8 and not style[7] for style in chart_styles):
+            fail("%s chart DNA missing series_palette evidence" % style_program)
+    systems = list(signatures)
+    for i, a in enumerate(systems):
+        for b in systems[i + 1:]:
+            dist = dna_distance(signatures[a], signatures[b])
+            if dist < 8:
+                fail("VISUAL_DNA_DISTANCE_TOO_LOW between %s and %s: distance=%d signatures=%s" % (a, b, dist, signatures))
+            if signatures[a].get("chart_styles") == signatures[b].get("chart_styles"):
+                fail("CHART_DNA_UNCHANGED between %s and %s" % (a, b))
+            if signatures[a].get("font_set") == signatures[b].get("font_set") and signatures[a].get("title_size_avg") == signatures[b].get("title_size_avg"):
+                fail("TYPOGRAPHY_DNA_UNCHANGED between %s and %s" % (a, b))
+            if signatures[a].get("card_shapes") == signatures[b].get("card_shapes"):
+                fail("CONTAINER_DNA_UNCHANGED between %s and %s" % (a, b))
+
 def check_cross_system_distance(results: list[dict]):
     grammars = {}
     for result in results:
@@ -241,6 +374,7 @@ def main():
     for style_program, config in STYLE_SYSTEMS.items():
         results.append(validate_system(style_program, config, base_fingerprint, expected_texts))
     check_cross_system_distance(results)
+    check_visual_dna_depth(results)
     print("PASS visual systems same_content=1 count=%d %s" % (len(results), "; ".join("%s score=%.2f edit=%.2f" % (r["style_program"], r["score"], r["editability"]) for r in results)))
 
 

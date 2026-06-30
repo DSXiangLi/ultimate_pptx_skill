@@ -560,3 +560,20 @@ Rendered review artifacts:
 ### Prevention Rule
 
 Do not accept a new visual system solely because automated gates pass. For each new visual system, review at least the densest full-size rendered page plus the contact sheet. If full-size review finds overlap, treat it as a generation/layout bug even when layout safety, visual fidelity, and editability scores pass.
+
+## Problem 17: Visual DNA hardening must change information-bearing components
+
+**Symptom.** A multi-system deck can pass first-glance review while still feeling like one template with different backgrounds. The failure shows up in shared chart palettes, identical typography rhythm, reused metric cards, similar footer/header treatment, and nearly identical page-role skeletons.
+
+**Root cause.** The compiler treated `visual_system_grammar` as mostly surface/background grammar. Chart rendering, typography, container geometry, metric cards, analyst/report components, and process/scenario page structures still shared one implementation path.
+
+**Fix.** Visual DNA hardening must alter real editable IR/PPTX objects, not only declared metadata:
+
+- chart `series_palette`, axis/grid style, value label color, and bar geometry;
+- text font roles for title/body/metric/caption;
+- metric-card and container geometry by visual system;
+- research memo components such as exhibit labels, analyst notes, assumption tables, execution checklists;
+- atlas route/node layout for process pages;
+- fintech dashboard contrast and signal-card treatment.
+
+**Acceptance rule.** A visual system is not release-ready if chart, font, card/container, component, and layout signatures remain substantially shared. The same-content contact sheet must show visual DNA differences in information-bearing regions, not just background texture or accent color.

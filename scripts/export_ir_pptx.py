@@ -121,12 +121,12 @@ def shape(obj, shape_id, placeholder=False):
     )
 
 
-def make_text_obj(oid, text, x, y, w, h, size=10, color_value="B6C7D8", bold=False):
+def make_text_obj(oid, text, x, y, w, h, size=10, color_value="B6C7D8", bold=False, font="Microsoft YaHei"):
     return {
         "id": oid,
         "box": {"x": x, "y": y, "w": w, "h": h},
         "text": text,
-        "style": {"font": "Microsoft YaHei", "size": size, "color": color_value, "bold": bold},
+        "style": {"font": font, "size": size, "color": color_value, "bold": bold},
     }
 
 
@@ -143,7 +143,11 @@ def make_shape_obj(oid, x, y, w, h, fill, stroke=None, opacity=1.0, stroke_opaci
     }
 
 
-def chart_tone_color(tone):
+def chart_tone_color(tone, style=None, index=0):
+    style = style or {}
+    palette = style.get("series_palette") or []
+    if palette:
+        return color(palette[index % len(palette)], "5ED7FF")
     return {"positive": "31D0AA", "warning": "FBBF24", "accent": "7C3AED"}.get(tone, "5ED7FF")
 
 
@@ -160,17 +164,18 @@ def chart_vector_parts(obj, shape_id):
         parts.append(shape(make_shape_obj(oid, sx, sy, sw, sh, fill, stroke, opacity, stroke_opacity, prst), shape_id))
         shape_id += 1
 
-    def add_text(oid, text, tx, ty, tw, th, size=10, color_value="B6C7D8", bold=False):
+    def add_text(oid, text, tx, ty, tw, th, size=10, color_value="B6C7D8", bold=False, font=None):
         nonlocal shape_id
-        parts.append(text_shape(make_text_obj(oid, text, tx, ty, tw, th, size, color_value, bold), shape_id))
+        parts.append(text_shape(make_text_obj(oid, text, tx, ty, tw, th, size, color_value, bold, font or st.get("font", "Microsoft YaHei")), shape_id))
         shape_id += 1
 
-    add_shape(obj["id"] + "_panel", x, y, w, h, st.get("panel_fill", "13243A"), st.get("panel_stroke", "2A6F91"), 0.48, st.get("stroke_opacity", 0.75), "roundRect")
-    add_text(obj["id"] + "_title", obj.get("title", ""), x + 18, y + 8, max(1, w - 36), 20, 12, st.get("title_color", "EAF7FF"), True)
+    add_shape(obj["id"] + "_panel", x, y, w, h, st.get("panel_fill", "13243A"), st.get("panel_stroke", "2A6F91"), st.get("opacity", 0.48), st.get("stroke_opacity", 0.75), "roundRect")
+    add_text(obj["id"] + "_title", obj.get("title", ""), x + 18, y + 8, max(1, w - 36), 20, 12, st.get("title_color", "EAF7FF"), True, st.get("title_font"))
     lx = x + 18
     for idx, ser in enumerate(series[:3]):
         gx = lx + idx * 72
-        add_shape(obj["id"] + "_legend_swatch_%d" % (idx + 1), gx, y + 32, 10, 10, chart_tone_color(ser.get("tone")), chart_tone_color(ser.get("tone")), 0.9, 0.0)
+        c = chart_tone_color(ser.get("tone"), st, idx)
+        add_shape(obj["id"] + "_legend_swatch_%d" % (idx + 1), gx, y + 32, 10, 10, c, c, 0.92, 0.0)
         add_text(obj["id"] + "_legend_label_%d" % (idx + 1), ser.get("name", ""), gx + 15, y + 29, 54, 14, 9, st.get("label_color", "B6C7D8"), False)
     plot_x, plot_y, plot_w, plot_h = x + 44, y + 66, max(1, w - 70), max(1, h - 116)
     max_total = 100
@@ -180,11 +185,12 @@ def chart_vector_parts(obj, shape_id):
             max_total = max(max_total, total)
     for val in [0, 50, 100]:
         yy = plot_y + plot_h - plot_h * val / max_total
-        add_shape(obj["id"] + "_grid_%d" % val, plot_x, yy, plot_w, 1, st.get("grid_color", "2A6F91"), st.get("grid_color", "2A6F91"), 0.22, 0.0)
+        add_shape(obj["id"] + "_grid_%d" % val, plot_x, yy, plot_w, 1, st.get("grid_color", "2A6F91"), st.get("grid_color", "2A6F91"), st.get("grid_opacity", 0.22), 0.0)
         add_text(obj["id"] + "_axis_%d" % val, "%d%%" % val, x + 8, yy - 7, 32, 12, 8, st.get("label_color", "B6C7D8"), False)
     if categories:
         gap = 10
         bw = max(10, (plot_w - gap * (len(categories) + 1)) / len(categories))
+        bar_prst = st.get("bar_shape", "rect") if st.get("bar_shape") in {"rect", "roundRect"} else "rect"
         for i, cat in enumerate(categories):
             bx = plot_x + gap + i * (bw + gap)
             cursor = plot_y + plot_h
@@ -193,9 +199,10 @@ def chart_vector_parts(obj, shape_id):
                 val = float(vals[i]) if i < len(vals) else 0
                 bh = plot_h * val / max_total
                 cursor -= bh
-                add_shape(obj["id"] + "_bar_%d_%d" % (i + 1, sidx + 1), bx, cursor, bw, max(1, bh), chart_tone_color(ser.get("tone")), chart_tone_color(ser.get("tone")), 0.86, 0.0)
+                c = chart_tone_color(ser.get("tone"), st, sidx)
+                add_shape(obj["id"] + "_bar_%d_%d" % (i + 1, sidx + 1), bx, cursor, bw, max(1, bh), c, c, 0.88, 0.0, bar_prst)
                 if i == len(categories) - 1 and bh >= 13:
-                    add_text(obj["id"] + "_label_%d_%d" % (i + 1, sidx + 1), str(int(round(val))), bx, cursor + bh / 2 - 6, bw, 12, 8, "EAF7FF", False)
+                    add_text(obj["id"] + "_label_%d_%d" % (i + 1, sidx + 1), str(int(round(val))), bx, cursor + bh / 2 - 6, bw, 12, 8, st.get("value_label_color", "EAF7FF"), False)
             add_text(obj["id"] + "_cat_%d" % (i + 1), str(cat), bx - 4, y + h - 38, bw + 8, 14, 9, st.get("label_color", "B6C7D8"), False)
     source = str(obj.get("source", ""))[:42]
     if source:

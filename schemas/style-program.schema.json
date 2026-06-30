@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ultimate PPTX Style Program",
+  "type": "object",
+  "required": [
+    "style_program"
+  ],
+  "properties": {
+    "style_program": {
+      "type": "object",
+      "required": [
+        "id",
+        "tension",
+        "grammar",
+        "tokens",
+        "base_dna",
+        "sota_dna",
+        "pptx_material_strategy",
+        "degradation_rules",
+        "density_modes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tension": {
+          "type": "object"
+        },
+        "grammar": {
+          "type": "object"
+        },
+        "tokens": {
+          "type": "object"
+        },
+        "base_dna": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "sota_dna": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string"
+          }
+        },
+        "pptx_material_strategy": {
+          "type": "object"
+        },
+        "degradation_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "density_modes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

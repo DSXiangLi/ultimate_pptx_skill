@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ultimate PPTX Deck Spec",
+  "type": "object",
+  "required": [
+    "content_contract",
+    "style_program",
+    "slides"
+  ],
+  "properties": {
+    "content_contract": {
+      "type": "object"
+    },
+    "style_program": {
+      "type": "string"
+    },
+    "slides": {
+      "type": "array"
+    }
+  }
+}

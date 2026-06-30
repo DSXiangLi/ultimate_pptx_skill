@@ -1,0 +1,53 @@
+{
+  "style_program": {
+    "id": "swiss-grid-pptx",
+    "tension": {
+      "order_emergence": "order",
+      "surface_structure": "structure",
+      "authority_access": "authority"
+    },
+    "grammar": {
+      "line": "mechanical",
+      "color_application": "flat",
+      "space": "grid",
+      "information_encoding": "typography_chart",
+      "depth": "flat_layered"
+    },
+    "tokens": {
+      "palette": "institutional-cool",
+      "typography": "office-cn-sans",
+      "theme_mapping": "pptx-theme-safe"
+    },
+    "base_dna": [
+      "strict mathematical grid alignment"
+    ],
+    "sota_dna": [
+      "giant thin numeral as structural image",
+      "controlled one-point grid break to create tension"
+    ],
+    "pptx_material_strategy": {
+      "native": [
+        "text",
+        "shape",
+        "chart",
+        "table"
+      ],
+      "vector": [
+        "icon",
+        "simple diagram"
+      ],
+      "raster": [
+        "subtle paper texture only"
+      ]
+    },
+    "degradation_rules": [
+      "never rasterize priority >=4 text",
+      "remove texture before rasterizing charts or tables",
+      "if Office font missing, fall back to Microsoft YaHei / Aptos"
+    ],
+    "density_modes": [
+      "medium",
+      "high"
+    ]
+  }
+}

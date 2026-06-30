@@ -1,6 +1,8 @@
 # Visual-System Generalization
 
-A visual-language gate inside one anchor is not enough. It can still overfit to one local optimum, such as dark glass finance dashboards.
+A visual-language gate inside one anchor is not enough. It can still overfit to one local optimum, such as dark glass finance dashboards. First-glance difference is also insufficient: a deck can use different background colors or surfaces while reusing the same chart palette, fonts, card geometry, component hierarchy, and layout skeleton.
+
+Read `references/visual-dna-model.md` before accepting any new style anchor.
 
 ## Rule
 
@@ -18,8 +20,9 @@ A multi-visual-system validation run is accepted only when all of the following 
 
 - At least three full style anchors compile from the same content contract and the same `narrative_intent`.
 - At least two style anchors are visually distant from the original dark-glass finance anchor.
-- Each style anchor declares a distinct `visual_system_grammar` with surface, composition, material, chromatic mode, and container grammar.
-- Pairwise visual-system grammar distance is high enough that a new system cannot be a shallow recolor.
+- Each style anchor declares a distinct `visual_system_grammar` with surface, composition, material, chromatic mode, typography system, chart grammar, component grammar, layout archetypes, lighting model, motif system, and container grammar.
+- Pairwise visual-system grammar distance is high enough that a new system cannot be a shallow recolor, background swap, or decorative overlay.
+- Chart palettes/axis treatment, typography/numeral voice, metric-card geometry, footer/source rail, and page-role layout archetypes must differ materially across full visual systems unless explicitly constrained by a corporate standard.
 - Critical business text from the source contract is preserved as native editable PPTX text in every generated system.
 - Every system exports a real `.pptx` and passes layout safety, PPTX export audit, visual fidelity, and QA editability gates.
 - Rendered contact sheets are reviewed, and at least the densest page of each new visual system receives full-size visual review.
@@ -37,6 +40,7 @@ Release is blocked unless:
 - A new style anchor changes slide content to pass layout.
 - Critical business text is missing from native editable PPTX objects.
 - The style anchor only recolors an existing visual system.
+- The style anchor changes background/texture but reuses the same chart colors, typography, card geometry, component hierarchy, and layout skeleton.
 - The style cannot export real `.pptx` and pass layout/render/QA gates.
 - Contact-sheet review or full-size review finds a blocking visual issue after automated gates pass.
 

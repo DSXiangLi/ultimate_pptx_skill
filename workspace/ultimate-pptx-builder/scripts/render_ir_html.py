@@ -39,45 +39,58 @@ def render_chart_svg(obj):
     w, h = int(box["w"]), int(box["h"])
     categories = obj.get("categories", [])
     series = obj.get("series", [])
-    tone = {"positive": "#31D0AA", "warning": "#FBBF24", "accent": "#8B5CF6"}
+    st = obj.get("style", {})
+    palette = ["#" + str(c).strip().lstrip("#") for c in st.get("series_palette", [])]
+    fallback = {"positive": "#31D0AA", "warning": "#FBBF24", "accent": "#8B5CF6"}
+    def series_color(ser, idx):
+        return palette[idx % len(palette)] if palette else fallback.get(ser.get("tone"), "#5ED7FF")
     title = html.escape(obj.get("title", ""))
-    label_color = "#B6C7D8"
+    label_color = css_color(st.get("label_color", "B6C7D8"), 1.0, "B6C7D8")
+    title_color = css_color(st.get("title_color", "EAF7FF"), 1.0, "EAF7FF")
+    value_label_color = css_color(st.get("value_label_color", "EAF7FF"), 1.0, "EAF7FF")
+    grid_color = css_color(st.get("grid_color", "2A6F91"), st.get("grid_opacity", .22), "2A6F91")
+    panel_fill = css_color(st.get("panel_fill", "13243A"), st.get("opacity", .48), "13243A")
+    panel_stroke = css_color(st.get("panel_stroke", "2A6F91"), st.get("stroke_opacity", .75), "2A6F91")
+    chart_font = html.escape(st.get("font", "Microsoft YaHei"))
+    title_font = html.escape(st.get("title_font", chart_font))
+    bar_rx = 7 if st.get("bar_shape") == "roundRect" else 1
     plot_x, plot_y, plot_w, plot_h = 44, 66, max(1, w - 70), max(1, h - 116)
     max_total = 100
     if categories:
         max_total = max(max_total, max(sum(float(s.get("values", [0] * len(categories))[i]) for s in series if i < len(s.get("values", []))) for i in range(len(categories))))
     parts = [
         '<svg width="100%%" height="100%%" viewBox="0 0 %d %d" preserveAspectRatio="none">' % (w, h),
-        '<rect x="0" y="0" width="%d" height="%d" rx="18" fill="rgba(19,36,58,.48)" stroke="rgba(42,111,145,.75)"/>' % (w, h),
-        '<text x="18" y="22" fill="#EAF7FF" font-size="12" font-weight="700">%s</text>' % title,
+        '<rect x="0" y="0" width="%d" height="%d" rx="18" fill="%s" stroke="%s"/>' % (w, h, panel_fill, panel_stroke),
+        '<text x="18" y="22" fill="%s" font-family="%s" font-size="12" font-weight="700">%s</text>' % (title_color, title_font, title),
     ]
     lx = 18
-    for idx, s in enumerate(series[:3]):
+    for idx, ser in enumerate(series[:3]):
         gx = lx + idx * 72
-        parts.append('<rect x="%d" y="32" width="10" height="10" rx="2" fill="%s" opacity=".90"/>' % (gx, tone.get(s.get("tone"), "#5ED7FF")))
-        parts.append('<text x="%d" y="41" fill="%s" font-size="10">%s</text>' % (gx + 15, label_color, html.escape(s.get("name", ""))))
+        c = series_color(ser, idx)
+        parts.append('<rect x="%d" y="32" width="10" height="10" rx="2" fill="%s" opacity=".92"/>' % (gx, c))
+        parts.append('<text x="%d" y="41" fill="%s" font-family="%s" font-size="10">%s</text>' % (gx + 15, label_color, chart_font, html.escape(ser.get("name", ""))))
     for val in [0, 50, 100]:
         yy = plot_y + plot_h - plot_h * val / max_total
-        parts.append('<line x1="%d" y1="%.1f" x2="%d" y2="%.1f" stroke="rgba(94,215,255,.18)" stroke-width="1"/>' % (plot_x, yy, plot_x + plot_w, yy))
-        parts.append('<text x="10" y="%.1f" fill="%s" font-size="9">%d%%</text>' % (yy + 3, label_color, val))
+        parts.append('<line x1="%d" y1="%.1f" x2="%d" y2="%.1f" stroke="%s" stroke-width="1"/>' % (plot_x, yy, plot_x + plot_w, yy, grid_color))
+        parts.append('<text x="10" y="%.1f" fill="%s" font-family="%s" font-size="9">%d%%</text>' % (yy + 3, label_color, chart_font, val))
     if categories:
         gap = 10
         bw = max(10, (plot_w - gap * (len(categories) + 1)) / len(categories))
         for i, cat in enumerate(categories):
             x = plot_x + gap + i * (bw + gap)
             y_cursor = plot_y + plot_h
-            for s in series:
-                vals = s.get("values", [])
+            for sidx, ser in enumerate(series):
+                vals = ser.get("values", [])
                 val = float(vals[i]) if i < len(vals) else 0
                 bh = plot_h * val / max_total
                 y_cursor -= bh
-                parts.append('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="3" fill="%s" opacity=".86"/>' % (x, y_cursor, bw, bh, tone.get(s.get("tone"), "#5ED7FF")))
+                parts.append('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="%d" fill="%s" opacity=".88"/>' % (x, y_cursor, bw, bh, bar_rx, series_color(ser, sidx)))
                 if i == len(categories) - 1 and bh >= 13:
-                    parts.append('<text x="%.1f" y="%.1f" fill="#EAF7FF" font-size="8" text-anchor="middle">%d</text>' % (x + bw / 2, y_cursor + bh / 2 + 3, int(round(val))))
-            parts.append('<text x="%.1f" y="%d" fill="%s" font-size="10" text-anchor="middle">%s</text>' % (x + bw / 2, h - 30, label_color, html.escape(str(cat))))
+                    parts.append('<text x="%.1f" y="%.1f" fill="%s" font-family="%s" font-size="8" text-anchor="middle">%d</text>' % (x + bw / 2, y_cursor + bh / 2 + 3, value_label_color, chart_font, int(round(val))))
+            parts.append('<text x="%.1f" y="%d" fill="%s" font-family="%s" font-size="10" text-anchor="middle">%s</text>' % (x + bw / 2, h - 30, label_color, chart_font, html.escape(str(cat))))
     source = html.escape(obj.get("source", ""))
     if source:
-        parts.append('<text x="18" y="%d" fill="%s" font-size="8">%s</text>' % (h - 10, label_color, source[:52]))
+        parts.append('<text x="18" y="%d" fill="%s" font-family="%s" font-size="8">%s</text>' % (h - 10, label_color, chart_font, source[:52]))
     parts.append('</svg>')
     return "".join(parts)
 

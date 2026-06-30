@@ -1,0 +1,157 @@
+{
+  "deck": {
+    "id": "minimal-finance-demo",
+    "size": {
+      "w": 1280,
+      "h": 720
+    },
+    "slides": [
+      {
+        "id": "s1",
+        "objects": [
+          {
+            "id": "bg_texture",
+            "type": "rasterIsland",
+            "role": "background",
+            "box": {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 720
+            },
+            "z": 0,
+            "editability": {
+              "level": "replaceable",
+              "priority": 1,
+              "user_can_edit": [
+                "replace",
+                "regenerate"
+              ]
+            },
+            "render_policy": "raster",
+            "source": {
+              "kind": "texture",
+              "regenerable": true,
+              "description": "subtle institutional gradient texture"
+            },
+            "must_not_contain": [
+              "title",
+              "body",
+              "risk",
+              "source",
+              "chart-data"
+            ]
+          },
+          {
+            "id": "title",
+            "type": "text",
+            "role": "title",
+            "box": {
+              "x": 80,
+              "y": 64,
+              "w": 760,
+              "h": 88
+            },
+            "z": 10,
+            "text": "IR-first 才是可编辑 PPTX 的正确起点",
+            "style": {
+              "font": "Microsoft YaHei",
+              "size": 34,
+              "color": "111827",
+              "bold": true
+            },
+            "editability": {
+              "level": "text",
+              "priority": 5,
+              "user_can_edit": [
+                "text",
+                "position",
+                "style"
+              ]
+            },
+            "render_policy": "native"
+          },
+          {
+            "id": "key_card",
+            "type": "shape",
+            "role": "supporting-card",
+            "box": {
+              "x": 80,
+              "y": 190,
+              "w": 480,
+              "h": 300
+            },
+            "z": 5,
+            "shape": "roundRect",
+            "fill": "FFFFFF",
+            "stroke": "D1D5DB",
+            "editability": {
+              "level": "style",
+              "priority": 3,
+              "user_can_edit": [
+                "fill",
+                "stroke",
+                "position"
+              ]
+            },
+            "render_policy": "native"
+          },
+          {
+            "id": "body_1",
+            "type": "text",
+            "role": "body",
+            "box": {
+              "x": 112,
+              "y": 230,
+              "w": 416,
+              "h": 170
+            },
+            "z": 11,
+            "text": "HTML 可以继续作为预览和布局引擎，但真实源应是带有编辑性预算的 Slide IR。",
+            "style": {
+              "font": "Microsoft YaHei",
+              "size": 20,
+              "color": "1F2937"
+            },
+            "editability": {
+              "level": "text",
+              "priority": 5,
+              "user_can_edit": [
+                "text",
+                "position",
+                "style"
+              ]
+            },
+            "render_policy": "native"
+          },
+          {
+            "id": "risk_note",
+            "type": "text",
+            "role": "risk",
+            "box": {
+              "x": 80,
+              "y": 650,
+              "w": 1120,
+              "h": 32
+            },
+            "z": 20,
+            "text": "资料来源：内部研究示例。本文档仅用于技能设计，不构成投资建议。",
+            "style": {
+              "font": "Microsoft YaHei",
+              "size": 10,
+              "color": "6B7280"
+            },
+            "editability": {
+              "level": "text",
+              "priority": 5,
+              "user_can_edit": [
+                "text"
+              ]
+            },
+            "render_policy": "native"
+          }
+        ]
+      }
+    ]
+  }
+}

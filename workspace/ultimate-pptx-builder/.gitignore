@@ -1,0 +1,11 @@
+# Generated validation/build artifacts
+build/
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local editor/system files
+.DS_Store
+.idea/
+.vscode/

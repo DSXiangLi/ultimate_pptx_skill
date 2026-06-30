@@ -1,0 +1,71 @@
+{
+  "style_program": {
+    "id": "glass-fintech-pptx",
+    "tension": {
+      "clarity_depth": "financial clarity over atmospheric depth",
+      "institutional_futurism": "regulated finance rendered with restrained future UI",
+      "signal_noise": "glow accents highlight signal, never decorate critical text"
+    },
+    "grammar": {
+      "line": "thin luminous separators",
+      "color_application": "dark base with translucent glass layers and cyan/violet accents",
+      "space": "layered dashboard grid",
+      "information_encoding": "metric cards, risk bands, action rails",
+      "depth": "native translucency, shadow, highlight stroke"
+    },
+    "tokens": {
+      "palette": {
+        "background": "07111F",
+        "panel": "13243A",
+        "panel_alt": "19324D",
+        "stroke": "5ED7FF",
+        "stroke_soft": "2A6F91",
+        "accent": "7C3AED",
+        "positive": "31D0AA",
+        "warning": "FBBF24",
+        "text": "EAF7FF",
+        "muted": "B6C7D8"
+      },
+      "typography": "office-cn-sans",
+      "theme_mapping": "pptx-native-dark-glass"
+    },
+    "base_dna": [
+      "dark institutional canvas",
+      "translucent information panels with native editable text",
+      "thin luminous cyan strokes used as structure not decoration"
+    ],
+    "sota_dna": [
+      "glass cards arranged as a terminal-like financial cockpit",
+      "large ghost numerals as depth anchors behind native metrics",
+      "risk/compliance rail pinned to the bottom as a persistent institutional layer"
+    ],
+    "pptx_material_strategy": {
+      "native": [
+        "text",
+        "shape",
+        "metric card",
+        "risk rail",
+        "divider",
+        "pill"
+      ],
+      "vector": [
+        "simple arrows",
+        "sparkline placeholders"
+      ],
+      "raster": [
+        "background blur texture only; forbidden in MVP showcase"
+      ]
+    },
+    "degradation_rules": [
+      "never rasterize priority >=4 text",
+      "if blur is unavailable, simulate glass with translucent native fills, highlight stroke, and shadow",
+      "if glow is unavailable, use low-opacity accent shapes behind native cards",
+      "risk/source text remains native and visible on every slide"
+    ],
+    "density_modes": [
+      "executive",
+      "dashboard",
+      "risk-review"
+    ]
+  }
+}

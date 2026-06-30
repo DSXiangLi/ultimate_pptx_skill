@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ultimate PPTX QA Report",
+  "type": "object",
+  "required": [
+    "deck_id",
+    "scores",
+    "blocking_issues",
+    "objects_audited",
+    "release_decision"
+  ],
+  "properties": {
+    "deck_id": {
+      "type": "string"
+    },
+    "scores": {
+      "type": "object",
+      "required": [
+        "fidelity",
+        "editability",
+        "design",
+        "practicality"
+      ],
+      "properties": {
+        "fidelity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "editability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "design": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "practicality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "visual_fidelity": {
+      "type": "object",
+      "properties": {
+        "overall_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "slides": {
+          "type": "array"
+        }
+      }
+    },
+    "blocking_issues": {
+      "type": "array"
+    },
+    "objects_audited": {
+      "type": "array"
+    },
+    "notes": {
+      "type": "array"
+    },
+    "release_decision": {
+      "enum": [
+        "pass",
+        "fail",
+        "pass_with_accepted_exceptions"
+      ]
+    }
+  }
+}

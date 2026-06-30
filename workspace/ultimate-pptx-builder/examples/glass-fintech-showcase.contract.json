@@ -1,0 +1,159 @@
+{
+  "deck_id": "glass-fintech-showcase-v1",
+  "size": {
+    "w": 1280,
+    "h": 720
+  },
+  "scenario": "financial-institution-strategy-brief",
+  "style_program": "glass-fintech-pptx",
+  "slides": [
+    {
+      "id": "g1",
+      "topology": "glass-hero",
+      "kicker": "资产配置委员会 / 2026H2",
+      "title": "以可编辑的 Glass Fintech Cockpit 呈现金融决策信号",
+      "subtitle": "把视觉纵深、合规文本和核心指标同时保留为 PowerPoint 原生对象。",
+      "metrics": [
+        {
+          "label": "组合波动率",
+          "value": "8.4%",
+          "delta": "-1.2pct",
+          "tone": "positive"
+        },
+        {
+          "label": "权益仓位",
+          "value": "42%",
+          "delta": "+6pct",
+          "tone": "accent"
+        },
+        {
+          "label": "信用利差",
+          "value": "118bp",
+          "delta": "审慎",
+          "tone": "warning"
+        }
+      ],
+      "body": [
+        "关键业务文字、指标和风险提示全部 native；玻璃质感由可编辑形状、透明度和高光边框组合。",
+        "复杂背景不进入 rasterIsland，先把一个风格端到端打穿，再扩展素材能力。"
+      ],
+      "risk_note": "资料来源：内部研究示例。仅用于 PPTX 技能验证，不构成投资建议。"
+    },
+    {
+      "id": "g2",
+      "topology": "glass-dashboard",
+      "kicker": "市场温度 / Dashboard",
+      "title": "三类信号共同决定下半年风险预算",
+      "metrics": [
+        {
+          "label": "增长动能",
+          "value": "中性+",
+          "delta": "PMI 边际修复",
+          "tone": "positive"
+        },
+        {
+          "label": "流动性",
+          "value": "宽松",
+          "delta": "资金利率低位",
+          "tone": "positive"
+        },
+        {
+          "label": "估值拥挤",
+          "value": "偏高",
+          "delta": "TMT 分化",
+          "tone": "warning"
+        },
+        {
+          "label": "政策扰动",
+          "value": "可控",
+          "delta": "窗口期观察",
+          "tone": "accent"
+        }
+      ],
+      "body": [
+        "权益风险预算向盈利确定性集中，固收维持中性久期，另类配置保持稳定。",
+        "风险预算随增长、流动性与政策信号动态再平衡。"
+      ],
+      "risk_note": "风险提示：历史表现不代表未来，宏观政策与海外流动性可能改变配置结论。",
+      "chart": {
+        "title": "下半年风险预算路径，占总风险预算比例",
+        "kind": "stacked-bar",
+        "unit": "%",
+        "categories": [
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月"
+        ],
+        "series": [
+          {
+            "name": "权益",
+            "tone": "accent",
+            "values": [
+              32,
+              36,
+              38,
+              42,
+              44
+            ]
+          },
+          {
+            "name": "固收",
+            "tone": "positive",
+            "values": [
+              48,
+              46,
+              45,
+              42,
+              40
+            ]
+          },
+          {
+            "name": "另类",
+            "tone": "warning",
+            "values": [
+              20,
+              18,
+              17,
+              16,
+              16
+            ]
+          }
+        ],
+        "source": "来源：内部测算（示例数据），基于宏观、估值与流动性信号；仅供方法演示。"
+      }
+    },
+    {
+      "id": "g3",
+      "topology": "glass-action-rail",
+      "kicker": "执行路径 / Action Rail",
+      "title": "从视觉样板到生产级 PPTX 的下一轮迭代",
+      "metrics": [
+        {
+          "label": "Fidelity Gate",
+          "value": "≥88",
+          "delta": "visual diff",
+          "tone": "positive"
+        },
+        {
+          "label": "Editability",
+          "value": "≥95",
+          "delta": "native text",
+          "tone": "positive"
+        },
+        {
+          "label": "Style Depth",
+          "value": "1→N",
+          "delta": "先极致后扩展",
+          "tone": "accent"
+        }
+      ],
+      "body": [
+        "下一步优先补真实图片/SVG 嵌入，再补 chart/table 原生对象。",
+        "风格扩展必须复用 glass 的端到端验收，而不是复制一套一次性模板。"
+      ],
+      "risk_note": "验收口径：每次修改必须重新运行 glass showcase validator，并保留 expected/actual/diff。"
+    }
+  ]
+}

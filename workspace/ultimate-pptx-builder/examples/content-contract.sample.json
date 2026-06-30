@@ -1,0 +1,21 @@
+{
+  "deck_id": "phase1-sample-finance-brief",
+  "size": {
+    "w": 1280,
+    "h": 720
+  },
+  "scenario": "financial-institution-internal-research",
+  "style_program": "swiss-grid-pptx",
+  "slides": [
+    {
+      "id": "s1",
+      "topology": "hero",
+      "title": "IR-first 让复杂视觉与可编辑 PPTX 不再冲突",
+      "body": [
+        "HTML 负责预览和布局反馈，Slide IR 负责语义、编辑性与导出策略。",
+        "关键业务信息必须 native；复杂背景和纹理可以 rasterIsland 化。"
+      ],
+      "risk_note": "资料来源：内部研究示例。本文档仅用于技能设计，不构成投资建议。"
+    }
+  ]
+}

@@ -864,10 +864,10 @@ def add_atlas_budget_route_map(objects, sid, chart, x, y, w, h, z, profile):
 
         objects.append(shape_obj(sid + "_bridge_guardrail", "guardrail", x + w - 102, y + 44, 2, h - 78, z + 64, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=3, opacity=0.46, stroke_opacity=0.0))
         objects.append(text_obj(sid + "_bridge_guardrail_label", "research-folio", "DD GUARDRAIL", x + w - 140, y + 36, 108, 12, z + 65, 7, color=system_pal(profile, "warning"), bold=True, priority=3))
-        objects.append(text_obj(sid + "_bridge_limit_rule", "metric-note", "Limit rule: 权益≤62%；固收≥30%；另类现金≥8% 保留尾部对冲底仓", x + 20, y + 118, w - 60, 14, z + 70, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
-        objects.append(text_obj(sid + "_bridge_dd_rule", "metric-note", "DD guardrail: 组合回撤>5%或周度回撤>3% → 停止加权益并回建议仓位", x + 20, y + 204, w - 60, 14, z + 71, 6, color=system_pal(profile, "warning"), bold=True, priority=4))
+        objects.append(text_obj(sid + "_bridge_limit_rule", "metric-note", "上限：权益≤62；固收≥30；另类现金≥8（尾部对冲底仓）", x + 20, y + 118, w - 60, 16, z + 70, 7, color=system_pal(profile, "ink"), bold=True, priority=4))
+        objects.append(text_obj(sid + "_bridge_dd_rule", "metric-note", "回撤>5%或周撤>3%：停加权益，回建议仓位", x + 20, y + 204, w - 60, 16, z + 71, 7, color=system_pal(profile, "warning"), bold=True, priority=4))
         if chart.get("source"):
-            objects.append(text_obj(sid + "_budget_source", "research-folio", chart.get("source", ""), x + w - 176, y + h - 24, 150, 12, z + 72, 6, color=system_pal(profile, "muted"), priority=2))
+            objects.append(text_obj(sid + "_budget_source", "research-folio", "Source: 投研/Wind/Bloomberg", x + w - 244, y + 14, 218, 12, z + 72, 7, color=system_pal(profile, "muted"), priority=2))
         return
 
     # Slide02: macro decision route. The route is signal-gated, not month-driven.
@@ -935,23 +935,23 @@ def add_atlas_budget_route_map(objects, sid, chart, x, y, w, h, z, profile):
     objects.append(text_obj(sid + "_macro_now_text", "metric-note", "NOW: CONFIRM EARLY\n当前处于确认初期", now_x + 8, now_y + 5, 110, 27, z + 58, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
 
     target = "/".join(str(int(v)) for v in last_vals)
-    target_label = "Target: %s = %s/%s/%s" % (target, asset_names[0], asset_names[1], asset_names[2]) if len(asset_names) >= 3 else "Target budget: " + target
+    target_label = "%s = 权益/固收/另类" % target if len(asset_names) >= 3 else "Target " + target
     matrix_y = y + h - 48
-    objects.append(shape_obj(sid + "_macro_rule_matrix", "trigger-row", x + 18, matrix_y, w - 36, 42, z + 60, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.78, stroke_opacity=0.30))
+    objects.append(shape_obj(sid + "_macro_rule_matrix", "trigger-row", x + 18, matrix_y, w - 36, 46, z + 60, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.78, stroke_opacity=0.30))
     cols = [x + 30, x + 170, x + 306, x + 462]
     matrix = [
         ("SCORE", "增长+1 流动性+2 估值-1\n政策VETO=0 → +2"),
-        ("STAGE", "+2 → CONFIRM EARLY\n≥3+盈利确认→DEPLOY"),
-        ("ACTION", target_label + "\n确认期分段靠近目标"),
-        ("ROLLBACK", "政策冲击/流动性收紧→WATCH\n盈利失败→CONFIRM"),
+        ("STAGE", "+2 = CONFIRM EARLY\n≥3+盈利确认 = DEPLOY"),
+        ("ACTION", target_label + "\n分段靠近目标"),
+        ("ROLLBACK", "政策/流动性收紧 → WATCH\n盈利失败 → CONFIRM"),
     ]
     for mi, (head, body) in enumerate(matrix):
         mw = [126, 126, 146, 154][mi]
         tone = ["muted", "positive", "accent", "warning"][mi]
         objects.append(text_obj("%s_macro_matrix_%d_head" % (sid, mi + 1), "research-folio", head, cols[mi], matrix_y + 5, mw, 10, z + 62 + mi, 6, color=system_tone_color(profile, tone) if tone != "muted" else system_pal(profile, "muted"), bold=True, priority=3))
-        objects.append(text_obj("%s_macro_matrix_%d_body" % (sid, mi + 1), "metric-note", body, cols[mi], matrix_y + 16, mw, 22, z + 66 + mi, 5, color=system_pal(profile, "ink"), bold=True, priority=4))
+        objects.append(text_obj("%s_macro_matrix_%d_body" % (sid, mi + 1), "metric-note", body, cols[mi], matrix_y + 16, mw, 26, z + 66 + mi, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
     if chart.get("source"):
-        objects.append(text_obj(sid + "_budget_source", "research-folio", chart.get("source", ""), x + 292, y + h - 30, w - 570, 12, z + 66, 6, color=system_pal(profile, "muted"), priority=2))
+        objects.append(text_obj(sid + "_budget_source", "research-folio", "Source: 投研/Wind/Bloomberg", x + w - 244, y + 14, 218, 12, z + 66, 7, color=system_pal(profile, "muted"), priority=2))
 
 
 def add_atlas_scenario_map(objects, sid, metrics, scenarios, x, y, w, h, z, profile):
@@ -994,7 +994,7 @@ def add_atlas_process_state_machine(objects, sid, process, metrics, x, y, w, h, 
         objects.append(shape_obj("%s_process_signal_%d" % (sid, i), "signal-chip", chip_x, chip_y, chip_w, 54, z + 8 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.86, stroke_opacity=0.60))
         objects.append(text_obj("%s_process_signal_%d_label" % (sid, i), "metric-label", metric.get("label", ""), chip_x + 10, chip_y + 6, 106, 14, z + 12 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
         objects.append(text_obj("%s_process_signal_%d_value" % (sid, i), "metric", metric.get("value", ""), chip_x + 10, chip_y + 22, 42, 20, z + 16 + i, 13, color=tone, bold=True, priority=5))
-        objects.append(text_obj("%s_process_signal_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), chip_x + 54, chip_y + 18, 68, 32, z + 20 + i, 7, color=system_pal(profile, "ink"), priority=4))
+        objects.append(text_obj("%s_process_signal_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), chip_x + 54, chip_y + 16, 68, 34, z + 20 + i, 7, color=system_pal(profile, "ink"), priority=4))
 
     objects.append(shape_obj(sid + "_process_map_panel", "process-state-map", x, y, w, h, z + 30, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=3, opacity=0.98, stroke_opacity=0.54))
     objects.append(text_obj(sid + "_process_map_title", "research-folio", "EXECUTION STATE MACHINE / TRIGGER-GATED LOOP", x + 18, y + 14, 330, 16, z + 31, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
@@ -1005,7 +1005,7 @@ def add_atlas_process_state_machine(objects, sid, process, metrics, x, y, w, h, 
         objects.append(shape_obj("%s_state_route_%d" % (sid, i + 1), "route-line", x1 + 44, y1 - 2, x2 - x1 - 88, 4, z + 34 + i, fill=system_pal(profile, "positive" if i < 1 else "accent"), stroke=system_pal(profile, "positive" if i < 1 else "accent"), shape="rect", priority=2, opacity=0.30, stroke_opacity=0.0))
     # Feedback loop makes it a state machine, not a one-way checklist.
     objects.append(shape_obj(sid + "_state_feedback_route", "route-line", x + 160, y + 176, 570, 3, z + 34, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=2, opacity=0.18, stroke_opacity=0.0))
-    objects.append(text_obj(sid + "_state_feedback_label", "research-folio", "monthly review / override / rebalance loop", x + 420, y + 184, 250, 14, z + 36, 7, color=system_pal(profile, "muted"), bold=True, priority=2))
+    objects.append(text_obj(sid + "_state_feedback_label", "research-folio", "月度复盘 / 授权覆核 / 再平衡", x + 420, y + 184, 250, 14, z + 36, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
     for i, step in enumerate(process[:4], start=1):
         nx, ny = nodes[i - 1]
         tone_name = ["positive", "accent", "warning", "positive"][i - 1]
@@ -1134,8 +1134,8 @@ def compile_atlas_slide(slide, index):
                 yy = map_y + 28 + (j - 1) * 30
                 tone = "warning" if key == "Guardrail" else ("accent" if key in {"Trigger", "Action"} else "positive")
                 objects.append(shape_obj("%s_decision_chain_%d" % (sid, j), "trigger-row", map_x, yy, 388, 24, 76 + j, fill=system_pal(profile, "panel"), stroke=system_tone_color(profile, tone), shape="roundRect", priority=3, opacity=0.76, stroke_opacity=0.34))
-                objects.append(text_obj("%s_decision_chain_%d_key" % (sid, j), "research-folio", key, map_x + 10, yy + 5, 74, 12, 84 + j, 7, color=system_tone_color(profile, tone), bold=True, priority=3))
-                objects.append(text_obj("%s_decision_chain_%d_val" % (sid, j), "body", val, map_x + 90, yy + 4, 286, 16, 90 + j, 7, color=system_pal(profile, "ink"), priority=5))
+                objects.append(text_obj("%s_decision_chain_%d_key" % (sid, j), "research-folio", key, map_x + 10, yy + 5, 74, 13, 84 + j, 8, color=system_tone_color(profile, tone), bold=True, priority=3))
+                objects.append(text_obj("%s_decision_chain_%d_val" % (sid, j), "body", val, map_x + 90, yy + 4, 286, 17, 90 + j, 8, color=system_pal(profile, "ink"), priority=5))
         else:
             band_labels = [("DEFENSIVE", "warning"), ("NEUTRAL+", "positive"), ("RISK ADD", "accent")]
             for j, (label, tone_name) in enumerate(band_labels, start=1):

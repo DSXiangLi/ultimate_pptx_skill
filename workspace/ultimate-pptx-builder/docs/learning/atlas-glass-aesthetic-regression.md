@@ -55,9 +55,17 @@ A Market Atlas slide is not acceptable unless the map grammar answers:
 ## Gate Requirements Added
 
 - Slide 02 macro route must expose a native decision matrix with `SCORE`, `STAGE`, `ACTION`, `ROLLBACK`, `政策VETO`, and `CONFIRM EARLY`.
+- Slide 02 decision matrix body must not regress into microtext: keep it at least 6pt with at least 26px text boxes.
+- Slide 02 source tags must stay outside the decision matrix and should not be squeezed below 200px width.
 - Slide 03 allocation bridge must expose `Trigger`, `Action`, `Funding`, `Limit`, `Guardrail`, `DD>5%`, and `另类现金≥8`.
+- Slide 03 decision-chain values must stay at least 8pt with at least 17px text boxes; limit/DD guardrail rule text must stay at least 7pt with at least 16px boxes.
+- Slide 03 source tags must stay outside the allocation bridge and should not be squeezed below 200px width.
 - Semantic Atlas route IDs such as `_macro_route_`, `_bridge_route_`, `_decision_route_`, `_state_route_`, and `_scenario_branch_` must be treated as business routes, not decorative background motifs.
 - Business nodes such as `_bridge_node_`, `_state_node_`, `_budget_station_`, `_macro_station_`, `_scenario_zone_`, and `_decision_node_` must not be treated as background motif nodes.
+
+## Same-Content Polish Rule
+
+Do not improve readability by paraphrasing or deleting source content unless the contract explicitly allows it. This iteration attempted to shorten Slide 05 signal-chip text (`PMI/社融/盈利验证`, `单周风险预算≤8%`, `偏离阈值即调整`) and same-content validation correctly failed. Safe polish options are: enlarge the box, increase spacing, move source tags, or change visual hierarchy while preserving exact native text evidence.
 
 ## Human Review Rule
 

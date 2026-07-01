@@ -39,6 +39,18 @@ def box_area(obj: dict) -> float:
     return float(b.get("w", 0)) * float(b.get("h", 0))
 
 
+def box_width(obj: dict) -> float:
+    return float((obj.get("box", {}) or {}).get("w", 0) or 0)
+
+
+def box_height(obj: dict) -> float:
+    return float((obj.get("box", {}) or {}).get("h", 0) or 0)
+
+
+def font_size(obj: dict) -> float:
+    return float((obj.get("style", {}) or {}).get("size", obj.get("font_size", 0)) or 0)
+
+
 def check_glass(ir: dict) -> list[str]:
     issues: list[str] = []
     deck = ir.get("deck", {})
@@ -117,6 +129,12 @@ def check_atlas(ir: dict) -> list[str]:
                 issues.append(f"{sid}: ATLAS_MACRO_ROUTE_MISSING_DECISION_RULE_MATRIX: macro route must expose Score/Stage/Action/Rollback, not just staged color bands")
             if missing_terms:
                 issues.append(f"{sid}: ATLAS_MACRO_ROUTE_RULE_NOT_AUDITABLE: missing decision-rule terms {missing_terms}")
+            matrix_body = [o for o in objs if "_macro_matrix_" in o.get("id", "") and o.get("id", "").endswith("_body")]
+            if any(font_size(o) < 6 or box_height(o) < 26 for o in matrix_body):
+                issues.append(f"{sid}: ATLAS_MACRO_ROUTE_RULE_MATRIX_MICROTEXT: decision matrix body must stay >=6pt with >=26px text boxes")
+            source_tags = [o for o in objs if o.get("id", "").endswith("_budget_source")]
+            if any(box_width(o) < 200 for o in source_tags):
+                issues.append(f"{sid}: ATLAS_SOURCE_TAG_TOO_COMPRESSED: source tag must not be squeezed into the rule matrix")
 
         if sid == "ls03":
             joined_text = "\n".join(texts)
@@ -127,6 +145,15 @@ def check_atlas(ir: dict) -> list[str]:
                 issues.append(f"{sid}: ATLAS_ALLOCATION_BRIDGE_MISSING_DECISION_CHAIN: allocation page must show Trigger/Action/Funding/Limit/Guardrail, not repeated KPI cards")
             if missing_terms:
                 issues.append(f"{sid}: ATLAS_ALLOCATION_GUARDRAIL_NOT_AUDITABLE: missing decision-chain terms {missing_terms}")
+            decision_vals = [o for o in objs if "_decision_chain_" in o.get("id", "") and o.get("id", "").endswith("_val")]
+            if any(font_size(o) < 8 or box_height(o) < 17 for o in decision_vals):
+                issues.append(f"{sid}: ATLAS_DECISION_CHAIN_MICROTEXT: decision chain values must stay >=8pt with >=17px text boxes")
+            guardrail_rules = [o for o in objs if o.get("id", "").endswith(("_bridge_limit_rule", "_bridge_dd_rule"))]
+            if any(font_size(o) < 7 or box_height(o) < 16 for o in guardrail_rules):
+                issues.append(f"{sid}: ATLAS_ALLOCATION_RULE_MICROTEXT: limit/DD guardrail rules must stay >=7pt with >=16px text boxes")
+            source_tags = [o for o in objs if o.get("id", "").endswith("_budget_source")]
+            if any(box_width(o) < 200 for o in source_tags):
+                issues.append(f"{sid}: ATLAS_SOURCE_TAG_TOO_COMPRESSED: source tag must not be squeezed into the allocation bridge")
 
     # Palette authority: current mint-only palette is too soft for institutional finance.
     grammar = deck.get("visual_system_grammar", {})

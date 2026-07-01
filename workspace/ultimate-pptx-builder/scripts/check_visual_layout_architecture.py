@@ -15,6 +15,49 @@ from pathlib import Path
 
 CRITICAL_ROLES = {"title", "body", "metric", "metric-label", "metric-note", "process-step", "chart", "table", "risk"}
 DECORATIVE_ROUTE_IDS = {"source_band"}
+SEMANTIC_ATLAS_ROUTE_TOKENS = (
+    "_budget_route_",
+    "_macro_route_",
+    "_bridge_route_",
+    "_state_route_",
+    "_scenario_branch_",
+    "_allocation_route_spine",
+    "_decision_route_",
+)
+
+
+def is_semantic_atlas_route(obj):
+    oid = obj.get("id", "")
+    return any(tok in oid for tok in SEMANTIC_ATLAS_ROUTE_TOKENS) or obj.get("role") in {
+        "semantic-route",
+        "scenario-branch",
+    }
+
+
+def is_decorative_atlas_motif(obj):
+    """Background motif only; excludes business routes/state nodes.
+
+    Earlier gates treated any id containing `_node_1` as decorative. That became
+    wrong once Atlas grew semantic state-machine nodes such as `state_node_1`.
+    """
+    oid = obj.get("id", "")
+    if obj.get("role") == "atlas-gridline":
+        return True
+    if any(tok in oid for tok in ["_route_primary", "_route_secondary"]):
+        return True
+    if any(oid.endswith(tok) for tok in ["_node_1", "_node_2", "_node_3"]):
+        return not any(
+            semantic in oid
+            for semantic in [
+                "_state_node_",
+                "_bridge_node_",
+                "_budget_station_",
+                "_macro_station_",
+                "_scenario_zone_",
+                "_decision_node_",
+            ]
+        )
+    return False
 
 
 def box(o):
@@ -109,7 +152,7 @@ def check_deck(deck):
         # If they are below grids/routes, opacity changes only tint the page and
         # cannot actually prevent route/grid bleed-through inside content regions.
         if "market-atlas" in style:
-            motif_z = [float(o.get("z", 0)) for o in objects if o.get("role") == "atlas-gridline" or any(tok in o.get("id", "") for tok in ["_route_primary", "_route_secondary", "_node_1", "_node_2", "_node_3"])]
+            motif_z = [float(o.get("z", 0)) for o in objects if is_decorative_atlas_motif(o)]
             max_motif_z = max(motif_z) if motif_z else 0.0
             for zone in [o for o in objects if o.get("role") == "background" and any(o.get("id", "").endswith(suffix) for suffix in ["_zone_left", "_zone_right", "_zone_bottom"] )]:
                 if float(zone.get("z", 0)) <= max_motif_z:
@@ -158,7 +201,7 @@ def check_deck(deck):
                     oid, "S",
                     "Map grids must be atmospheric (<0.085 opacity) unless clipped away from content zones.",
                 )
-            if "market-atlas" in style and role == "route-line" and "source_band" not in oid and op > 0.26:
+            if "market-atlas" in style and role == "route-line" and "source_band" not in oid and not is_semantic_atlas_route(o) and op > 0.26:
                 issue(
                     issues, deck, slide,
                     "ATLAS_ROUTE_TOO_PROMINENT", "blocking",

@@ -19,7 +19,7 @@ NARRATIVE_INTENT = "strategy_update"
 THRESHOLD = 86.0
 STYLE_SYSTEMS = {
     "glass-fintech-pptx": {
-        "visual_language": "matte-institutional",
+        "visual_language": "luminous-glass",
         "anchor_path": ROOT / "examples" / "visual-anchors" / "glass-fintech-pptx.anchor.json",
         "style_path": ROOT / "examples" / "glass-fintech-pptx.style.json",
         "expected_grammar": {
@@ -27,7 +27,7 @@ STYLE_SYSTEMS = {
             "composition": "dashboard-cards",
             "material": "translucent-glass",
         },
-        "required_roles": {"glass-panel", "risk-rail", "institutional-ruler"},
+        "required_roles": {"glass-panel", "risk-rail", "spotlight-orb", "luminous-ribbon"},
     },
     "paper-analyst-report": {
         "visual_language": "editorial-ledger",
@@ -49,7 +49,7 @@ STYLE_SYSTEMS = {
             "composition": "modular-infographic-map",
             "material": "flat-map-tiles",
         },
-        "required_roles": {"atlas-canvas", "map-tile", "route-line"},
+        "required_roles": {"atlas-canvas", "route-map", "scenario-map", "process-state-map", "route-line", "map-node", "signal-node"},
     },
 }
 
@@ -176,6 +176,7 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     narrative_path = build / ("%s-narrative-safety-report.json" % style_program)
     layout_path = build / ("%s-layout-safety-report.json" % style_program)
     visual_layout_path = build / ("%s-visual-layout-architecture-report.json" % style_program)
+    aesthetic_path = build / ("%s-visual-aesthetic-contract-report.json" % style_program)
     export_path = build / ("%s-export-report.json" % style_program)
     visual_path = build / ("%s-visual-fidelity-report.json" % style_program)
     qa_path = build / ("%s-qa-report.json" % style_program)
@@ -196,6 +197,10 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     visual_layout = load_json(visual_layout_path)
     if visual_layout.get("release_decision") != "pass" or visual_layout.get("blocking_count", 0):
         fail("%s visual layout architecture failed: %s" % (style_program, visual_layout_path.relative_to(ROOT)))
+    run([sys.executable, str(ROOT / "scripts" / "check_visual_aesthetic_contract.py"), str(ir_path), "--report", str(aesthetic_path)])
+    aesthetic = load_json(aesthetic_path)
+    if aesthetic.get("release_decision") != "pass" or aesthetic.get("blocking_count", 0):
+        fail("%s visual aesthetic contract failed: %s" % (style_program, aesthetic_path.relative_to(ROOT)))
     run([sys.executable, str(ROOT / "scripts" / "export_ir_pptx.py"), str(ir_path), str(pptx_path), "--report", str(export_path)])
     run([sys.executable, str(ROOT / "scripts" / "check_pptx_package.py"), str(pptx_path)])
     export = load_json(export_path)
@@ -241,6 +246,8 @@ def visual_dna_signature(ir: dict) -> dict:
     fonts = set()
     chart_styles = []
     chart_boxes = []
+    atlas_viz_shapes = []
+    atlas_viz_palette = []
     card_shapes = []
     card_boxes = []
     role_counts = {}
@@ -280,7 +287,13 @@ def visual_dna_signature(ir: dict) -> dict:
                     st.get("marker_style"),
                 ))
                 chart_boxes.append((box.get("x"), box.get("y"), box.get("w"), box.get("h")))
-            elif obj.get("type") == "shape" and role in {"glass-panel", "ledger-metric", "map-tile", "supporting-card", "process-step"}:
+            elif obj.get("type") == "shape" and role in {"route-map", "scenario-map", "process-state-map", "asset-allocation-band", "scenario-zone", "trigger-row", "route-line", "map-node", "signal-chip", "process-node", "guardrail"}:
+                if role in {"asset-allocation-band", "scenario-zone", "trigger-row", "route-line", "map-node", "signal-chip", "process-node", "guardrail"} and obj.get("fill"):
+                    atlas_viz_palette.append(obj.get("fill"))
+                if role in {"route-map", "scenario-map", "process-state-map"}:
+                    atlas_viz_shapes.append((role, obj.get("shape"), obj.get("fill"), obj.get("stroke"), obj.get("opacity"), obj.get("stroke_opacity")))
+                    chart_boxes.append((box.get("x"), box.get("y"), box.get("w"), box.get("h")))
+            elif obj.get("type") == "shape" and role in {"glass-panel", "ledger-metric", "map-tile", "signal-chip", "supporting-card", "process-step"}:
                 card_shapes.append((role, obj.get("shape"), obj.get("fill"), obj.get("stroke"), obj.get("opacity"), obj.get("stroke_opacity"), bool(obj.get("shadow"))))
                 card_boxes.append((role, box.get("w"), box.get("h")))
                 if role in {"ledger-metric", "map-tile"}:
@@ -290,6 +303,14 @@ def visual_dna_signature(ir: dict) -> dict:
     def avg(vals):
         vals = [v for v in vals if isinstance(v, (int, float))]
         return rounded_ratio(sum(vals) / len(vals)) if vals else None
+    if atlas_viz_shapes:
+        # Treat semantic native Atlas maps as data-viz DNA. This prevents the gate
+        # from forcing Atlas back into ordinary chart objects when route maps,
+        # scenario zones, and state machines are the stronger visual language.
+        chart_styles.extend(
+            ("native-atlas-map", role, shape, fill, stroke, opacity, stroke_opacity, tuple(sorted(set(atlas_viz_palette))), "coordinate-route", "atlas-legend", "semantic-node")
+            for role, shape, fill, stroke, opacity, stroke_opacity in atlas_viz_shapes
+        )
     return {
         "font_set": tuple(sorted(fonts)),
         "title_size_avg": avg(title_sizes),

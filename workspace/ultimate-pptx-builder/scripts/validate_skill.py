@@ -83,6 +83,7 @@ REQUIRED = [
     "scripts/run_visual_fidelity.py",
     "scripts/check_layout_safety.py",
     "scripts/check_visual_layout_architecture.py",
+    "scripts/check_visual_aesthetic_contract.py",
     "scripts/check_narrative_safety.py",
     "scripts/check_visual_anchor.py",
     "scripts/check_narrative_visual_orthogonality.py",

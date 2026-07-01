@@ -28,7 +28,7 @@ HTML is allowed as a preview and layout engine, but it is not the source of trut
 
 ## Learning Notes Rule
 
-Before modifying an area with prior discoveries, read `docs/learning/` first. When development reveals and solves a new issue, add a learning note with context, symptom, root cause, fix, verification command, affected files, and prevention rule. Current visual-rendering learnings live in `docs/learning/phase4b-visual-rendering.md`; glass showcase learnings live in `docs/learning/glass-fintech-showcase.md`.
+Before modifying an area with prior discoveries, read `docs/learning/` first. When development reveals and solves a new issue, add a learning note with context, symptom, root cause, fix, verification command, affected files, and prevention rule. Current visual-rendering learnings live in `docs/learning/phase4b-visual-rendering.md`; glass showcase learnings live in `docs/learning/glass-fintech-showcase.md`; Atlas/Glass aesthetic regression learnings live in `docs/learning/atlas-glass-aesthetic-regression.md`.
 
 ## When to Use
 

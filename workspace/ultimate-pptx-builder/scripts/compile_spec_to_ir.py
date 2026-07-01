@@ -80,8 +80,8 @@ VARIANT_PROFILES = {
             "chart_treatment": "spotlight-chart-vector",
         },
         "palette": {"background": "071326", "panel": "142A46", "panel_alt": "1C3D60", "stroke": "67E8F9", "stroke_soft": "328BB5", "accent": "A78BFA", "warning": "FACC15", "positive": "34D399"},
-        "orb_cyan": {"x": 760, "y": -132, "w": 520, "h": 520, "opacity": 0.28, "role": "spotlight-orb"},
-        "orb_violet": {"x": -190, "y": 318, "w": 470, "h": 470, "opacity": 0.22, "role": "spotlight-orb"},
+        "orb_cyan": {"x": 1020, "y": -82, "w": 256, "h": 256, "opacity": 0.15, "role": "spotlight-orb"},
+        "orb_violet": {"x": -138, "y": 350, "w": 360, "h": 360, "opacity": 0.135, "role": "spotlight-orb"},
         "ghost_opacity": 0.060,
         "ghost_size": 48,
         "hairline_opacity": 0.98,
@@ -94,6 +94,8 @@ VARIANT_PROFILES = {
         "risk_height": 30,
         "extra_grid": False,
         "gold_orb": True,
+        "chart": {"series_palette": ["67E8F9", "A78BFA", "FACC15"], "axis_style": "luminous-glass-axis", "legend_style": "spotlight-legend", "marker_style": "glow-node", "bar_shape": "roundRect", "panel_opacity": 0.50, "grid_opacity": 0.24, "label_color": "C9D6E2", "value_label_color": "F4FAFF"},
+        "fonts": {"title": "Bahnschrift SemiBold", "body": "Microsoft YaHei", "metric": "Aptos Display", "caption": "Microsoft YaHei"},
     },
     "terminal-cockpit": {
         "name": "terminal-cockpit",
@@ -540,7 +542,7 @@ def compile_glass_slide(slide, index, profile=None):
         objects.append(text_obj(sid + "_folio", "institutional-folio", "%02d" % index, 1130, 62, 58, 30, 11, 22, color=pal(profile, "muted"), bold=True, priority=1, opacity=0.55))
     else:
         objects.append(text_obj(sid + "_ghost_num", "decorative-ghost-number", "%02d" % index, 1110, 54, 96, 52, 11, 38, color=pal(profile, "white"), bold=True, priority=1, opacity=profile.get("ghost_opacity", 0.026)))
-    title_w = 720 if topology in {"glass-cover", "glass-hero"} else 960
+    title_w = 720 if topology in {"glass-cover", "glass-hero"} else (900 if name == "luminous-glass" else 960)
     content_heavy = {"glass-dashboard", "glass-table", "glass-chart-focus", "glass-matrix", "glass-scenario", "glass-process", "glass-timeline", "glass-compliance", "glass-quote", "glass-action-rail"}
     preferred_title_size = 30 if topology in {"glass-cover", "glass-hero"} else (28 if topology in content_heavy or len(slide.get("title", "")) > 30 else 32)
     title_size = fit_title_size(slide["title"], title_w, preferred_title_size)
@@ -650,10 +652,10 @@ VISUAL_SYSTEM_PROFILES = {
             "surface": "atlas-map-canvas",
             "composition": "modular-infographic-map",
             "material": "flat-map-tiles",
-            "chromatic_mode": "sand-mint-cartographic",
+            "chromatic_mode": "institutional-cartographic-navy-sage",
             "container_grammar": "map-tiles-route-lines",
         },
-        "palette": {"background": "DCEBE1", "paper": "FBFFF8", "ink": "0B2B24", "muted": "2C5148", "rule": "579A86", "accent": "1457A8", "positive": "187956", "warning": "B86414", "panel": "D2E8DA", "panel_alt": "BFDCCB", "stroke_soft": "4E927E", "text": "0B2B24", "white": "FFFFFF"},
+        "palette": {"background": "EEF2EA", "paper": "FBFCF7", "ink": "0E2723", "muted": "334E48", "rule": "6F8278", "accent": "173B67", "positive": "23624D", "warning": "8C5A2B", "panel": "E1E8DC", "panel_alt": "D3DED4", "stroke_soft": "72857B", "text": "0E2723", "white": "FFFFFF"},
         "fonts": {"title": "Aptos Display", "body": "Aptos", "metric": "Arial Narrow", "caption": "Aptos"},
         "chart": {"series_palette": ["1457A8", "187956", "B86414"], "axis_style": "coordinate-grid-axis", "legend_style": "map-legend", "marker_style": "route-node", "bar_shape": "roundRect", "panel_opacity": 0.72, "grid_opacity": 0.10, "label_color": "2C5148", "value_label_color": "0B2B24"},
         "container": {"metric_shape": "roundRect", "scenario_shape": "roundRect", "process_shape": "roundRect", "metric_shadow": False, "metric_opacity": 0.94, "metric_stroke_opacity": 0.88},
@@ -773,7 +775,262 @@ def atlas_frame(objects, sid, index, slide):
     objects.append(text_obj(sid + "_folio", "research-folio", "MARKET ATLAS / ZONE-%02d" % index, 80, 54, 300, 22, 10, 10, color=system_pal(profile, "muted"), bold=True, priority=2))
     objects.append(text_obj(sid + "_legend_1", "research-folio", "SIGNAL FIELD", 760, 206, 160, 18, 11, 9, color=system_pal(profile, "muted"), bold=True, priority=2))
     objects.append(text_obj(sid + "_legend_2", "research-folio", "ALLOCATION ROUTE", 92, 402, 220, 18, 11, 9, color=system_pal(profile, "positive"), bold=True, priority=2))
+    if not slide.get("process"):
+        # Make the atlas vocabulary functional: the route label must be backed by
+        # a real allocation path, not a decorative caption floating over empty space.
+        route_y = 454
+        route_nodes = [(142, "DEF"), (332, "RISK"), (522, "HEDGE")]
+        objects.append(shape_obj(sid + "_allocation_route_spine", "route-line", 148, route_y + 8, 392, 3, 74, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.24, stroke_opacity=0.0))
+        for ni, (nx, label) in enumerate(route_nodes, start=1):
+            objects.append(shape_obj("%s_allocation_stop_%d" % (sid, ni), "map-node", nx, route_y, 18, 18, 76 + ni, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "positive" if ni != 2 else "accent"), shape="ellipse", priority=2, opacity=0.96, stroke_opacity=0.86))
+            objects.append(text_obj("%s_allocation_stop_%d_label" % (sid, ni), "research-folio", label, nx - 22, route_y + 26, 70, 16, 80 + ni, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
     objects.append(text_obj(sid + "_kicker", "kicker", slide.get("kicker", ""), 82, 84, 520, 24, 12, 11, color=system_pal(profile, "accent"), bold=True, priority=4))
+
+
+def add_atlas_legend(objects, sid, x, y, z, profile, items):
+    objects.append(text_obj(sid + "_atlas_legend_label", "research-folio", "LEGEND", x, y, 82, 14, z, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+    cx = x + 62
+    for i, (label, tone) in enumerate(items, start=1):
+        px = cx + (i - 1) * 120
+        color = system_tone_color(profile, tone)
+        objects.append(shape_obj("%s_atlas_legend_%d_dot" % (sid, i), "legend-marker", px, y + 3, 8, 8, z + i, fill=color, stroke=color, shape="ellipse", priority=2, opacity=0.86, stroke_opacity=0.0))
+        objects.append(text_obj("%s_atlas_legend_%d_text" % (sid, i), "research-folio", label, px + 12, y - 1, 100, 16, z + i, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+
+
+def add_atlas_signal_field_map(objects, sid, metrics, x, y, w, h, z, profile):
+    """Render metrics as a field/compass, not independent dashboard cards."""
+    cx = x + w / 2
+    cy = y + h / 2 + 6
+    objects.append(shape_obj(sid + "_signal_field_axis_h", "atlas-axis", x + 44, cy, w - 88, 2, z, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=2, opacity=0.20, stroke_opacity=0.0))
+    objects.append(shape_obj(sid + "_signal_field_axis_v", "atlas-axis", cx, y + 44, 2, h - 88, z, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=2, opacity=0.20, stroke_opacity=0.0))
+    objects.append(shape_obj(sid + "_signal_field_core", "map-node", cx - 54, cy - 32, 108, 64, z + 5, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "accent"), shape="roundRect", priority=3, opacity=0.92, stroke_opacity=0.72))
+    objects.append(text_obj(sid + "_signal_field_core_k", "research-folio", "REGIME", cx - 42, cy - 24, 84, 14, z + 6, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+    objects.append(text_obj(sid + "_signal_field_core_v", "metric", "中性偏积极", cx - 44, cy - 8, 88, 40, z + 7, 11, color=system_pal(profile, "ink"), bold=True, priority=5))
+    positions = [(x + 22, y + 20), (x + w - 152, y + 20), (x + 22, y + h - 76), (x + w - 152, y + h - 76)]
+    for i, metric in enumerate(metrics[:4], start=1):
+        px, py = positions[i - 1]
+        tone = system_tone_color(profile, metric.get("tone"))
+        objects.append(shape_obj("%s_signal_point_%d" % (sid, i), "signal-node", px, py, 130, 58, z + 10 + i, fill=system_pal(profile, "paper"), stroke=tone, shape="roundRect", priority=3, opacity=0.90, stroke_opacity=0.62))
+        objects.append(text_obj("%s_signal_point_%d_label" % (sid, i), "metric-label", metric.get("label", ""), px + 12, py + 7, 102, 14, z + 20 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
+        objects.append(text_obj("%s_signal_point_%d_value" % (sid, i), "metric", metric.get("value", ""), px + 12, py + 23, 102, 20, z + 30 + i, 13, color=system_pal(profile, "ink"), bold=True, priority=5))
+        objects.append(text_obj("%s_signal_point_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), px + 12, py + 42, 110, 12, z + 40 + i, 7, color=tone, priority=4))
+        # Connector from field point to regime core. Thin rectangles keep PPTX editable.
+        mx = px + 65
+        my = py + 29
+        objects.append(shape_obj("%s_signal_vector_%d" % (sid, i), "signal-vector", min(mx, cx), min(my, cy), max(abs(cx - mx), 2), 2, z + 2 + i, fill=tone, stroke=tone, shape="rect", priority=2, opacity=0.16, stroke_opacity=0.0))
+
+
+def add_atlas_budget_route_map(objects, sid, chart, x, y, w, h, z, profile):
+    """Atlas-native budget route.
+
+    Two grammars are used:
+    - Macro route pages (months): signal score -> staged risk-budget checkpoints.
+    - Allocation pages (current/proposed/limit): current -> action -> target bridge.
+
+    Both avoid chart axes and generic stacked bars; values stay native/editable.
+    """
+    cats = chart.get("categories", [])
+    series = chart.get("series", [])
+    objects.append(shape_obj(sid + "_budget_map_panel", "route-map", x, y, w, h, z, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=3, opacity=0.98, stroke_opacity=0.48))
+    objects.append(text_obj(sid + "_budget_map_title", "research-folio", "ALLOCATION ROUTE MAP / " + chart.get("title", "配置路径"), x + 18, y + 12, w - 36, 16, z + 2, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
+    if not cats or not series:
+        return
+
+    is_allocation_bridge = set(cats[:3]) == {"当前", "建议", "上限"} or cats[:3] == ["当前", "建议", "上限"]
+
+    if is_allocation_bridge:
+        # Slide03: make the core read as a decision bridge, not a chart.
+        col_x = [x + 126, x + 316, x + 506]
+        heads = [("CURRENT", "当前配置"), ("PROPOSED", "建议动作"), ("LIMIT", "风险上限")]
+        for i, (eng, zh) in enumerate(heads):
+            objects.append(text_obj("%s_bridge_head_%d" % (sid, i + 1), "research-folio", eng, col_x[i] - 46, y + 42, 96, 12, z + 5 + i, 7, color=system_pal(profile, "muted"), bold=True, priority=3))
+            objects.append(shape_obj("%s_bridge_node_%d" % (sid, i + 1), "map-node", col_x[i] - 18, y + 64, 36, 36, z + 10 + i, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive" if i < 2 else "warning"), shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.76))
+            objects.append(text_obj("%s_bridge_node_label_%d" % (sid, i + 1), "research-folio", zh, col_x[i] - 44, y + 104, 90, 12, z + 12 + i, 7, color=system_pal(profile, "ink"), bold=True, priority=3))
+        for i in [0, 1]:
+            objects.append(shape_obj("%s_bridge_route_%d" % (sid, i + 1), "route-line", col_x[i] + 24, y + 80, col_x[i + 1] - col_x[i] - 48, 4, z + 14 + i, fill=system_pal(profile, "positive" if i == 0 else "warning"), stroke=system_pal(profile, "positive" if i == 0 else "warning"), shape="rect", priority=2, opacity=0.34, stroke_opacity=0.0))
+            objects.append(text_obj("%s_bridge_route_label_%d" % (sid, i + 1), "metric-note", "加权益 / 控久期" if i == 0 else "护栏 / 不突破", col_x[i] + 54, y + 58, 118, 14, z + 18 + i, 7, color=system_pal(profile, "muted"), bold=True, priority=3))
+
+        lane_y = [y + 138, y + 160, y + 182]
+        for j, ser in enumerate(series[:3]):
+            tone = system_tone_color(profile, ser.get("tone"))
+            vals = [float(v) for v in ser.get("values", [0, 0, 0])[:3]]
+            yy = lane_y[j]
+            objects.append(text_obj("%s_bridge_asset_%d" % (sid, j + 1), "metric-label", ser.get("name", ""), x + 20, yy - 5, 72, 14, z + 34 + j, 8, color=tone, bold=True, priority=4))
+            for i, v in enumerate(vals):
+                objects.append(shape_obj("%s_bridge_asset_%d_stop_%d" % (sid, j + 1, i + 1), "signal-chip", col_x[i] - 34, yy - 8, 68, 18, z + 38 + j * 3 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.82, stroke_opacity=0.46))
+                objects.append(text_obj("%s_bridge_asset_%d_val_%d" % (sid, j + 1, i + 1), "metric-note", "%d%%" % int(v), col_x[i] - 18, yy - 5, 38, 12, z + 42 + j * 3 + i, 7, color=system_pal(profile, "ink"), bold=True, priority=4))
+            delta = int(vals[1] - vals[0])
+            objects.append(text_obj("%s_bridge_asset_%d_delta" % (sid, j + 1), "metric-note", "%+dpct" % delta, col_x[0] + 86, yy - 5, 58, 12, z + 52 + j, 7, color=tone, bold=True, priority=4))
+
+        objects.append(shape_obj(sid + "_bridge_guardrail", "guardrail", x + w - 102, y + 44, 2, h - 78, z + 64, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=3, opacity=0.46, stroke_opacity=0.0))
+        objects.append(text_obj(sid + "_bridge_guardrail_label", "research-folio", "DD GUARDRAIL", x + w - 140, y + 36, 108, 12, z + 65, 7, color=system_pal(profile, "warning"), bold=True, priority=3))
+        objects.append(text_obj(sid + "_bridge_limit_rule", "metric-note", "Limit rule: 权益≤62%；固收≥30%；另类现金≥8% 保留尾部对冲底仓", x + 20, y + 118, w - 60, 14, z + 70, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
+        objects.append(text_obj(sid + "_bridge_dd_rule", "metric-note", "DD guardrail: 组合回撤>5%或周度回撤>3% → 停止加权益并回建议仓位", x + 20, y + 204, w - 60, 14, z + 71, 6, color=system_pal(profile, "warning"), bold=True, priority=4))
+        if chart.get("source"):
+            objects.append(text_obj(sid + "_budget_source", "research-folio", chart.get("source", ""), x + w - 176, y + h - 24, 150, 12, z + 72, 6, color=system_pal(profile, "muted"), priority=2))
+        return
+
+    # Slide02: macro decision route. The route is signal-gated, not month-driven.
+    route_x = x + 38
+    route_y = y + 36
+    route_w = w - 76
+    route_h = h - 86
+    n = max(1, len(cats))
+    first_vals = [float(ser.get("values", [0] * n)[0]) for ser in series[:3]]
+    last_vals = [float(ser.get("values", [0] * n)[n - 1]) for ser in series[:3]]
+    asset_names = [ser.get("name", "") for ser in series[:3]]
+
+    zone_defs = [
+        {
+            "eng": "WATCH", "zh": "观察", "tone": "warning",
+            "if": "IF 增长弱修复 / 估值拥挤",
+            "then": "THEN 维持中性预算",
+            "window": "6-7月观察窗口",
+        },
+        {
+            "eng": "CONFIRM", "zh": "确认", "tone": "positive",
+            "if": "IF 流动性宽松延续",
+            "then": "THEN 小幅加风险",
+            "window": "8-9月确认窗口",
+        },
+        {
+            "eng": "DEPLOY", "zh": "部署", "tone": "accent",
+            "if": "IF 增长/盈利确认",
+            "then": "THEN 执行目标预算",
+            "window": "10月后分段执行",
+        },
+    ]
+    zone_w = (route_w - 24) / 3
+    node_centers = []
+    for i, zd in enumerate(zone_defs, start=1):
+        zx = route_x + (i - 1) * (zone_w + 12)
+        zy = route_y + 22 + (6 if i == 2 else 0)
+        tone = system_tone_color(profile, zd["tone"])
+        objects.append(shape_obj("%s_macro_zone_%d" % (sid, i), "route-map", zx, zy, zone_w, 72, z + 3 + i, fill=tone, stroke=tone, shape="roundRect", priority=3, opacity=0.13 + i * 0.018, stroke_opacity=0.0))
+        objects.append(text_obj("%s_macro_zone_%d_label" % (sid, i), "research-folio", "%s / %s" % (zd["eng"], zd["zh"]), zx + 12, zy + 8, zone_w - 24, 14, z + 8 + i, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
+        objects.append(text_obj("%s_macro_zone_%d_if" % (sid, i), "metric-note", zd["if"], zx + 12, zy + 30, zone_w - 24, 14, z + 12 + i, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
+        objects.append(text_obj("%s_macro_zone_%d_then" % (sid, i), "metric-note", zd["then"], zx + 12, zy + 50, zone_w - 24, 14, z + 16 + i, 6, color=tone, bold=True, priority=4))
+        cx = zx + zone_w / 2
+        cy = zy + 88
+        node_centers.append((cx, cy, tone))
+        objects.append(shape_obj("%s_macro_station_%d" % (sid, i), "map-node", cx - 12, cy - 12, 24, 24, z + 30 + i, fill=system_pal(profile, "paper"), stroke=tone, shape="ellipse", priority=3, opacity=0.98, stroke_opacity=0.92))
+        objects.append(text_obj("%s_macro_station_%d_name" % (sid, i), "research-folio", zd["eng"], cx - 30, cy + 15, 64, 12, z + 34 + i, 6, color=system_pal(profile, "muted"), bold=True, priority=3))
+
+    # Forward business route: signal-confirmed stages.
+    for i in range(2):
+        x1, y1, tone1 = node_centers[i]
+        x2, y2, tone2 = node_centers[i + 1]
+        objects.append(shape_obj("%s_macro_route_%d" % (sid, i + 1), "route-line", x1 + 16, y1 - 2, x2 - x1 - 32, 4, z + 44 + i, fill=tone2, stroke=tone2, shape="rect", priority=3, opacity=0.36, stroke_opacity=0.0))
+        objects.append(text_obj("%s_macro_route_%d_rule" % (sid, i + 1), "metric-note", "触发确认" if i == 0 else "条件满足", x1 + 56, y1 - 20, 74, 12, z + 46 + i, 7, color=tone2, bold=True, priority=4))
+
+    # Rollback / fail path makes this a risk route, not a one-way timeline.
+    rb_y = y + h - 58
+    objects.append(shape_obj(sid + "_macro_rollback_route", "route-line", node_centers[2][0] - 18, rb_y, node_centers[0][0] - node_centers[2][0] + 36, 3, z + 46, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=3, opacity=0.24, stroke_opacity=0.0))
+    objects.append(text_obj(sid + "_macro_rollback_label", "metric-note", "ROLLBACK PATH", route_x + route_w - 102, rb_y - 12, 96, 12, z + 48, 6, color=system_pal(profile, "warning"), bold=True, priority=4))
+
+    # Current state and signal-to-route mapping.
+    now_x = node_centers[1][0] - 52
+    now_y = route_y + 6
+    objects.append(shape_obj(sid + "_macro_now_card", "trigger-row", now_x, now_y, 126, 36, z + 56, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.84, stroke_opacity=0.54))
+    objects.append(text_obj(sid + "_macro_now_text", "metric-note", "NOW: CONFIRM EARLY\n当前处于确认初期", now_x + 8, now_y + 5, 110, 27, z + 58, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
+
+    target = "/".join(str(int(v)) for v in last_vals)
+    target_label = "Target: %s = %s/%s/%s" % (target, asset_names[0], asset_names[1], asset_names[2]) if len(asset_names) >= 3 else "Target budget: " + target
+    matrix_y = y + h - 48
+    objects.append(shape_obj(sid + "_macro_rule_matrix", "trigger-row", x + 18, matrix_y, w - 36, 42, z + 60, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.78, stroke_opacity=0.30))
+    cols = [x + 30, x + 170, x + 306, x + 462]
+    matrix = [
+        ("SCORE", "增长+1 流动性+2 估值-1\n政策VETO=0 → +2"),
+        ("STAGE", "+2 → CONFIRM EARLY\n≥3+盈利确认→DEPLOY"),
+        ("ACTION", target_label + "\n确认期分段靠近目标"),
+        ("ROLLBACK", "政策冲击/流动性收紧→WATCH\n盈利失败→CONFIRM"),
+    ]
+    for mi, (head, body) in enumerate(matrix):
+        mw = [126, 126, 146, 154][mi]
+        tone = ["muted", "positive", "accent", "warning"][mi]
+        objects.append(text_obj("%s_macro_matrix_%d_head" % (sid, mi + 1), "research-folio", head, cols[mi], matrix_y + 5, mw, 10, z + 62 + mi, 6, color=system_tone_color(profile, tone) if tone != "muted" else system_pal(profile, "muted"), bold=True, priority=3))
+        objects.append(text_obj("%s_macro_matrix_%d_body" % (sid, mi + 1), "metric-note", body, cols[mi], matrix_y + 16, mw, 22, z + 66 + mi, 5, color=system_pal(profile, "ink"), bold=True, priority=4))
+    if chart.get("source"):
+        objects.append(text_obj(sid + "_budget_source", "research-folio", chart.get("source", ""), x + 292, y + h - 30, w - 570, 12, z + 66, 6, color=system_pal(profile, "muted"), priority=2))
+
+
+def add_atlas_scenario_map(objects, sid, metrics, scenarios, x, y, w, h, z, profile):
+    objects.append(shape_obj(sid + "_scenario_map_panel", "scenario-map", x, y, w, h, z, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=3, opacity=0.98, stroke_opacity=0.54))
+    objects.append(text_obj(sid + "_scenario_map_title", "research-folio", "SCENARIO PRESSURE MAP", x + 18, y + 14, 220, 16, z + 1, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+    start_x = x + 52
+    start_y = y + h / 2
+    objects.append(shape_obj(sid + "_scenario_origin", "map-node", start_x - 16, start_y - 16, 32, 32, z + 8, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.78))
+    objects.append(text_obj(sid + "_scenario_origin_label", "research-folio", "CURRENT\nBOOK", start_x - 28, start_y + 22, 70, 28, z + 9, 7, color=system_pal(profile, "muted"), bold=True, priority=2))
+    row_y = [y + 52, y + 138, y + 224]
+    tones = ["positive", "warning", "accent"]
+    for i, sc in enumerate(scenarios[:3], start=1):
+        metric = metrics[i - 1] if i - 1 < len(metrics) else {}
+        ry = row_y[i - 1]
+        tone_name = tones[i - 1]
+        tone = system_tone_color(profile, tone_name)
+        # Branch connector from origin to scenario zone.
+        objects.append(shape_obj("%s_scenario_branch_%d" % (sid, i), "scenario-branch", start_x + 14, start_y - 1 if ry >= start_y else ry + 44, 116, 3, z + 4 + i, fill=tone, stroke=tone, shape="rect", priority=2, opacity=0.28, stroke_opacity=0.0))
+        objects.append(shape_obj("%s_scenario_zone_%d" % (sid, i), "scenario-zone", x + 184, ry, w - 220, 70, z + 20 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.96, stroke_opacity=0.76))
+        objects.append(shape_obj("%s_scenario_zone_%d_pin" % (sid, i), "map-node", x + 198, ry + 14, 12, 12, z + 30 + i, fill=tone, stroke=tone, shape="ellipse", priority=2, opacity=0.88, stroke_opacity=0.0))
+        objects.append(text_obj("%s_scenario_zone_%d_name" % (sid, i), "body", sc.get("name", ""), x + 218, ry + 8, 58, 18, z + 31 + i, 11, color=system_pal(profile, "ink"), bold=True, priority=5))
+        objects.append(text_obj("%s_scenario_zone_%d_prob_label" % (sid, i), "metric-label", metric.get("label", ""), x + 276, ry + 6, 72, 14, z + 32 + i, 7, color=system_pal(profile, "muted"), bold=True, priority=4))
+        objects.append(text_obj("%s_scenario_zone_%d_prob" % (sid, i), "metric", metric.get("value", ""), x + 276, ry + 22, 62, 22, z + 33 + i, 13, color=tone, bold=True, priority=5))
+        objects.append(text_obj("%s_scenario_zone_%d_impact" % (sid, i), "metric", sc.get("impact", ""), x + 344, ry + 8, 148, 22, z + 34 + i, 12, color=system_pal(profile, "ink"), bold=True, priority=5))
+        objects.append(text_obj("%s_scenario_zone_%d_trigger" % (sid, i), "metric-note", metric.get("delta", ""), x + 218, ry + 43, 150, 18, z + 35 + i, 8, color=system_pal(profile, "muted"), priority=4))
+        objects.append(text_obj("%s_scenario_zone_%d_action" % (sid, i), "body", sc.get("action", ""), x + 372, ry + 43, 130, 18, z + 36 + i, 9, color=tone, bold=True, priority=5))
+    add_atlas_legend(objects, sid + "_scenario", x + 18, y + h - 24, z + 80, profile, [("基准", "positive"), ("紧缩", "warning"), ("衰退", "accent")])
+
+
+def add_atlas_process_state_machine(objects, sid, process, metrics, x, y, w, h, z, profile):
+    """Execution page: state machine + real signal field, not fake matrix."""
+    # Fill the otherwise empty SIGNAL FIELD zone with native trigger evidence.
+    sf_x, sf_y, sf_w, sf_h = 748, 232, 426, 92
+    objects.append(shape_obj(sid + "_process_signal_field_panel", "signal-field", sf_x, sf_y, sf_w, sf_h, z + 2, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="roundRect", priority=3, opacity=0.94, stroke_opacity=0.42))
+    for i, metric in enumerate(metrics[:3], start=1):
+        chip_w = 130
+        chip_x = sf_x + 14 + (i - 1) * 136
+        chip_y = sf_y + 24
+        tone = system_tone_color(profile, metric.get("tone"))
+        objects.append(shape_obj("%s_process_signal_%d" % (sid, i), "signal-chip", chip_x, chip_y, chip_w, 54, z + 8 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.86, stroke_opacity=0.60))
+        objects.append(text_obj("%s_process_signal_%d_label" % (sid, i), "metric-label", metric.get("label", ""), chip_x + 10, chip_y + 6, 106, 14, z + 12 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
+        objects.append(text_obj("%s_process_signal_%d_value" % (sid, i), "metric", metric.get("value", ""), chip_x + 10, chip_y + 22, 42, 20, z + 16 + i, 13, color=tone, bold=True, priority=5))
+        objects.append(text_obj("%s_process_signal_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), chip_x + 54, chip_y + 18, 68, 32, z + 20 + i, 7, color=system_pal(profile, "ink"), priority=4))
+
+    objects.append(shape_obj(sid + "_process_map_panel", "process-state-map", x, y, w, h, z + 30, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=3, opacity=0.98, stroke_opacity=0.54))
+    objects.append(text_obj(sid + "_process_map_title", "research-folio", "EXECUTION STATE MACHINE / TRIGGER-GATED LOOP", x + 18, y + 14, 330, 16, z + 31, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+    nodes = [(x + 92, y + 82), (x + 286, y + 82), (x + 480, y + 82), (x + 674, y + 82)]
+    for i in range(len(nodes) - 1):
+        x1, y1 = nodes[i]
+        x2, y2 = nodes[i + 1]
+        objects.append(shape_obj("%s_state_route_%d" % (sid, i + 1), "route-line", x1 + 44, y1 - 2, x2 - x1 - 88, 4, z + 34 + i, fill=system_pal(profile, "positive" if i < 1 else "accent"), stroke=system_pal(profile, "positive" if i < 1 else "accent"), shape="rect", priority=2, opacity=0.30, stroke_opacity=0.0))
+    # Feedback loop makes it a state machine, not a one-way checklist.
+    objects.append(shape_obj(sid + "_state_feedback_route", "route-line", x + 160, y + 176, 570, 3, z + 34, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=2, opacity=0.18, stroke_opacity=0.0))
+    objects.append(text_obj(sid + "_state_feedback_label", "research-folio", "monthly review / override / rebalance loop", x + 420, y + 184, 250, 14, z + 36, 7, color=system_pal(profile, "muted"), bold=True, priority=2))
+    for i, step in enumerate(process[:4], start=1):
+        nx, ny = nodes[i - 1]
+        tone_name = ["positive", "accent", "warning", "positive"][i - 1]
+        tone = system_tone_color(profile, tone_name)
+        objects.append(shape_obj("%s_state_node_%d" % (sid, i), "process-node", nx - 24, ny - 24, 48, 48, z + 40 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.82))
+        objects.append(text_obj("%s_state_num_%d" % (sid, i), "process-step", step.get("step", ""), nx - 13, ny - 11, 30, 20, z + 44 + i, 10, color=tone, bold=True, priority=5))
+        objects.append(text_obj("%s_state_title_%d" % (sid, i), "process-step", step.get("title", ""), nx - 58, ny + 34, 116, 18, z + 48 + i, 10, color=system_pal(profile, "ink"), bold=True, priority=5))
+        objects.append(text_obj("%s_state_text_%d" % (sid, i), "process-step", step.get("text", ""), nx - 74, ny + 58, 148, 44, z + 52 + i, 8, color=system_pal(profile, "muted"), priority=5))
+
+    # Compact governance strip replaces the unreadable pseudo-matrix.
+    gx = x + 820
+    gy = y + 46
+    objects.append(shape_obj(sid + "_governance_strip", "trigger-row", gx - 16, gy - 14, 238, 154, z + 42, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "rule"), shape="roundRect", priority=3, opacity=0.70, stroke_opacity=0.28))
+    objects.append(text_obj(sid + "_governance_head", "research-folio", "GOVERNANCE", gx, gy - 2, 120, 14, z + 50, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+    rows = [
+        ("Trigger", "PMI>50 / 盈利确认"),
+        ("Budget", "单周新增≤8%"),
+        ("Hedge", "利率/政策扰动"),
+        ("Review", "月度 / 偏离5ppt"),
+    ]
+    for i, (k, v) in enumerate(rows, start=1):
+        ry = gy + 18 + (i - 1) * 28
+        objects.append(text_obj("%s_governance_%d_k" % (sid, i), "research-folio", k, gx, ry, 68, 15, z + 52 + i, 8, color=system_pal(profile, "accent"), bold=True, priority=2))
+        objects.append(text_obj("%s_governance_%d_v" % (sid, i), "body", v, gx + 72, ry, 138, 18, z + 56 + i, 8, color=system_pal(profile, "ink"), priority=5))
+    add_atlas_legend(objects, sid + "_process", x + 18, y + h - 24, z + 80, profile, [("当前节点", "positive"), ("风险部署", "accent"), ("风控闸门", "warning")])
 
 
 def compile_paper_slide(slide, index):
@@ -845,50 +1102,68 @@ def compile_atlas_slide(slide, index):
         # same-content body text natively, but move it into the Signal Field note
         # zone so the left narrative column does not create orphan punctuation.
         if body:
-            objects.append(text_obj(sid + "_signal_note", "body", body[0], 760, 338, 392, 34, 42, 10, color=system_pal(profile, "muted"), priority=5))
+            objects.append(text_obj(sid + "_signal_note", "body", body[0], 84, 250, 560, 32, 42, 9, color=system_pal(profile, "muted"), priority=5))
     else:
         add_body_paragraphs(objects, sid, body, 88, 238, 470, 38, 30, size=14, max_items=3, gap=10, profile={"palette": {"text": system_pal(profile, "ink"), "muted": system_pal(profile, "muted")}})
-    if slide.get("process"):
-        # Process pages are route-led. Keep metric evidence native/editable, but
-        # demote it into compact signal chips so the process tiles remain L1.
-        signal_positions = [(742, 232), (898, 232), (1054, 232)]
+    if slide.get("chart") and len(metrics) >= 4:
+        add_atlas_signal_field_map(objects, sid, metrics, 746, 232, 420, 268, 42, profile)
+    elif not slide.get("scenarios") and not slide.get("process"):
+        # Cover / thesis pages keep compact signal chips, but they no longer masquerade as a full Atlas map.
+        tile_positions = [(742, 232), (898, 232), (1054, 232)]
         for i, metric in enumerate(metrics[:3], start=1):
-            x, y = signal_positions[i - 1]
+            x, y = tile_positions[i - 1]
             tone = system_tone_color(profile, metric.get("tone"))
-            objects.append(shape_obj("%s_metric_%d_chip" % (sid, i), "signal-chip", x, y, 138, 82, 42 + i * 10, fill=system_pal(profile, "paper"), stroke=tone, shape="roundRect", priority=3, opacity=0.72, stroke_opacity=0.58))
+            objects.append(shape_obj("%s_metric_%d_chip" % (sid, i), "signal-chip", x, y, 138, 82, 42 + i * 10, fill=system_pal(profile, "paper"), stroke=tone, shape="roundRect", priority=3, opacity=0.84, stroke_opacity=0.68))
             objects.append(text_obj("%s_metric_%d_label" % (sid, i), "metric-label", metric.get("label", ""), x + 12, y + 8, 114, 16, 44 + i * 10, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
             objects.append(text_obj("%s_metric_%d_value" % (sid, i), "metric", metric.get("value", ""), x + 12, y + 28, 114, 24, 45 + i * 10, 17, color=system_pal(profile, "ink"), bold=True, priority=5))
             objects.append(text_obj("%s_metric_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), x + 12, y + 54, 114, 22, 46 + i * 10, 8, color=tone, priority=4))
-        objects.append(shape_obj(sid + "_signal_timeline", "route-line", 778, 390, 356, 2, 72, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=2, opacity=0.10, stroke_opacity=0.0))
-        for i, x in enumerate([780, 954, 1130], start=1):
-            objects.append(shape_obj("%s_signal_tick_%d" % (sid, i), "process-node", x, 384, 10, 10, 73 + i, fill=system_pal(profile, "accent" if i == 2 else "positive"), stroke=system_pal(profile, "accent" if i == 2 else "positive"), shape="ellipse", priority=2, opacity=0.38, stroke_opacity=0.0))
-    else:
-        tile_positions = [(760, 230), (1000, 230), (760, 362), (1000, 362)]
-        for i, metric in enumerate(metrics[:4], start=1):
-            x, y = tile_positions[i - 1]
-            add_system_metric(objects, "%s_metric_%d" % (sid, i), metric, x, y, 190, 100, 42 + i * 10, profile, role="map-tile")
+        # Fill the lower half of the right panel with a real decision map.
+        # Allocation pages need an auditable if/then chain instead of repeated KPI cards.
+        map_x, map_y = 748, 338
+        is_allocation_chart = bool(slide.get("chart")) and (slide.get("chart", {}).get("categories", [])[:3] == ["当前", "建议", "上限"])
+        objects.append(text_obj(sid + "_right_field_head", "research-folio", "DECISION CHAIN / LIMIT GUARDRAIL" if is_allocation_chart else "BUDGET CORRIDOR / DECISION MAP", map_x, map_y, 330, 16, 74, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+        if is_allocation_chart:
+            decision_rows = [
+                ("Trigger", "权益风险预算释放 +5pct"),
+                ("Action", "权益50→55；提高弹性但不追满"),
+                ("Funding", "固收-4pct；另类现金-1pct"),
+                ("Limit", "权益≤62；固收≥30；另类现金≥8"),
+                ("Guardrail", "DD>5%或周撤>3%：停加风险/回建议仓位"),
+            ]
+            for j, (key, val) in enumerate(decision_rows, start=1):
+                yy = map_y + 28 + (j - 1) * 30
+                tone = "warning" if key == "Guardrail" else ("accent" if key in {"Trigger", "Action"} else "positive")
+                objects.append(shape_obj("%s_decision_chain_%d" % (sid, j), "trigger-row", map_x, yy, 388, 24, 76 + j, fill=system_pal(profile, "panel"), stroke=system_tone_color(profile, tone), shape="roundRect", priority=3, opacity=0.76, stroke_opacity=0.34))
+                objects.append(text_obj("%s_decision_chain_%d_key" % (sid, j), "research-folio", key, map_x + 10, yy + 5, 74, 12, 84 + j, 7, color=system_tone_color(profile, tone), bold=True, priority=3))
+                objects.append(text_obj("%s_decision_chain_%d_val" % (sid, j), "body", val, map_x + 90, yy + 4, 286, 16, 90 + j, 7, color=system_pal(profile, "ink"), priority=5))
+        else:
+            band_labels = [("DEFENSIVE", "warning"), ("NEUTRAL+", "positive"), ("RISK ADD", "accent")]
+            for j, (label, tone_name) in enumerate(band_labels, start=1):
+                yy = map_y + 30 + (j - 1) * 34
+                tone = system_tone_color(profile, tone_name)
+                objects.append(shape_obj("%s_corridor_band_%d" % (sid, j), "route-map", map_x, yy, 388, 18, 74 + j, fill=tone, stroke=tone, shape="roundRect", priority=2, opacity=0.13 + j * 0.035, stroke_opacity=0.0))
+                objects.append(text_obj("%s_corridor_band_%d_label" % (sid, j), "research-folio", label, map_x + 10, yy + 3, 110, 12, 78 + j, 7, color=system_pal(profile, "ink"), bold=True, priority=3))
+            path_nodes = [(map_x + 136, map_y + 78), (map_x + 232, map_y + 63), (map_x + 328, map_y + 48)]
+            for j, (nx, ny) in enumerate(path_nodes, start=1):
+                if j > 1:
+                    px, py = path_nodes[j - 2]
+                    objects.append(shape_obj("%s_decision_route_%d" % (sid, j - 1), "route-line", px + 8, py + 5, nx - px - 10, 3, 90 + j, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.30, stroke_opacity=0.0))
+                objects.append(shape_obj("%s_decision_node_%d" % (sid, j), "map-node", nx, ny, 14, 14, 96 + j, fill=system_pal(profile, "positive" if j < 3 else "accent"), stroke=system_pal(profile, "background"), shape="ellipse", priority=3, opacity=0.94, stroke_opacity=0.5))
+            rule_rows = [
+                ("Trigger", metrics[0].get("delta", "") if len(metrics) > 0 else "signal pass"),
+                ("Budget", metrics[2].get("value", "") if len(metrics) > 2 else "neutral+"),
+                ("Action", "纪律性加风险 / 保留回撤保护"),
+            ]
+            for j, (key, val) in enumerate(rule_rows, start=1):
+                yy = map_y + 146 + (j - 1) * 22
+                objects.append(text_obj("%s_decision_rule_%d_key" % (sid, j), "research-folio", key, map_x, yy, 76, 14, 104 + j, 8, color=system_pal(profile, "accent"), bold=True, priority=3))
+                objects.append(text_obj("%s_decision_rule_%d_val" % (sid, j), "body", val, map_x + 82, yy, 300, 16, 108 + j, 8, color=system_pal(profile, "ink"), priority=5))
     if slide.get("chart"):
-        objects.append(chart_obj(sid + "_chart", slide["chart"], 88, 420, 640, 174, 78, chart_profile_for_system(profile)))
+        add_atlas_budget_route_map(objects, sid, slide["chart"], 88, 392, 640, 196, 78, profile)
     elif slide.get("scenarios"):
-        for i, sc in enumerate(slide.get("scenarios", [])[:3], start=1):
-            x = 604 + (i - 1) * 196
-            objects.append(shape_obj("%s_scenario_%d" % (sid, i), "map-tile", x, 430, 164, 120, 78 + i, fill=system_pal(profile, "paper"), stroke=system_tone_color(profile, ["positive", "warning", "accent"][(i - 1) % 3]), shape="rect", priority=3, opacity=0.97, stroke_opacity=0.88))
-            objects.append(text_obj("%s_scenario_%d_name" % (sid, i), "body", sc.get("name", ""), x + 12, 444, 140, 20, 84 + i, 12, color=system_pal(profile, "accent"), bold=True, priority=5))
-            objects.append(text_obj("%s_scenario_%d_impact" % (sid, i), "metric", sc.get("impact", ""), x + 12, 462, 140, 56, 90 + i, 15, color=system_pal(profile, "ink"), bold=True, priority=5))
-            objects.append(text_obj("%s_scenario_%d_action" % (sid, i), "body", sc.get("action", ""), x + 12, 526, 140, 20, 96 + i, 9, color=system_pal(profile, "muted"), priority=5))
+        add_atlas_scenario_map(objects, sid, metrics, slide.get("scenarios", []), 710, 228, 486, 352, 78, profile)
     elif slide.get("process"):
-        route = [(88, 338), (392, 338), (88, 478), (392, 478)]
-        for i in range(len(route) - 1):
-            x1, y1 = route[i]
-            x2, y2 = route[i + 1]
-            objects.append(shape_obj("%s_process_route_%d" % (sid, i + 1), "route-line", min(x1, x2) + 74, min(y1, y2) + 36, abs(x2 - x1) + 42, 4, 76 + i, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.12, stroke_opacity=0.0))
-        for i, step in enumerate(slide.get("process", [])[:4], start=1):
-            x, y = route[i - 1]
-            objects.append(shape_obj("%s_process_%d_tile" % (sid, i), "map-tile", x, y, 312, 106, 82 + i, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "rule"), shape="roundRect", priority=3, opacity=0.99, stroke_opacity=0.48))
-            objects.append(shape_obj("%s_process_%d_node" % (sid, i), "process-node", x + 12, y + 12, 16, 16, 84 + i, fill=system_pal(profile, "accent"), stroke=system_pal(profile, "accent"), shape="ellipse", priority=2, opacity=0.90, stroke_opacity=0.0))
-            objects.append(text_obj("%s_process_%d_num" % (sid, i), "process-step", step.get("step", ""), x + 36, y + 10, 34, 18, 86 + i, 10, color=system_pal(profile, "accent"), bold=True, priority=5))
-            objects.append(text_obj("%s_process_%d_title" % (sid, i), "process-step", step.get("title", ""), x + 76, y + 10, 200, 20, 88 + i, 10, color=system_pal(profile, "ink"), bold=True, priority=5))
-            objects.append(text_obj("%s_process_%d_text" % (sid, i), "process-step", step.get("text", ""), x + 16, y + 40, 280, 52, 92 + i, 10, color=system_pal(profile, "muted"), priority=5))
+        add_atlas_process_state_machine(objects, sid, slide.get("process", []), metrics, 88, 344, 1088, 244, 78, profile)
     if slide.get("risk_note"):
         objects.append(shape_obj(sid + "_footer_mask", "footer-mask", 76, 600, 1128, 54, 888, fill=system_pal(profile, "background"), stroke=system_pal(profile, "background"), shape="rect", priority=1, opacity=0.94, stroke_opacity=0.0))
         objects.append(shape_obj(sid + "_source_band", "route-line", 76, 604, 1128, 2, 890, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.08, stroke_opacity=0.0))

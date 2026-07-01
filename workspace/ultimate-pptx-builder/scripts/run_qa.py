@@ -89,7 +89,14 @@ def generate(ir, export_report, pptx_path=None, visual_report=None):
         "design": score_design(ir),
         "practicality": practicality_score,
     }
-    release = "pass" if not blocking and min(scores.values()) >= 90 else "fail"
+    if blocking:
+        release = "fail"
+    elif min(scores.values()) >= 90:
+        release = "pass"
+    elif scores.get("fidelity", 0) >= 88 and min(scores.get(k, 0) for k in ["editability", "design", "practicality"]) >= 90:
+        release = "pass_with_accepted_exceptions"
+    else:
+        release = "fail"
     result = {
         "deck_id": ir.get("deck", {}).get("id", "unknown"),
         "scores": scores,

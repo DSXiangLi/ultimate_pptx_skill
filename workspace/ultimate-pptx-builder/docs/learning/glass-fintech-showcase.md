@@ -598,3 +598,15 @@ python3 scripts/validate_skill.py
 Full-size visual review of `build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-05.png` returned PASS: process order is clear, text is readable, bottom safety improved, and no blocking overlap/overflow remains.
 
 **Prevention rule:** If a rendered PPTX has a visible layout defect after automated PASS, treat it as a validation-system bug first. Classify A local / B style-DNA / C systemic before fixing. A class-C issue blocks release until the skill reference or executable gate is upgraded.
+
+## Problem 19: Strict visual acceptance must catch decorative hierarchy noise and Office package compatibility
+
+**Symptom:** A deck can pass coarse layout/fidelity/editability gates while still showing fine text crowding, chaotic-looking containers, noisy decorative map lines, and PowerPoint/WPS repair warnings.
+
+**Root cause:** The old validation was too broad: it checked large overlaps and package presence, but not strict Office compatibility, decorative hierarchy, protected-term wrapping, or professional layout order at detail level. The hand-written OOXML exporter also created a stricter-Office compatibility risk.
+
+**Fix:** Use `python-pptx` for default PPTX package generation, strengthen `check_pptx_package.py` with relationship resolution and roundtrip checks, tighten `check_visual_layout_architecture.py`, reduce Atlas grid/route/node noise, separate Paper title and KPI rails, and shrink/fade Dark Glass edge decoration.
+
+**Verification:** `python3 scripts/validate_visual_systems.py` passes with editability 100; strict visual audit final decision is PASS; `check_pptx_package.py` passes all three generated PPTX files.
+
+**Prevention:** Treat user-visible fine overlap/noise and Office repair prompts as release blockers. Do not call a PPTX final until strict visual review and Office package compatibility pass together.

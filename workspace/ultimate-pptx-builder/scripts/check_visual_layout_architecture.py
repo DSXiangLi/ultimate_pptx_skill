@@ -104,6 +104,83 @@ def check_deck(deck):
                             "Routes must be clipped, shifted, faded, or masked around title/subtitle zones.",
                         )
 
+
+        # Atlas content-zone masks must sit above decorative background motifs.
+        # If they are below grids/routes, opacity changes only tint the page and
+        # cannot actually prevent route/grid bleed-through inside content regions.
+        if "market-atlas" in style:
+            motif_z = [float(o.get("z", 0)) for o in objects if o.get("role") == "atlas-gridline" or any(tok in o.get("id", "") for tok in ["_route_primary", "_route_secondary", "_node_1", "_node_2", "_node_3"])]
+            max_motif_z = max(motif_z) if motif_z else 0.0
+            for zone in [o for o in objects if o.get("role") == "background" and any(o.get("id", "").endswith(suffix) for suffix in ["_zone_left", "_zone_right", "_zone_bottom"] )]:
+                if float(zone.get("z", 0)) <= max_motif_z:
+                    issue(
+                        issues, deck, slide,
+                        "ATLAS_CONTENT_MASK_BELOW_MOTIF", "blocking",
+                        f"Atlas content mask z={zone.get('z')} is below/inside decorative motif z={max_motif_z:.0f}; it cannot block grid/route bleed-through.",
+                        zone.get("id"), "S",
+                        "Place content masks above decorative grids/routes and below business text/cards, or clip motifs away from content zones.",
+                    )
+            risks = [o for o in objects if o.get("role") == "risk"]
+            footer_masks = [o for o in objects if o.get("role") == "footer-mask"]
+            for risk in risks:
+                rb = box(risk)
+                protected = any(intersects(box(m), rb, pad=-4) and float(m.get("z", 0)) < float(risk.get("z", 0)) and float(m.get("opacity", 0) or 0) >= 0.75 for m in footer_masks)
+                if not protected:
+                    issue(
+                        issues, deck, slide,
+                        "ATLAS_FOOTER_UNMASKED", "blocking",
+                        "Atlas risk/footer text lacks a strong footer-mask, so bottom grid/routes can bleed through compliance text.",
+                        risk.get("id"), "S",
+                        "Add a dedicated footer-mask above decorative motifs and below risk/source text.",
+                    )
+
+        # Decorative layer must stay subordinate to content. Strong map grids/routes
+        # and large glows can pass geometry checks while still making the slide feel
+        # chaotic or non-design intentional.
+        for o in objects:
+            role = o.get("role")
+            oid = o.get("id", "")
+            op = float(o.get("opacity", 1.0) if o.get("opacity", 1.0) is not None else 1.0)
+            b = box(o)
+            if "market-atlas" in style and role == "background" and (oid.endswith("_zone_left") or oid.endswith("_zone_bottom")) and op < 0.28:
+                issue(
+                    issues, deck, slide,
+                    "ATLAS_CONTENT_ZONE_UNDERMASKED", "blocking",
+                    f"Atlas content isolation zone opacity {op:.2f} is too low; grid/routes will bleed through content regions.",
+                    oid, "S",
+                    "Do not solve atlas visual noise by fading the content mask. Keep content zones >=0.28 opacity and fade/clamp decorative routes instead.",
+                )
+            if "market-atlas" in style and role == "atlas-gridline" and op > 0.085:
+                issue(
+                    issues, deck, slide,
+                    "ATLAS_GRID_TOO_PROMINENT", "blocking",
+                    f"Atlas gridline opacity {op:.2f} exceeds strict readability threshold; background grid is competing with content.",
+                    oid, "S",
+                    "Map grids must be atmospheric (<0.085 opacity) unless clipped away from content zones.",
+                )
+            if "market-atlas" in style and role == "route-line" and "source_band" not in oid and op > 0.26:
+                issue(
+                    issues, deck, slide,
+                    "ATLAS_ROUTE_TOO_PROMINENT", "blocking",
+                    f"Atlas route opacity {op:.2f} is too prominent for a decorative/infrastructure line.",
+                    oid, "S",
+                    "Decorative routes must stay below content hierarchy or become semantic connectors only.",
+                )
+            if "glass-fintech" in style and role in {"decorative-glow", "spotlight-orb"}:
+                if area(b) > 36000 and op > 0.035 and title_safe and intersects(b, title_safe, pad=-20):
+                    issue(
+                        issues, deck, slide,
+                        "GLASS_GLOW_COMPETES_WITH_TITLE", "blocking",
+                        f"Large glow area={area(b):.0f} opacity={op:.2f} competes with the title safe area.",
+                        oid, "S",
+                        "Reduce glow size/opacity or move it outside title safe zones.",
+                    )
+            if role == "risk":
+                if style_size(o) and style_size(o) < 9:
+                    issue(issues, deck, slide, "FOOTER_TEXT_TOO_SMALL", "blocking", "Risk/source footer text below 9px is not acceptable for finance PPT review.", oid, "S", "Use >=9px footer text or shorten the note.")
+                if bottom(b) > 662:
+                    issue(issues, deck, slide, "FOOTER_SAFE_ZONE_TOO_LOW", "blocking", "Risk/source footer exceeds strict bottom safe zone.", oid, "S", "Keep risk/source text above y=662 in 16:9 canvas.")
+
         # Chart pages must allocate enough physical area for axis/legend labels.
         for o in objects:
             if o.get("type") == "chart" or o.get("role") == "chart":

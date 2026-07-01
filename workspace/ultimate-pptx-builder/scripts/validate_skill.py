@@ -30,6 +30,7 @@ REQUIRED = [
     "references/pptx-capability-matrix.md",
     "references/qa-loop.md",
     "references/layout-text-safety.md",
+    "references/layout-defect-taxonomy.md",
     "references/finance-benchmark-decks.md",
     "references/visual-quality-rubric.md",
     "references/conversion-rules.md",
@@ -74,12 +75,14 @@ REQUIRED = [
     "scripts/compile_spec_to_ir.py",
     "scripts/render_ir_html.py",
     "scripts/export_ir_pptx.py",
+    "scripts/check_pptx_package.py",
     "scripts/run_qa.py",
     "scripts/render_ir_png.py",
     "scripts/render_pptx_png.py",
     "scripts/compare_slide_images.py",
     "scripts/run_visual_fidelity.py",
     "scripts/check_layout_safety.py",
+    "scripts/check_visual_layout_architecture.py",
     "scripts/check_narrative_safety.py",
     "scripts/check_visual_anchor.py",
     "scripts/check_narrative_visual_orthogonality.py",
@@ -133,14 +136,15 @@ def check_acceptance_language():
         "references/phase3-pptx-export.md",
         "references/phase4-qa-report.md",
         "references/layout-text-safety.md",
+        "references/layout-defect-taxonomy.md",
         "references/phase4b-visual-fidelity.md",
         "references/style-glass-fintech-pptx.md",
-    "references/narrative-visual-expansion-roadmap.md",
-    "references/narrative-kernel.md",
-    "references/visual-anchor-system.md",
-    "references/visual-variant-distinctiveness.md",
-    "references/visual-system-generalization.md",
-    "references/visual-dna-model.md",
+        "references/narrative-visual-expansion-roadmap.md",
+        "references/narrative-kernel.md",
+        "references/visual-anchor-system.md",
+        "references/visual-variant-distinctiveness.md",
+        "references/visual-system-generalization.md",
+        "references/visual-dna-model.md",
         "references/qa-loop.md",
         "references/editability-policy.md",
     ]
@@ -348,6 +352,9 @@ def check_phase3_pptx_export():
         fail("Phase 3 exporter did not create PPTX")
     if not zipfile.is_zipfile(pptx_path):
         fail("Phase 3 PPTX output is not a zip/OPC package")
+    pkg_proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "check_pptx_package.py"), str(pptx_path)], cwd=str(ROOT), text=True, capture_output=True)
+    if pkg_proc.returncode != 0:
+        fail("Phase 3 PPTX Office package validation failed: " + (pkg_proc.stderr or pkg_proc.stdout))
     with zipfile.ZipFile(pptx_path) as zf:
         names = set(zf.namelist())
         required_parts = {"[Content_Types].xml", "_rels/.rels", "ppt/presentation.xml", "ppt/slides/slide1.xml"}

@@ -283,11 +283,13 @@ Run all five QA gates:
 - [ ] `references/style-program.md` defines Base/SOTA DNA and PPTX material strategy.
 - [ ] `references/qa-loop.md` defines the five gates and release criteria.
 - [ ] `references/layout-text-safety.md` defines the executable safe-zone and text-capacity gate.
-- [ ] `references/layout-root-cause-and-exhaustive-qa.md` is consulted when a rendered deck passes automated gates but a reviewer still sees overlap, crowding, title/card collisions, line-leading defects, or container-level layout defects.
+- [ ] `references/layout-root-cause-and-exhaustive-qa.md` and `references/layout-defect-taxonomy.md` are consulted when a rendered deck passes automated gates but a reviewer still sees overlap, crowding, title/card collisions, line-leading defects, container-level layout defects, or style-DNA/page-role layout mismatch.
 - [ ] `references/finance-benchmark-decks.md` is used when creating or evaluating long-form finance benchmarks; do not rely on pixel/editability scores alone.
 - [ ] `references/phase4b-visual-fidelity.md` defines the render/diff loop.
 - [ ] `references/style-glass-fintech-pptx.md` defines the first deep style anchor and acceptance target.
 - [ ] `references/visual-dna-model.md` is consulted before accepting a visual anchor; first-glance difference is insufficient if chart grammar, typography, card/component geometry, and page-role layout skeleton remain the same.
+- [ ] `scripts/check_visual_layout_architecture.py` classifies visible layout defects as local slide bugs, style-DNA adaptation bugs, or systemic skill/gate gaps, and blocks route/title intrusion, microtext, chart undersizing, process-page density overload, and page-role hierarchy mismatch.
+- [ ] `scripts/check_pptx_package.py` validates Office-compatible PPTX package structure including slide master/layout/theme relationships; LibreOffice-openable minimal ZIPs are not enough.
 - [ ] `scripts/check_layout_safety.py` enforces 64px bottom safe zone, 16px footer separation, CJK-aware text capacity, explicit multi-line leading budget, pairwise text collision checks, metric-card internal stack gaps/padding, visual container overlap/nesting rules, title-to-content gaps, table density/readability limits, compliance density rules, and anti-template page-number checks.
 - [ ] `scripts/validate_glass_showcase.py` passes before adding another style preset.
 - [ ] `scripts/validate_glass_benchmark.py` passes for the 15-slide narrative benchmark before expanding style presets.

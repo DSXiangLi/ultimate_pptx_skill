@@ -175,6 +175,7 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     pptx_path = build / ("%s.pptx" % style_program)
     narrative_path = build / ("%s-narrative-safety-report.json" % style_program)
     layout_path = build / ("%s-layout-safety-report.json" % style_program)
+    visual_layout_path = build / ("%s-visual-layout-architecture-report.json" % style_program)
     export_path = build / ("%s-export-report.json" % style_program)
     visual_path = build / ("%s-visual-fidelity-report.json" % style_program)
     qa_path = build / ("%s-qa-report.json" % style_program)
@@ -191,7 +192,12 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     layout = load_json(layout_path)
     if layout.get("release_decision") != "pass" or layout.get("blocking_count", 0):
         fail("%s layout safety failed: %s" % (style_program, layout_path.relative_to(ROOT)))
+    run([sys.executable, str(ROOT / "scripts" / "check_visual_layout_architecture.py"), str(ir_path), "--report", str(visual_layout_path)])
+    visual_layout = load_json(visual_layout_path)
+    if visual_layout.get("release_decision") != "pass" or visual_layout.get("blocking_count", 0):
+        fail("%s visual layout architecture failed: %s" % (style_program, visual_layout_path.relative_to(ROOT)))
     run([sys.executable, str(ROOT / "scripts" / "export_ir_pptx.py"), str(ir_path), str(pptx_path), "--report", str(export_path)])
+    run([sys.executable, str(ROOT / "scripts" / "check_pptx_package.py"), str(pptx_path)])
     export = load_json(export_path)
     if export.get("critical_raster_count"):
         fail("%s has critical rasterized objects" % style_program)

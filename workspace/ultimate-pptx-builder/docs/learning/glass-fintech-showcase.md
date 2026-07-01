@@ -577,3 +577,24 @@ Do not accept a new visual system solely because automated gates pass. For each 
 - fintech dashboard contrast and signal-card treatment.
 
 **Acceptance rule.** A visual system is not release-ready if chart, font, card/container, component, and layout signatures remain substantially shared. The same-content contact sheet must show visual DNA differences in information-bearing regions, not just background texture or accent color.
+
+## Problem 18: Layout defects are architecture diagnostics
+
+**Context:** Multi-visual-system PPTX outputs passed geometric layout safety, visual fidelity, editability, and QA, but review still found style-specific layout failures: chart undersizing, atlas route/title intrusion, and process-page route/card density overload.
+
+**Symptom:** The defect was tempting to fix with local coordinate edits. That would have left the skill vulnerable because each generated PPTX was actually a diagnostic sample for the architecture.
+
+**Root cause:** Existing gates checked object overlap, text capacity, safe zones, and visual fidelity, but did not classify visible layout defects as local slide bugs, style-DNA adaptation bugs, or systemic gate gaps. They also lacked visual-layout architecture rules for route/title safe areas, chart minimum area, process-page content budgets, and page-role hierarchy.
+
+**Fix:** Added `references/layout-defect-taxonomy.md` and `scripts/check_visual_layout_architecture.py`. Integrated the new gate into cross-visual-system validation before PPTX export. Repaired the compiler grammar instead of patching one slide: enlarged Glass chart-led dashboard chart slot, moved/suppressed Atlas decorative routes around title/process pages, demoted Atlas process metrics to signal chips, enlarged process cards, raised process text size, and reduced process-page grid noise.
+
+**Verification:**
+
+```bash
+python3 scripts/validate_visual_systems.py
+python3 scripts/validate_skill.py
+```
+
+Full-size visual review of `build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-05.png` returned PASS: process order is clear, text is readable, bottom safety improved, and no blocking overlap/overflow remains.
+
+**Prevention rule:** If a rendered PPTX has a visible layout defect after automated PASS, treat it as a validation-system bug first. Classify A local / B style-DNA / C systemic before fixing. A class-C issue blocks release until the skill reference or executable gate is upgraded.

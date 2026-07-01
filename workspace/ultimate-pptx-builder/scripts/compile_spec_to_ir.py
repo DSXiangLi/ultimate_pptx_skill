@@ -150,7 +150,7 @@ PALETTE = {
     "positive": "31D0AA",
     "warning": "FBBF24",
     "text": "EAF7FF",
-    "muted": "B6C7D8",
+    "muted": "C9D6E2",
     "white": "FFFFFF",
 }
 
@@ -759,15 +759,15 @@ def atlas_frame(objects, sid, index, slide):
     objects.append(shape_obj(sid + "_zone_right", "background", 730, 202, 470, 330, 7, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.96, stroke_opacity=0.30))
     objects.append(shape_obj(sid + "_zone_bottom", "background", 72, 412, 1138, 158, 6, fill=system_pal(profile, "panel_alt"), stroke=system_pal(profile, "panel_alt"), shape="rect", priority=1, opacity=0.78, stroke_opacity=0.0))
     for gx in [96, 256, 416, 576, 736, 896, 1056, 1216]:
-        objects.append(shape_obj("%s_grid_v_%d" % (sid, gx), "atlas-gridline", gx, 52, 1, 590, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.024 if slide.get("process") else 0.030), stroke_opacity=0.0))
+        objects.append(shape_obj("%s_grid_v_%d" % (sid, gx), "atlas-gridline", gx, 52, 1, 590, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.018 if slide.get("process") else 0.022), stroke_opacity=0.0))
     for gy in [118, 238, 358, 478, 598]:
-        objects.append(shape_obj("%s_grid_h_%d" % (sid, gy), "atlas-gridline", 64, gy, 1152, 1, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.022 if slide.get("process") else 0.028), stroke_opacity=0.0))
+        objects.append(shape_obj("%s_grid_h_%d" % (sid, gy), "atlas-gridline", 64, gy, 1152, 1, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.016 if slide.get("process") else 0.020), stroke_opacity=0.0))
     # Decorative atlas routes are style DNA, but they must adapt to page role.
     # Process pages use semantic connectors later; suppress global decorative routes
     # so route/card density does not compete with the actual execution path.
     if not slide.get("process"):
-        objects.append(shape_obj(sid + "_route_primary", "route-line", 88, 218, 1060, 8, 4, fill=system_pal(profile, "accent"), stroke=system_pal(profile, "accent"), shape="rect", priority=2, opacity=0.10, stroke_opacity=0.0))
-        objects.append(shape_obj(sid + "_route_secondary", "route-line", 190, 540, 880, 6, 4, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.08, stroke_opacity=0.0))
+        objects.append(shape_obj(sid + "_route_primary", "route-line", 88, 218, 1060, 8, 4, fill=system_pal(profile, "accent"), stroke=system_pal(profile, "accent"), shape="rect", priority=2, opacity=0.072, stroke_opacity=0.0))
+        objects.append(shape_obj(sid + "_route_secondary", "route-line", 190, 540, 880, 6, 4, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.055, stroke_opacity=0.0))
         for n, (nx, ny, tone) in enumerate([(716, 214, "accent"), (748, 536, "positive"), (1160, 214, "warning")], start=1):
             objects.append(shape_obj("%s_node_%d" % (sid, n), "map-node", nx, ny, 12, 12, 5, fill=system_tone_color(profile, tone), stroke=system_tone_color(profile, tone), shape="rect", priority=2, opacity=0.24, stroke_opacity=0.0))
     objects.append(text_obj(sid + "_folio", "research-folio", "MARKET ATLAS / ZONE-%02d" % index, 80, 54, 300, 22, 10, 10, color=system_pal(profile, "muted"), bold=True, priority=2))
@@ -840,7 +840,14 @@ def compile_atlas_slide(slide, index):
     objects.append(text_obj(sid + "_title", "title", slide["title"], 82, 112, atlas_title_w, title_h, 20, title_size, color=system_pal(profile, "ink"), bold=True, priority=5))
     if slide.get("subtitle"):
         objects.append(text_obj(sid + "_subtitle", "body", slide.get("subtitle", ""), 84, 112 + title_h + 8, 560, 46, 21, 12, color=system_pal(profile, "muted"), priority=5))
-    add_body_paragraphs(objects, sid, body, 88, 238, 470, 38, 30, size=14, max_items=3, gap=10, profile={"palette": {"text": system_pal(profile, "ink"), "muted": system_pal(profile, "muted")}})
+    if slide.get("process"):
+        # Process slides already carry the main warning in the subtitle. Preserve
+        # same-content body text natively, but move it into the Signal Field note
+        # zone so the left narrative column does not create orphan punctuation.
+        if body:
+            objects.append(text_obj(sid + "_signal_note", "body", body[0], 760, 338, 392, 34, 42, 10, color=system_pal(profile, "muted"), priority=5))
+    else:
+        add_body_paragraphs(objects, sid, body, 88, 238, 470, 38, 30, size=14, max_items=3, gap=10, profile={"palette": {"text": system_pal(profile, "ink"), "muted": system_pal(profile, "muted")}})
     if slide.get("process"):
         # Process pages are route-led. Keep metric evidence native/editable, but
         # demote it into compact signal chips so the process tiles remain L1.
@@ -852,6 +859,9 @@ def compile_atlas_slide(slide, index):
             objects.append(text_obj("%s_metric_%d_label" % (sid, i), "metric-label", metric.get("label", ""), x + 12, y + 8, 114, 16, 44 + i * 10, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
             objects.append(text_obj("%s_metric_%d_value" % (sid, i), "metric", metric.get("value", ""), x + 12, y + 28, 114, 24, 45 + i * 10, 17, color=system_pal(profile, "ink"), bold=True, priority=5))
             objects.append(text_obj("%s_metric_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), x + 12, y + 54, 114, 22, 46 + i * 10, 8, color=tone, priority=4))
+        objects.append(shape_obj(sid + "_signal_timeline", "route-line", 778, 390, 356, 2, 72, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=2, opacity=0.10, stroke_opacity=0.0))
+        for i, x in enumerate([780, 954, 1130], start=1):
+            objects.append(shape_obj("%s_signal_tick_%d" % (sid, i), "process-node", x, 384, 10, 10, 73 + i, fill=system_pal(profile, "accent" if i == 2 else "positive"), stroke=system_pal(profile, "accent" if i == 2 else "positive"), shape="ellipse", priority=2, opacity=0.38, stroke_opacity=0.0))
     else:
         tile_positions = [(760, 230), (1000, 230), (760, 362), (1000, 362)]
         for i, metric in enumerate(metrics[:4], start=1):
@@ -861,24 +871,24 @@ def compile_atlas_slide(slide, index):
         objects.append(chart_obj(sid + "_chart", slide["chart"], 88, 420, 640, 174, 78, chart_profile_for_system(profile)))
     elif slide.get("scenarios"):
         for i, sc in enumerate(slide.get("scenarios", [])[:3], start=1):
-            x = 610 + (i - 1) * 190
-            objects.append(shape_obj("%s_scenario_%d" % (sid, i), "map-tile", x, 430, 170, 120, 78 + i, fill=system_pal(profile, "paper"), stroke=system_tone_color(profile, ["positive", "warning", "accent"][(i - 1) % 3]), shape="rect", priority=3, opacity=0.96, stroke_opacity=0.88))
-            objects.append(text_obj("%s_scenario_%d_name" % (sid, i), "body", sc.get("name", ""), x + 12, 444, 146, 20, 84 + i, 12, color=system_pal(profile, "accent"), bold=True, priority=5))
-            objects.append(text_obj("%s_scenario_%d_impact" % (sid, i), "metric", sc.get("impact", ""), x + 12, 462, 146, 56, 90 + i, 15, color=system_pal(profile, "ink"), bold=True, priority=5))
-            objects.append(text_obj("%s_scenario_%d_action" % (sid, i), "body", sc.get("action", ""), x + 12, 526, 146, 20, 96 + i, 9, color=system_pal(profile, "muted"), priority=5))
+            x = 604 + (i - 1) * 196
+            objects.append(shape_obj("%s_scenario_%d" % (sid, i), "map-tile", x, 430, 164, 120, 78 + i, fill=system_pal(profile, "paper"), stroke=system_tone_color(profile, ["positive", "warning", "accent"][(i - 1) % 3]), shape="rect", priority=3, opacity=0.97, stroke_opacity=0.88))
+            objects.append(text_obj("%s_scenario_%d_name" % (sid, i), "body", sc.get("name", ""), x + 12, 444, 140, 20, 84 + i, 12, color=system_pal(profile, "accent"), bold=True, priority=5))
+            objects.append(text_obj("%s_scenario_%d_impact" % (sid, i), "metric", sc.get("impact", ""), x + 12, 462, 140, 56, 90 + i, 15, color=system_pal(profile, "ink"), bold=True, priority=5))
+            objects.append(text_obj("%s_scenario_%d_action" % (sid, i), "body", sc.get("action", ""), x + 12, 526, 140, 20, 96 + i, 9, color=system_pal(profile, "muted"), priority=5))
     elif slide.get("process"):
-        route = [(88, 338), (400, 338), (88, 478), (400, 478)]
+        route = [(88, 338), (392, 338), (88, 478), (392, 478)]
         for i in range(len(route) - 1):
             x1, y1 = route[i]
             x2, y2 = route[i + 1]
             objects.append(shape_obj("%s_process_route_%d" % (sid, i + 1), "route-line", min(x1, x2) + 74, min(y1, y2) + 36, abs(x2 - x1) + 42, 4, 76 + i, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.12, stroke_opacity=0.0))
         for i, step in enumerate(slide.get("process", [])[:4], start=1):
             x, y = route[i - 1]
-            objects.append(shape_obj("%s_process_%d_tile" % (sid, i), "map-tile", x, y, 326, 106, 82 + i, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "rule"), shape="roundRect", priority=3, opacity=0.99, stroke_opacity=0.48))
+            objects.append(shape_obj("%s_process_%d_tile" % (sid, i), "map-tile", x, y, 312, 106, 82 + i, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "rule"), shape="roundRect", priority=3, opacity=0.99, stroke_opacity=0.48))
             objects.append(shape_obj("%s_process_%d_node" % (sid, i), "process-node", x + 12, y + 12, 16, 16, 84 + i, fill=system_pal(profile, "accent"), stroke=system_pal(profile, "accent"), shape="ellipse", priority=2, opacity=0.90, stroke_opacity=0.0))
             objects.append(text_obj("%s_process_%d_num" % (sid, i), "process-step", step.get("step", ""), x + 36, y + 10, 34, 18, 86 + i, 10, color=system_pal(profile, "accent"), bold=True, priority=5))
-            objects.append(text_obj("%s_process_%d_title" % (sid, i), "process-step", step.get("title", ""), x + 76, y + 10, 214, 20, 88 + i, 10, color=system_pal(profile, "ink"), bold=True, priority=5))
-            objects.append(text_obj("%s_process_%d_text" % (sid, i), "process-step", step.get("text", ""), x + 16, y + 40, 294, 52, 92 + i, 10, color=system_pal(profile, "muted"), priority=5))
+            objects.append(text_obj("%s_process_%d_title" % (sid, i), "process-step", step.get("title", ""), x + 76, y + 10, 200, 20, 88 + i, 10, color=system_pal(profile, "ink"), bold=True, priority=5))
+            objects.append(text_obj("%s_process_%d_text" % (sid, i), "process-step", step.get("text", ""), x + 16, y + 40, 280, 52, 92 + i, 10, color=system_pal(profile, "muted"), priority=5))
     if slide.get("risk_note"):
         objects.append(shape_obj(sid + "_footer_mask", "footer-mask", 76, 600, 1128, 54, 888, fill=system_pal(profile, "background"), stroke=system_pal(profile, "background"), shape="rect", priority=1, opacity=0.94, stroke_opacity=0.0))
         objects.append(shape_obj(sid + "_source_band", "route-line", 76, 604, 1128, 2, 890, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.08, stroke_opacity=0.0))

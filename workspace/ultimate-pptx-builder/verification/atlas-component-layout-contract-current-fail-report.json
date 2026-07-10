@@ -1,0 +1,71 @@
+{
+  "gate": "component_layout_contract",
+  "release_decision": "fail",
+  "blocking_count": 4,
+  "warning_count": 0,
+  "issues": [
+    {
+      "code": "ATLAS_ROUTE_MAP_BOTTOM_BAND_INTRUSION",
+      "severity": "blocking",
+      "slide_id": "ls02",
+      "object_ids": [
+        "ls02_macro_rule_matrix",
+        "ls02_macro_zone_1",
+        "ls02_macro_zone_2",
+        "ls02_macro_zone_3"
+      ],
+      "message": "route-map bottom band intrudes into node/card body slot",
+      "evidence": {
+        "band": "ls02_macro_rule_matrix",
+        "cards": [
+          "ls02_macro_zone_1",
+          "ls02_macro_zone_2",
+          "ls02_macro_zone_3"
+        ]
+      }
+    },
+    {
+      "code": "ATLAS_FLOATING_BADGE_COVERS_CARD",
+      "severity": "blocking",
+      "slide_id": "ls02",
+      "object_ids": [
+        "ls02_macro_now_card",
+        "ls02_macro_zone_2"
+      ],
+      "message": "floating status badge covers route-map card body instead of staying in a badge slot",
+      "evidence": {
+        "overlap_h": 22.0,
+        "badge_bottom": 484.0,
+        "card_body_start": 478.0
+      }
+    },
+    {
+      "code": "ATLAS_GUARDRAIL_TEXT_ORPHANED",
+      "severity": "blocking",
+      "slide_id": "ls03",
+      "object_ids": [
+        "ls03_bridge_dd_rule",
+        "ls03_budget_map_panel"
+      ],
+      "message": "guardrail note sits outside its route-map panel instead of occupying a declared slot",
+      "evidence": {
+        "note_y": 602.0,
+        "panel_bottom": 584.0
+      }
+    },
+    {
+      "code": "ATLAS_FOOTER_GUARDRAIL_COLLISION",
+      "severity": "blocking",
+      "slide_id": "ls03",
+      "object_ids": [
+        "ls03_bridge_dd_rule",
+        "ls03_footer_mask"
+      ],
+      "message": "guardrail note is too close to footer/risk rail and reads as an orphaned footer collision",
+      "evidence": {
+        "gap": 2.0,
+        "required_gap": 16
+      }
+    }
+  ]
+}

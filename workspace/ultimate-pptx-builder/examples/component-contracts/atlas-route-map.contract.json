@@ -1,0 +1,63 @@
+{
+  "$schema": "../../schemas/component-contract.schema.json",
+  "id": "atlas-route-map",
+  "version": 1,
+  "component_selector": {"role": "route-map", "id_contains": "panel"},
+  "slots": [
+    {
+      "id": "card_lane",
+      "members": {"id_contains_any": ["_zone_", "_card_"], "role_any": ["route-map", "map-node"]}
+    },
+    {
+      "id": "bottom_band",
+      "members": {"id_contains_any": ["rule_matrix", "bottom_band"]}
+    },
+    {
+      "id": "status_badge",
+      "members": {"id_contains_any": ["now_card", "status_badge"]}
+    },
+    {
+      "id": "guardrail_note",
+      "external": true,
+      "members": {"id_contains_any": ["guardrail_note", "bridge_dd_rule"], "type_any": ["text"]}
+    },
+    {
+      "id": "footer",
+      "external": true,
+      "members": {"role_any": ["footer-mask", "risk", "source", "footnote"]}
+    }
+  ],
+  "rules": [
+    {
+      "type": "forbid_slot_overlap",
+      "code": "ATLAS_ROUTE_MAP_BOTTOM_BAND_INTRUSION",
+      "slot_a": "bottom_band",
+      "slot_b": "card_lane",
+      "min_overlap_h": 6,
+      "min_overlap_w_ratio": 0.25
+    },
+    {
+      "type": "conditional_badge_overlap",
+      "code": "ATLAS_FLOATING_BADGE_COVERS_CARD",
+      "badge_slot": "status_badge",
+      "target_slot": "card_lane",
+      "max_body_intrusion": 16
+    },
+    {
+      "type": "must_be_inside_component",
+      "code": "ATLAS_GUARDRAIL_TEXT_ORPHANED",
+      "slot": "guardrail_note",
+      "pad": 4,
+      "only_if_near_component_bottom": {"before": 8, "after": 42}
+    },
+    {
+      "type": "min_gap_between_slots",
+      "code": "ATLAS_FOOTER_GUARDRAIL_COLLISION",
+      "slot_a": "guardrail_note",
+      "slot_b": "footer",
+      "axis": "vertical",
+      "min_gap": 16,
+      "allow_overlap_projection": true
+    }
+  ]
+}

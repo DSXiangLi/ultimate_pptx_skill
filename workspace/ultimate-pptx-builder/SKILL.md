@@ -188,6 +188,14 @@ python3 scripts/check_layout_safety.py <deck.ir.json> --report <layout-safety-re
 
 This gate is blocking because knowledge-only standards are insufficient. It checks safe zones, bottom overflow risk, title/page-number collisions, priority text capacity, dense table readability, and repeated oversized page-number motifs.
 
+For complex component pages, also run the component layout contract gate:
+
+```bash
+python3 scripts/check_component_layout_contract.py <deck.ir.json> --report <component-layout-contract-report.json>
+```
+
+This gate catches container-grammar failures that can pass plain bbox/text checks: bottom bands intruding into cards, floating badges covering card bodies, orphaned guardrails, and footer/annotation collisions.
+
 **Acceptance Gate 2D: Layout/Text Safety**
 
 - [ ] `release_decision` is `pass`.
@@ -221,11 +229,21 @@ Generate Slide IR, not raw HTML. Each object must have:
 
 Render the IR to HTML preview. Browser layout may be used to compute bounding boxes, but the browser DOM must map back to IR IDs via `data-ir-id`.
 
+After HTML preview generation and before PPTX export, run the design/aesthetic contract gate:
+
+```bash
+python3 scripts/check_visual_aesthetic_contract.py <deck.ir.json> --report <visual-aesthetic-contract-report.json>
+```
+
+This is a taste gate, not a geometry gate. It catches defects that layout/fidelity/editability can miss: decorative glow/orb noise, weak visual restraint, style DNA collapse, motif overload, and effects that already look unattractive in the HTML preview.
+
 **Acceptance Gate 4: Preview Traceability**
 
 - [ ] Every exportable DOM node maps back to an IR object.
 - [ ] DOM-only decoration is not allowed to carry critical content.
 - [ ] Computed layout can be written back to IR or sidecar layout data.
+- [ ] HTML-stage visual aesthetic contract passes with zero blockers before PPTX export.
+- [ ] Large lower-edge glow/orb decoration remains atmospheric and does not compete with content, footer/source rails, or page hierarchy.
 
 ### Step 5 — PPTX Export
 
@@ -258,6 +276,8 @@ Run all five QA gates:
 4. visual/design critique
 5. finance practicality check
 
+The visual/design critique starts at HTML preview time. If the HTML already shows poor hierarchy, noisy decoration, insufficient visual restraint, or weak aesthetic quality, fix the style program/compiler before exporting PPTX.
+
 **Acceptance Gate 6: Release Criteria**
 
 - [ ] Fidelity score ≥ 90, or all deviations are documented and accepted.
@@ -288,6 +308,11 @@ Run all five QA gates:
 - [ ] `references/phase4b-visual-fidelity.md` defines the render/diff loop.
 - [ ] `references/style-glass-fintech-pptx.md` defines the first deep style anchor and acceptance target.
 - [ ] `references/visual-dna-model.md` is consulted before accepting a visual anchor; first-glance difference is insufficient if chart grammar, typography, card/component geometry, and page-role layout skeleton remain the same.
+- [ ] `scripts/check_visual_aesthetic_contract.py` runs after HTML preview and before PPTX export for glass showcase/benchmark decks; lower-edge decorative glow/orb noise is a blocking design failure.
+- [ ] `scripts/check_alignment_graph.py` validates declared `layout_relations` so PPTX QA can check alignment intent rather than relying only on overlap or a few hard-coded component names.
+- [ ] `scripts/check_component_layout_contract.py` validates complex component slots and semantic overlap policy so route-map bands, floating badges, guardrails, and footer annotations cannot pass as legal parent/child containment.
+- [ ] `scripts/check_component_contracts.py`, `schemas/component-contract.schema.json`, and `examples/component-contracts/*.contract.json` keep component contracts declarative instead of one-off hard-coded Python rules.
+- [ ] Atlas route-map slides declare `component_contract_refs` and authored `layout_graph.components` evidence so QA can distinguish intended component slots from geometry inferred after the fact.
 - [ ] `scripts/check_visual_layout_architecture.py` classifies visible layout defects as local slide bugs, style-DNA adaptation bugs, or systemic skill/gate gaps, and blocks route/title intrusion, microtext, chart undersizing, process-page density overload, and page-role hierarchy mismatch.
 - [ ] `scripts/check_pptx_package.py` validates Office-compatible PPTX package structure including slide master/layout/theme relationships; LibreOffice-openable minimal ZIPs are not enough.
 - [ ] `scripts/check_layout_safety.py` enforces 64px bottom safe zone, 16px footer separation, CJK-aware text capacity, explicit multi-line leading budget, pairwise text collision checks, metric-card internal stack gaps/padding, visual container overlap/nesting rules, title-to-content gaps, table density/readability limits, compliance density rules, and anti-template page-number checks.

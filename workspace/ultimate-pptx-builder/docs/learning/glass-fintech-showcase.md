@@ -610,3 +610,44 @@ Full-size visual review of `build/visual-system-market-atlas-infographic/visual-
 **Verification:** `python3 scripts/validate_visual_systems.py` passes with editability 100; strict visual audit final decision is PASS; `check_pptx_package.py` passes all three generated PPTX files.
 
 **Prevention:** Treat user-visible fine overlap/noise and Office repair prompts as release blockers. Do not call a PPTX final until strict visual review and Office package compatibility pass together.
+
+## Problem 20: Glass atmosphere needs an HTML-stage visual restraint gate
+
+**Symptom:** The latest Glass layout was acceptable, but the lower decorative orb/glow elements had too much visual presence. They reduced design quality by turning background atmosphere into foreground noise, even though layout, editability, and PPTX conversion were technically valid.
+
+**Root cause:** The old aesthetic checker protected Glass DNA by requiring large luminous orbs, but it did not constrain where those orbs sit in the page hierarchy. That encouraged a false tradeoff: keep high orb opacity to preserve the style, while ignoring visual restraint and taste.
+
+**Fix:** `scripts/check_visual_aesthetic_contract.py` now treats large lower-edge glows/orbs as blocking visual noise when their opacity or visual mass is too high. The checker is run after HTML preview/traceability and before PPTX export in both `validate_glass_showcase.py` and `validate_glass_benchmark.py`. Default Glass lower violet orb opacity was reduced from `0.13` to `0.045`; luminous lower violet/gold orbs were also toned down.
+
+**Verification:**
+
+```bash
+python3 -m py_compile scripts/check_visual_aesthetic_contract.py scripts/compile_spec_to_ir.py scripts/validate_glass_showcase.py scripts/validate_glass_benchmark.py
+python3 -m unittest tests/test_visual_aesthetic_contract.py -v
+python3 scripts/validate_glass_showcase.py
+python3 scripts/validate_glass_benchmark.py
+python3 scripts/validate_visual_systems.py
+```
+
+**Prevention rule:** Design acceptance starts at HTML preview time. Do not wait for PPTX export to judge aesthetics. Any recurring human critique about taste, visual restraint, hierarchy, or decorative noise should become an executable aesthetic contract rule, not just a one-off opacity tweak.
+
+## Problem 21: PPTX exporter can silently drop shape opacity even when IR/HTML are correct
+
+**Symptom:** After lowering Glass lower-edge orb opacity, the HTML preview and IR showed the expected value (`opacity: 0.045` / `rgba(...,0.045)`), but the PPTX appeared unchanged in review.
+
+**Root cause:** The exporter used `python-pptx` fill transparency APIs, but the installed `python-pptx` version did not serialize shape transparency into DrawingML. The resulting `ppt/slides/slide1.xml` contained `<a:srgbClr val="7C3AED"/>` with no child `<a:alpha>`, so PowerPoint rendered the orb as fully opaque/native default rather than respecting the IR opacity.
+
+**Fix:** `scripts/export_ir_pptx.py` now force-writes DrawingML alpha under the fill color element: `100000 = fully opaque`, so `opacity: 0.045` writes `<a:alpha val="4500"/>`. Added `tests/test_pptx_alpha_export.py` and wired it into `scripts/validate_skill.py`.
+
+**Verification:**
+
+```bash
+python3 -m unittest tests/test_pptx_alpha_export.py -v
+python3 scripts/validate_glass_showcase.py
+python3 scripts/validate_glass_benchmark.py
+```
+
+The regenerated PPTX files now contain `alpha val="4500"` near `g1_orb_violet` / `b01_orb_violet` in `ppt/slides/slide1.xml`.
+
+**Prevention rule:** For every visual property that matters to design taste—opacity, shadow, blur fallback, stroke alpha, font sizing—do not trust high-level exporter APIs alone. Add PPTX XML-level assertions for the properties that must survive IR → PPTX conversion.
+

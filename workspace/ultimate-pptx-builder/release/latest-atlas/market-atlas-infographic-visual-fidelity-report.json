@@ -1,0 +1,74 @@
+{
+  "visual_fidelity": {
+    "overall_score": 95.65,
+    "slides": [
+      {
+        "mae": 0.04625,
+        "score": 95.38,
+        "size": [
+          1280,
+          720
+        ],
+        "slide": 1,
+        "expected": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/expected/slide-01.png",
+        "actual": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-01.png",
+        "diff": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/diff/slide-01-diff.png"
+      },
+      {
+        "mae": 0.048892,
+        "score": 95.11,
+        "size": [
+          1280,
+          720
+        ],
+        "slide": 2,
+        "expected": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/expected/slide-02.png",
+        "actual": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-02.png",
+        "diff": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/diff/slide-02-diff.png"
+      },
+      {
+        "mae": 0.048224,
+        "score": 95.18,
+        "size": [
+          1280,
+          720
+        ],
+        "slide": 3,
+        "expected": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/expected/slide-03.png",
+        "actual": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-03.png",
+        "diff": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/diff/slide-03-diff.png"
+      },
+      {
+        "mae": 0.035211,
+        "score": 96.48,
+        "size": [
+          1280,
+          720
+        ],
+        "slide": 4,
+        "expected": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/expected/slide-04.png",
+        "actual": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-04.png",
+        "diff": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/diff/slide-04-diff.png"
+      },
+      {
+        "mae": 0.038879,
+        "score": 96.11,
+        "size": [
+          1280,
+          720
+        ],
+        "slide": 5,
+        "expected": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/expected/slide-05.png",
+        "actual": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-05.png",
+        "diff": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/diff/slide-05-diff.png"
+      }
+    ]
+  },
+  "threshold": 86.0,
+  "blocking_issues": [],
+  "release_decision": "pass",
+  "notes": [
+    "Phase 4B compares deterministic IR reference PNGs with LibreOffice-rendered PPTX PNGs.",
+    "This is a real render loop, but reference renderer is not a browser; HTML screenshot parity remains a later upgrade."
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ultimate PPTX Component Contract",
+  "type": "object",
+  "required": ["id", "version", "component_selector", "slots", "rules"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "version": {"type": "integer", "minimum": 1},
+    "component_selector": {"$ref": "#/$defs/selector"},
+    "slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "members"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "external": {"type": "boolean"},
+          "members": {"$ref": "#/$defs/selector"}
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "code"],
+        "additionalProperties": true,
+        "properties": {
+          "type": {
+            "enum": [
+              "forbid_slot_overlap",
+              "conditional_badge_overlap",
+              "must_be_inside_component",
+              "min_gap_between_slots"
+            ]
+          },
+          "code": {"type": "string", "minLength": 1},
+          "slot": {"type": "string"},
+          "slot_a": {"type": "string"},
+          "slot_b": {"type": "string"},
+          "badge_slot": {"type": "string"},
+          "target_slot": {"type": "string"},
+          "min_overlap_h": {"type": "number"},
+          "min_overlap_w_ratio": {"type": "number"},
+          "max_body_intrusion": {"type": "number"},
+          "pad": {"type": "number"},
+          "axis": {"enum": ["vertical", "horizontal"]},
+          "min_gap": {"type": "number"},
+          "allow_overlap_projection": {"type": "boolean"},
+          "only_if_near_component_bottom": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "before": {"type": "number"},
+              "after": {"type": "number"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string"},
+        "id_contains": {"type": "string"},
+        "id_contains_any": {"type": "array", "items": {"type": "string"}},
+        "role": {"type": "string"},
+        "role_any": {"type": "array", "items": {"type": "string"}},
+        "type": {"type": "string"},
+        "type_any": {"type": "array", "items": {"type": "string"}},
+        "component": {"type": "string"}
+      }
+    }
+  }
+}

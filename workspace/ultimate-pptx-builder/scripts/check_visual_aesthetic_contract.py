@@ -72,12 +72,40 @@ def check_glass(ir: dict) -> list[str]:
         if role == "glass-panel":
             panel_objs.append(obj)
 
+    slide_w = float((deck.get("size") or {}).get("w", 1280) or 1280)
+    slide_h = float((deck.get("size") or {}).get("h", 720) or 720)
+    slide_area = max(1.0, slide_w * slide_h)
+
     large_luminous_orbs = [
         obj for obj in orb_objs
-        if box_area(obj) >= 220 * 220 and float(obj.get("opacity", 0)) >= 0.05
+        if box_area(obj) >= 220 * 220 and float(obj.get("opacity", 0)) >= 0.025
     ]
     if len(large_luminous_orbs) < 2:
-        issues.append("GLASS_ORB_DNA_COLLAPSED: need at least two large luminous orb/glow objects with area>=220^2 and opacity>=0.05")
+        issues.append("GLASS_ORB_DNA_COLLAPSED: need at least two large atmospheric orb/glow objects with area>=220^2 and opacity>=0.025")
+
+    # Taste gate: glass atmosphere should read as restrained light physics, not
+    # as foreground decoration. Large glows near the bottom edge are especially
+    # dangerous because they compete with footer/source rails and become visual
+    # noise in HTML/PPTX previews even when layout and editability are valid.
+    for slide in deck.get("slides", []):
+        for obj in slide.get("objects", []):
+            role = obj.get("role", "")
+            if "orb" not in role and "glow" not in role:
+                continue
+            area = box_area(obj)
+            if area < 220 * 220:
+                continue
+            box = obj.get("box", {}) or {}
+            y = float(box.get("y", 0) or 0)
+            h = float(box.get("h", 0) or 0)
+            opacity = float(obj.get("opacity", 0) or 0)
+            center_y = y + h / 2.0
+            visual_mass = area * opacity / slide_area
+            if center_y >= slide_h * 0.58 and (opacity > 0.075 or visual_mass > 0.010):
+                issues.append(
+                    "%s: GLASS_DECORATIVE_NOISE_TOO_STRONG: bottom-edge %s opacity=%.3f visual_mass=%.3f; keep lower-edge glows atmospheric, not content-competing"
+                    % (slide.get("id", "slide"), obj.get("id", "orb"), opacity, visual_mass)
+                )
 
     if grid_objs and len(grid_objs) > len(orb_objs) * 2 + 6:
         issues.append("GLASS_GRID_DOMINATES_ORBS: grid/ruler motifs outnumber luminous motifs enough to create dark-table aesthetics")

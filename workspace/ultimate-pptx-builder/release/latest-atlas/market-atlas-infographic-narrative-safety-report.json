@@ -1,0 +1,8 @@
+{
+  "checker": "check_narrative_safety",
+  "contract": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/market-atlas-infographic.contract.json",
+  "issue_count": 0,
+  "blocking_count": 0,
+  "release_decision": "pass",
+  "issues": []
+}

@@ -18,6 +18,8 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+from pptx.oxml.ns import qn
+from pptx.oxml.xmlchemy import OxmlElement
 from pptx.util import Emu, Pt
 
 SLIDE_W_EMU = 12192000
@@ -53,6 +55,52 @@ def set_transparency(fmt, transparency):
         pass
 
 
+def clamp01(value):
+    return max(0.0, min(1.0, float(value)))
+
+
+def set_ooxml_alpha_on_container(container, opacity):
+    """Force DrawingML alpha because older python-pptx drops transparency.
+
+    PowerPoint alpha is expressed as opacity in 1/1000 percent units:
+    100000 = fully opaque, 4500 = 4.5% opaque.
+    """
+    if container is None:
+        return
+    try:
+        solid_fill = container.find(qn("a:solidFill"))
+        if solid_fill is None:
+            return
+        color = solid_fill.find(qn("a:srgbClr"))
+        if color is None:
+            color = solid_fill.find(qn("a:schemeClr"))
+        if color is None:
+            return
+        for child in list(color):
+            if child.tag == qn("a:alpha"):
+                color.remove(child)
+        alpha = OxmlElement("a:alpha")
+        alpha.set("val", str(int(round(clamp01(opacity) * 100000))))
+        color.append(alpha)
+    except Exception:
+        pass
+
+
+def set_shape_fill_alpha(shape, opacity):
+    try:
+        set_ooxml_alpha_on_container(shape._element.spPr, opacity)
+    except Exception:
+        pass
+
+
+def set_shape_line_alpha(shape, opacity):
+    try:
+        line = shape._element.spPr.find(qn("a:ln"))
+        set_ooxml_alpha_on_container(line, opacity)
+    except Exception:
+        pass
+
+
 def box_args(box):
     return emu(box["x"], "x"), emu(box["y"], "y"), emu(box["w"], "x"), emu(box["h"], "y")
 
@@ -78,6 +126,7 @@ def add_shape(slide, obj, shape_id_hint=None, placeholder=False):
     fill.solid()
     fill.fore_color.rgb = rgb(obj.get("fill"), "E5E7EB")
     set_transparency(fill, 1.0 - float(obj.get("opacity", 1.0)))
+    set_shape_fill_alpha(shp, float(obj.get("opacity", 1.0)))
     line = shp.line
     if float(obj.get("stroke_opacity", 1.0)) <= 0:
         line.fill.background()
@@ -88,6 +137,7 @@ def add_shape(slide, obj, shape_id_hint=None, placeholder=False):
         except Exception:
             pass
         set_transparency(line.fill, 1.0 - float(obj.get("stroke_opacity", 1.0)))
+        set_shape_line_alpha(shp, float(obj.get("stroke_opacity", 1.0)))
     return shp
 
 

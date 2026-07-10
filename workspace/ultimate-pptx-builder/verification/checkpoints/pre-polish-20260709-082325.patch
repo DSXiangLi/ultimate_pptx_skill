@@ -1,0 +1,1012 @@
+diff --git a/workspace/ultimate-pptx-builder/SKILL.md b/workspace/ultimate-pptx-builder/SKILL.md
+index 96e8202..f2c74d4 100644
+--- a/workspace/ultimate-pptx-builder/SKILL.md
++++ b/workspace/ultimate-pptx-builder/SKILL.md
+@@ -188,6 +188,14 @@ python3 scripts/check_layout_safety.py <deck.ir.json> --report <layout-safety-re
+ 
+ This gate is blocking because knowledge-only standards are insufficient. It checks safe zones, bottom overflow risk, title/page-number collisions, priority text capacity, dense table readability, and repeated oversized page-number motifs.
+ 
++For complex component pages, also run the component layout contract gate:
++
++```bash
++python3 scripts/check_component_layout_contract.py <deck.ir.json> --report <component-layout-contract-report.json>
++```
++
++This gate catches container-grammar failures that can pass plain bbox/text checks: bottom bands intruding into cards, floating badges covering card bodies, orphaned guardrails, and footer/annotation collisions.
++
+ **Acceptance Gate 2D: Layout/Text Safety**
+ 
+ - [ ] `release_decision` is `pass`.
+@@ -221,11 +229,21 @@ Generate Slide IR, not raw HTML. Each object must have:
+ 
+ Render the IR to HTML preview. Browser layout may be used to compute bounding boxes, but the browser DOM must map back to IR IDs via `data-ir-id`.
+ 
++After HTML preview generation and before PPTX export, run the design/aesthetic contract gate:
++
++```bash
++python3 scripts/check_visual_aesthetic_contract.py <deck.ir.json> --report <visual-aesthetic-contract-report.json>
++```
++
++This is a taste gate, not a geometry gate. It catches defects that layout/fidelity/editability can miss: decorative glow/orb noise, weak visual restraint, style DNA collapse, motif overload, and effects that already look unattractive in the HTML preview.
++
+ **Acceptance Gate 4: Preview Traceability**
+ 
+ - [ ] Every exportable DOM node maps back to an IR object.
+ - [ ] DOM-only decoration is not allowed to carry critical content.
+ - [ ] Computed layout can be written back to IR or sidecar layout data.
++- [ ] HTML-stage visual aesthetic contract passes with zero blockers before PPTX export.
++- [ ] Large lower-edge glow/orb decoration remains atmospheric and does not compete with content, footer/source rails, or page hierarchy.
+ 
+ ### Step 5 — PPTX Export
+ 
+@@ -258,6 +276,8 @@ Run all five QA gates:
+ 4. visual/design critique
+ 5. finance practicality check
+ 
++The visual/design critique starts at HTML preview time. If the HTML already shows poor hierarchy, noisy decoration, insufficient visual restraint, or weak aesthetic quality, fix the style program/compiler before exporting PPTX.
++
+ **Acceptance Gate 6: Release Criteria**
+ 
+ - [ ] Fidelity score ≥ 90, or all deviations are documented and accepted.
+@@ -288,6 +308,9 @@ Run all five QA gates:
+ - [ ] `references/phase4b-visual-fidelity.md` defines the render/diff loop.
+ - [ ] `references/style-glass-fintech-pptx.md` defines the first deep style anchor and acceptance target.
+ - [ ] `references/visual-dna-model.md` is consulted before accepting a visual anchor; first-glance difference is insufficient if chart grammar, typography, card/component geometry, and page-role layout skeleton remain the same.
++- [ ] `scripts/check_visual_aesthetic_contract.py` runs after HTML preview and before PPTX export for glass showcase/benchmark decks; lower-edge decorative glow/orb noise is a blocking design failure.
++- [ ] `scripts/check_alignment_graph.py` validates declared `layout_relations` so PPTX QA can check alignment intent rather than relying only on overlap or a few hard-coded component names.
++- [ ] `scripts/check_component_layout_contract.py` validates complex component slots and semantic overlap policy so route-map bands, floating badges, guardrails, and footer annotations cannot pass as legal parent/child containment.
+ - [ ] `scripts/check_visual_layout_architecture.py` classifies visible layout defects as local slide bugs, style-DNA adaptation bugs, or systemic skill/gate gaps, and blocks route/title intrusion, microtext, chart undersizing, process-page density overload, and page-role hierarchy mismatch.
+ - [ ] `scripts/check_pptx_package.py` validates Office-compatible PPTX package structure including slide master/layout/theme relationships; LibreOffice-openable minimal ZIPs are not enough.
+ - [ ] `scripts/check_layout_safety.py` enforces 64px bottom safe zone, 16px footer separation, CJK-aware text capacity, explicit multi-line leading budget, pairwise text collision checks, metric-card internal stack gaps/padding, visual container overlap/nesting rules, title-to-content gaps, table density/readability limits, compliance density rules, and anti-template page-number checks.
+diff --git a/workspace/ultimate-pptx-builder/docs/learning/market-atlas-visual-layering.md b/workspace/ultimate-pptx-builder/docs/learning/market-atlas-visual-layering.md
+index 1447ef1..38d77b5 100644
+--- a/workspace/ultimate-pptx-builder/docs/learning/market-atlas-visual-layering.md
++++ b/workspace/ultimate-pptx-builder/docs/learning/market-atlas-visual-layering.md
+@@ -90,3 +90,167 @@ Then manually inspect:
+ Do not solve Atlas visual noise by fading content masks. Fade or clip decorative motifs instead. Content masks are semantic isolation surfaces, not ornament.
+ 
+ A visual gate is incomplete if it checks only object opacity and not the z-order relationship between decorative motifs, isolation masks, and business content.
++
++## Problem 2: Passing geometry while failing Atlas layout grammar
++
++### Symptom
++
++A Market Atlas deck could pass layout safety, visual fidelity, and editability gates while a reviewer still saw institution-level layout problems:
++
++- Title/subtitle band felt too heavy and visually pushed the map grammar downward.
++- Large content masks intruded into the title area, making the header read like a heavy container.
++- Right signal/decision panels drifted between x positions and sometimes felt like floating cards.
++- Footer rail was visually too dominant for a finance review page.
++- Dense decision semantics were hidden as 6–7px microtext instead of being handled by layout grammar.
++- Slide 05 process page had a low visual center of gravity.
++
++### Root Cause
++
++The existing gates checked local overlap, safe zones, object editability, and render fidelity. They did not encode the Atlas visual grammar itself:
++
++```text
++light header band ≤ y214
++stable left analysis field starts around y222
++right decision rail anchored around x724–748
++weak compliance footer h≤44 and opacity≤0.90
++business semantic text should not rely on <8px microtype
++```
++
++Without those rules, the compiler could generate a technically valid but visually unstable map deck.
++
++### Fix
++
++- Added executable Atlas layout grammar checks in `scripts/check_visual_layout_architecture.py`:
++  - `ATLAS_TITLE_ZONE_OVERWEIGHT`
++  - `ATLAS_TITLE_ZONE_MASK_INTRUSION`
++  - `ATLAS_RIGHT_PANEL_FLOATING`
++  - `ATLAS_FOOTER_DOMINANCE`
++  - `ATLAS_DENSITY_PARITY_FAILURE`
++- Reworked `market-atlas-infographic` compiler grammar in `scripts/compile_spec_to_ir.py`:
++  - introduced a light header band and moved content masks below it;
++  - aligned right panels to a stable right-column grid;
++  - weakened the footer mask/source band;
++  - raised Atlas semantic business text out of 6–7px microtype;
++  - expanded macro decision matrix capacity instead of shrinking text;
++  - moved the process state-machine page upward to improve slide-05 visual balance.
++
++### Verification Commands
++
++```bash
++python3 -m py_compile scripts/compile_spec_to_ir.py scripts/check_visual_layout_architecture.py
++python3 scripts/validate_visual_systems.py
++python3 scripts/validate_skill.py
++```
++
++Manual rendered review artifact:
++
++```text
++build/visual-system-market-atlas-infographic/market-atlas-infographic-actual-contact-sheet-grammar-final.png
++```
++
++### Files Affected
++
++- `scripts/compile_spec_to_ir.py`
++- `scripts/check_visual_layout_architecture.py`
++- `docs/learning/market-atlas-visual-layering.md`
++
++### Future Prevention Rule
++
++Do not call an Atlas deck accepted just because overlap/fidelity/editability gates pass. Atlas needs its own layout grammar gate: light header, stable grid, anchored right rail, weak footer, and no business-critical microtext. Rendered contact-sheet review remains mandatory after changing this visual system.
++
++## Problem 3: Passing overlap checks while failing text spacing/alignment mechanics
++
++### Symptom
++
++A deck can pass collision checks and visual fidelity while still looking unprofessional because:
++
++- priority text blocks are not overlapping but are only a few pixels apart;
++- objects are visually near-aligned but not actually aligned;
++- repeated rows/cards drift in gutter or width;
++- child text leaves its semantic parent container.
++
++### Root Cause
++
++Previous gates treated layout mostly as independent boxes. That misses the professional layout layer: relationships between boxes. The missing mechanisms were:
++
++- a role-aware text distance field that scans text block pairs;
++- an alignment graph that validates declared left/top/row/equal-gutter/parent-padding relations;
++- a requirement that generated slides carry non-empty `layout_relations`.
++
++### Fix
++
++Added:
++
++- `scripts/check_text_spacing.py`
++- `scripts/check_alignment_graph.py`
++- `tests/test_text_spacing_and_alignment_gates.py`
++- `references/text-spacing-and-alignment-qa.md`
++
++Integrated both gates into `scripts/validate_visual_systems.py` and `scripts/validate_skill.py`.
++
++### Future Prevention Rule
++
++Do not describe layout acceptance as “no obvious overlap.” Release QA must state which text-distance and alignment relationships were traversed and validated.
++
++## Problem 4: Atlas process signal rail can pass gates but still read as floating
++
++**Context:** Rebuilding the Market Atlas validation deck with the new text-spacing and alignment-graph gates.
++
++**Symptom:** The process slide (`ls05`) originally placed a three-card `SIGNAL FIELD` outside the execution state-machine panel. Automated gates passed, but full-size rendered review judged the rail as floating because the slide had four process steps and only three signal cards.
++
++**Root cause:** The signal evidence was positioned as a separate right/top module instead of being integrated into the process grammar. The visual mapping was semantic but not spatially auditable.
++
++**Fix:** Embed `STEP SIGNAL WINDOWS` inside the `process-state-map` panel, render four native signal chips, keep metric labels as exact same-content text, and map each chip to the corresponding 01-04 process node by position and connector lines. Move the feedback loop above the nodes and move the legend into the right governance area so step explanations have breathing room.
++
++**Prevention rule:** Process-style Atlas pages must use a 1:1 `signal window -> process node` grammar. Do not use a detached signal rail when the main narrative is a state machine.
++
++## Problem 5: Atlas header repair can create title-zone overweight
++
++**Context:** Full-size review found the kicker line visually too close to the Chinese title.
++
++**Symptom:** Moving the title down fixed kicker/title crowding but triggered `ATLAS_TITLE_ZONE_OVERWEIGHT` on long-title slides because the subtitle band extended to the body start.
++
++**Root cause:** A global hard title offset ignored long-title height and subtitle budget.
++
++**Fix:** Keep the kicker at `y=78`, move the title only to `y=98`, and reduce the Atlas title/subtitle gap to 8px. This preserves separation without pushing the title band into the map grammar.
++
++**Prevention rule:** Header fixes must satisfy both local text spacing and global Atlas title-zone weight. Never solve kicker/title collision by simply pushing all title content downward.
++
++## Problem 6: Route-map children can be legally contained but semantically overlapping
++
++**Context:** User review found serious container overlap on Market Atlas page2/page3 even after generic overlap, text spacing, alignment graph, visual fidelity, and editability gates passed.
++
++**Symptom:**
++
++- Slide `ls02` macro route map placed the bottom SCORE/STAGE/ACTION/ROLLBACK rule matrix inside the same parent panel as WATCH/CONFIRM/DEPLOY cards, but the matrix band intruded into the card/node region.
++- The `NOW: CONFIRM EARLY` marker read as a floating panel covering the CONFIRM card body.
++- Slide `ls03` allocation bridge placed the DD drawdown rule outside the route-map component and too close to the footer/risk rail, creating an orphaned guardrail/footer collision.
++
++**Root cause:** Generic bbox checks treated these objects as valid children inside the parent route-map panel. The missing rule was not geometric containment; it was component grammar: route-map cards, floating status badges, bottom bands, guardrail notes, and footer rails need explicit slots and semantic overlap policy.
++
++**Fix:**
++
++- Added `scripts/check_component_layout_contract.py` and regression tests for Atlas route-map bottom-band intrusion, floating badge coverage, orphaned guardrails, and footer/guardrail collision.
++- Reworked `add_atlas_budget_route_map(...)` so `ls02` uses separate upper card/node slots and a true bottom rule-matrix slot; the status marker is a small chrome badge rather than a body-covering card.
++- Reworked `ls03` allocation bridge so limit/DD rules stay inside the route-map panel with sufficient text box height and spacing from asset rows/footer.
++- Integrated `check_component_layout_contract.py` into `scripts/validate_visual_systems.py` as a formal release gate.
++
++**Verification:**
++
++```bash
++python3 -m py_compile scripts/compile_spec_to_ir.py scripts/check_component_layout_contract.py scripts/validate_visual_systems.py
++python3 scripts/validate_visual_systems.py
++python3 scripts/check_component_layout_contract.py build/visual-system-market-atlas-infographic/market-atlas-infographic.ir.json --report verification/atlas-component-layout-contract-fixed-report.json
++python3 scripts/validate_skill.py
++```
++
++Expected result:
++
++```text
++PASS visual systems ... market-atlas-infographic score>=95 edit=100
++PASS component layout contract
++ALL CHECKS PASSED
++```
++
++**Prevention rule:** Do not rely on parent-child containment to accept Atlas route-map layouts. Complex components need slot-level contract checks: card body, status badge, bottom band, guardrail note, and footer must occupy declared regions with explicit semantic-overlap policy.
++
+diff --git a/workspace/ultimate-pptx-builder/scripts/compile_spec_to_ir.py b/workspace/ultimate-pptx-builder/scripts/compile_spec_to_ir.py
+index 5198c4d..5f1f997 100644
+--- a/workspace/ultimate-pptx-builder/scripts/compile_spec_to_ir.py
++++ b/workspace/ultimate-pptx-builder/scripts/compile_spec_to_ir.py
+@@ -27,7 +27,7 @@ VARIANT_PROFILES = {
+         },
+         "palette": {},
+         "orb_cyan": {"x": 870, "y": -70, "w": 360, "h": 360, "opacity": 0.16, "role": "decorative-glow"},
+-        "orb_violet": {"x": -120, "y": 410, "w": 330, "h": 330, "opacity": 0.13, "role": "decorative-glow"},
++        "orb_violet": {"x": -120, "y": 410, "w": 330, "h": 330, "opacity": 0.045, "role": "decorative-glow"},
+         "ghost_opacity": 0.026,
+         "ghost_size": 38,
+         "hairline_opacity": 0.85,
+@@ -81,7 +81,7 @@ VARIANT_PROFILES = {
+         },
+         "palette": {"background": "071326", "panel": "142A46", "panel_alt": "1C3D60", "stroke": "67E8F9", "stroke_soft": "328BB5", "accent": "A78BFA", "warning": "FACC15", "positive": "34D399"},
+         "orb_cyan": {"x": 1020, "y": -82, "w": 256, "h": 256, "opacity": 0.15, "role": "spotlight-orb"},
+-        "orb_violet": {"x": -138, "y": 350, "w": 360, "h": 360, "opacity": 0.135, "role": "spotlight-orb"},
++        "orb_violet": {"x": -138, "y": 350, "w": 360, "h": 360, "opacity": 0.070, "role": "spotlight-orb"},
+         "ghost_opacity": 0.060,
+         "ghost_size": 48,
+         "hairline_opacity": 0.98,
+@@ -267,6 +267,126 @@ def normalize_z(objects):
+     return objects
+ 
+ 
++def obj_box(obj):
++    return obj.get("box", {}) or {}
++
++
++def same_row(objs, tol=4):
++    if len(objs) < 2:
++        return False
++    ys = [float(obj_box(o).get("y", 0) or 0) for o in objs]
++    return max(ys) - min(ys) <= tol
++
++
++def same_size(objs, dim, tol=4):
++    if len(objs) < 2:
++        return False
++    key = "w" if dim == "width" else "h"
++    vals = [float(obj_box(o).get(key, 0) or 0) for o in objs]
++    return max(vals) - min(vals) <= tol
++
++
++def infer_layout_relations(sid, objects):
++    """Declare concrete alignment intent for downstream QA.
++
++    These relations are intentionally conservative: they describe component rows,
++    repeated body columns, and parent padding only when object IDs/roles make the
++    intended relationship explicit. The alignment graph gate then validates these
++    declarations instead of relying on vague visual inspection.
++    """
++    relations = []
++    by_id = {o.get("id"): o for o in objects if o.get("id")}
++
++    body_ids = [o.get("id") for o in objects if o.get("type") == "text" and o.get("role") == "body" and ("_body_" in o.get("id", "") or o.get("id", "").startswith("body_"))]
++    body_objs = [by_id[i] for i in body_ids if i in by_id]
++    if len(body_objs) >= 2:
++        left = min(float(obj_box(o).get("x", 0) or 0) for o in body_objs)
++        col = [o for o in body_objs if abs(float(obj_box(o).get("x", 0) or 0) - left) <= 8]
++        if len(col) >= 2:
++            relations.append({"id": sid + "_body_column_left", "type": "align-left", "objects": [o["id"] for o in col], "tolerance": 4})
++
++    row_patterns = [
++        ("metric-chip-row", "_metric_", ("_chip", "_card")),
++        ("process-signal-row", "_process_signal_", ("",)),
++        ("scenario-zone-row", "_scenario_zone_", ("",)),
++        ("scenario-card-row", "_scenario_", ("_card",)),
++        ("process-card-row", "_process_", ("_card",)),
++    ]
++    for rel_name, marker, suffixes in row_patterns:
++        candidates = []
++        for o in objects:
++            oid = o.get("id", "")
++            if o.get("type") == "shape" and marker in oid and any(oid.endswith(suf) for suf in suffixes):
++                candidates.append(o)
++        if len(candidates) >= 2:
++            candidates = sorted(candidates, key=lambda o: (float(obj_box(o).get("y", 0) or 0), float(obj_box(o).get("x", 0) or 0)))
++            rows = []
++            for obj in candidates:
++                y = float(obj_box(obj).get("y", 0) or 0)
++                for row in rows:
++                    if abs(float(obj_box(row[0]).get("y", 0) or 0) - y) <= 6:
++                        row.append(obj)
++                        break
++                else:
++                    rows.append([obj])
++            for ri, row in enumerate(rows, start=1):
++                if len(row) >= 2 and same_row(row, 6):
++                    rel = {"id": "%s_%s_%d" % (sid, rel_name, ri), "type": "row", "objects": [o["id"] for o in row], "align": ["top"], "tolerance": 6}
++                    equal = []
++                    if same_size(row, "width", 6):
++                        equal.append("width")
++                    if same_size(row, "height", 6):
++                        equal.append("height")
++                    if equal:
++                        rel["equal"] = equal
++                    if len(row) >= 3:
++                        rel["gutter"] = {"mode": "equal", "tolerance": 8}
++                    relations.append(rel)
++
++    container_roles = {"signal-chip", "scenario-zone", "process-node", "supporting-card", "glass-panel", "metric-card", "ledger-metric"}
++    for prefix, cols in [
++        ("scenario", ["name", "impact", "action"]),
++        ("process", ["num", "title", "text"]),
++    ]:
++        for col in cols:
++            ids = []
++            for o in objects:
++                oid = o.get("id", "")
++                if o.get("type") == "text" and ("_%s_" % prefix) in oid and oid.endswith("_" + col):
++                    ids.append(oid)
++            if len(ids) >= 2:
++                xs = [float(obj_box(by_id[i]).get("x", 0) or 0) for i in ids if i in by_id]
++                if xs and max(xs) - min(xs) <= 3:
++                    relations.append({"id": "%s_%s_%s_column" % (sid, prefix, col), "type": "align-left", "objects": ids, "tolerance": 3})
++        # Row top alignment for each numbered table row; only declare it when
++        # the row actually uses a tabular horizontal grammar.
++        for n in range(1, 8):
++            row_ids = []
++            for o in objects:
++                oid = o.get("id", "")
++                if o.get("type") == "text" and ("_%s_%d_" % (prefix, n)) in oid:
++                    row_ids.append(oid)
++            row_objs = [by_id[i] for i in row_ids if i in by_id]
++            if len(row_objs) >= 2 and same_row(row_objs, 4):
++                relations.append({"id": "%s_%s_%d_row" % (sid, prefix, n), "type": "row", "objects": row_ids, "align": ["top"], "tolerance": 4})
++
++    container_roles = {"signal-chip", "scenario-zone", "process-node", "supporting-card", "glass-panel", "metric-card", "ledger-metric"}
++    for parent in objects:
++        if parent.get("type") != "shape" or parent.get("role") not in container_roles:
++            continue
++        pid = parent.get("id", "")
++        children = [o.get("id") for o in objects if o.get("type") == "text" and o.get("id", "").startswith(pid + "_") and (o.get("editability") or {}).get("priority", 0) >= 4]
++        if children:
++            relations.append({"id": pid + "_padding", "type": "parent-padding", "parent": pid, "children": children, "padding": {"x": 2, "y": 2}, "tolerance": 8})
++
++    return relations
++
++
++def slide_ir(sid, objects):
++    normalized = normalize_z(objects)
++    return {"id": sid, "objects": normalized, "layout_relations": infer_layout_relations(sid, normalized)}
++
++
+ def add_body_paragraphs(objects, sid, body, x, y, w, line_h, z, size=16, max_items=3, gap=10, profile=None):
+     profile = profile or VARIANT_PROFILES["default"]
+     yy = y
+@@ -372,7 +492,7 @@ def compile_slide(slide):
+     risk = slide.get("risk_note") or slide.get("source") or ""
+     if risk:
+         objects.append(text_obj("risk_note", "risk", risk, 80, 650, 1120, 32, 30, 10, color="6B7280"))
+-    return {"id": slide["id"], "objects": objects}
++    return slide_ir(slide["id"], objects)
+ 
+ 
+ def tone_color(tone):
+@@ -497,7 +617,7 @@ def glass_frame(objects, slide_id, profile=None):
+     objects.append(shape_obj(slide_id + "_orb_cyan", cyan.get("role", "decorative-glow"), cyan["x"], cyan["y"], cyan["w"], cyan["h"], 1, fill=pal(profile, "stroke"), stroke=pal(profile, "stroke"), shape="ellipse", priority=1, opacity=cyan["opacity"], stroke_opacity=0.0))
+     objects.append(shape_obj(slide_id + "_orb_violet", violet.get("role", "decorative-glow"), violet["x"], violet["y"], violet["w"], violet["h"], 2, fill=pal(profile, "accent"), stroke=pal(profile, "accent"), shape="ellipse", priority=1, opacity=violet["opacity"], stroke_opacity=0.0))
+     if profile.get("gold_orb"):
+-        objects.append(shape_obj(slide_id + "_orb_gold", "spotlight-orb", 1000, 392, 260, 260, 3, fill=pal(profile, "warning"), stroke=pal(profile, "warning"), shape="ellipse", priority=1, opacity=0.10, stroke_opacity=0.0))
++        objects.append(shape_obj(slide_id + "_orb_gold", "spotlight-orb", 1000, 392, 260, 260, 3, fill=pal(profile, "warning"), stroke=pal(profile, "warning"), shape="ellipse", priority=1, opacity=0.055, stroke_opacity=0.0))
+     if name == "luminous-glass":
+         objects.append(shape_obj(slide_id + "_luminous_ribbon", "luminous-ribbon", 64, 50, 520, 8, 5, fill=pal(profile, "warning"), stroke=pal(profile, "warning"), shape="rect", priority=1, opacity=0.72, stroke_opacity=0.0))
+         objects.append(shape_obj(slide_id + "_luminous_sweep", "luminous-ribbon", 820, 104, 310, 14, 6, fill=pal(profile, "stroke"), stroke=pal(profile, "stroke"), shape="roundRect", priority=1, opacity=0.34, stroke_opacity=0.0))
+@@ -627,7 +747,7 @@ def compile_glass_slide(slide, index, profile=None):
+     if slide.get("risk_note"):
+         objects.append(text_obj(sid + "_risk_note", "risk", slide["risk_note"], 88, 600, 1090, 24, 900, 10, color=pal(profile, "muted"), priority=5))
+     apply_text_dna(objects, profile)
+-    return {"id": sid, "objects": normalize_z(objects)}
++    return slide_ir(sid, objects)
+ 
+ 
+ 
+@@ -753,38 +873,49 @@ def paper_frame(objects, sid, index, slide):
+ def atlas_frame(objects, sid, index, slide):
+     profile = VISUAL_SYSTEM_PROFILES["market-atlas-infographic"]
+     objects.append(shape_obj(sid + "_bg", "atlas-canvas", 0, 0, 1280, 720, 0, fill=system_pal(profile, "background"), stroke=system_pal(profile, "background"), shape="rect", priority=1))
+-    # Content-zone masks are not decorative noise: they create the paper layer
+-    # that prevents atlas grids/routes from bleeding through text, chart, and
+-    # process regions. Keep these masks materially stronger than background
+-    # motif lines; fade routes/grids instead of fading the masks.
+-    objects.append(shape_obj(sid + "_zone_left", "background", 64, 104, 630, 500, 6, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "panel"), shape="rect", priority=1, opacity=0.72, stroke_opacity=0.0))
+-    objects.append(shape_obj(sid + "_zone_right", "background", 730, 202, 470, 330, 7, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.96, stroke_opacity=0.30))
+-    objects.append(shape_obj(sid + "_zone_bottom", "background", 72, 412, 1138, 158, 6, fill=system_pal(profile, "panel_alt"), stroke=system_pal(profile, "panel_alt"), shape="rect", priority=1, opacity=0.78, stroke_opacity=0.0))
+-    for gx in [96, 256, 416, 576, 736, 896, 1056, 1216]:
+-        objects.append(shape_obj("%s_grid_v_%d" % (sid, gx), "atlas-gridline", gx, 52, 1, 590, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.018 if slide.get("process") else 0.022), stroke_opacity=0.0))
+-    for gy in [118, 238, 358, 478, 598]:
+-        objects.append(shape_obj("%s_grid_h_%d" % (sid, gy), "atlas-gridline", 64, gy, 1152, 1, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.016 if slide.get("process") else 0.020), stroke_opacity=0.0))
+-    # Decorative atlas routes are style DNA, but they must adapt to page role.
+-    # Process pages use semantic connectors later; suppress global decorative routes
+-    # so route/card density does not compete with the actual execution path.
+-    if not slide.get("process"):
+-        objects.append(shape_obj(sid + "_route_primary", "route-line", 88, 218, 1060, 8, 4, fill=system_pal(profile, "accent"), stroke=system_pal(profile, "accent"), shape="rect", priority=2, opacity=0.072, stroke_opacity=0.0))
+-        objects.append(shape_obj(sid + "_route_secondary", "route-line", 190, 540, 880, 6, 4, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.055, stroke_opacity=0.0))
+-        for n, (nx, ny, tone) in enumerate([(716, 214, "accent"), (748, 536, "positive"), (1160, 214, "warning")], start=1):
+-            objects.append(shape_obj("%s_node_%d" % (sid, n), "map-node", nx, ny, 12, 12, 5, fill=system_tone_color(profile, tone), stroke=system_tone_color(profile, tone), shape="rect", priority=2, opacity=0.24, stroke_opacity=0.0))
++    # Atlas grammar constants. The style must read as a controlled investment map:
++    # light header, left analysis field, right decision rail, weak compliance footer.
++    left_x, left_w = 80, 624
++    right_x, right_w = 724, 480
++    main_y = 222
++    footer_y = 616
++    has_chart = bool(slide.get("chart"))
++    has_scenarios = bool(slide.get("scenarios"))
++    has_process = bool(slide.get("process"))
++    if not has_process:
++        objects.append(shape_obj(sid + "_zone_left", "background", left_x, main_y, left_w, 150, 6, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "panel"), shape="rect", priority=1, opacity=0.76, stroke_opacity=0.0))
++    if has_chart:
++        objects.append(shape_obj(sid + "_zone_bottom", "background", 88, 394, 610, 194, 6, fill=system_pal(profile, "panel_alt"), stroke=system_pal(profile, "panel_alt"), shape="rect", priority=1, opacity=0.86, stroke_opacity=0.0))
++        objects.append(shape_obj(sid + "_zone_right", "background", right_x, 222, right_w, 336, 7, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.96, stroke_opacity=0.28))
++    elif has_scenarios:
++        objects.append(shape_obj(sid + "_zone_right", "background", right_x, 222, right_w, 364, 7, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.96, stroke_opacity=0.28))
++    elif has_process:
++        pass
++    else:
++        objects.append(shape_obj(sid + "_zone_bottom", "background", 88, 410, 610, 154, 6, fill=system_pal(profile, "panel_alt"), stroke=system_pal(profile, "panel_alt"), shape="rect", priority=1, opacity=0.84, stroke_opacity=0.0))
++        objects.append(shape_obj(sid + "_zone_right", "background", right_x, 222, right_w, 336, 7, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=1, opacity=0.96, stroke_opacity=0.28))
++    for gx in [80, 240, 400, 560, 720, 880, 1040, 1200]:
++        objects.append(shape_obj("%s_grid_v_%d" % (sid, gx), "atlas-gridline", gx, 62, 1, 552, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.016 if has_process else 0.020), stroke_opacity=0.0))
++    for gy in [118, 222, 326, 430, 534, 638]:
++        objects.append(shape_obj("%s_grid_h_%d" % (sid, gy), "atlas-gridline", 80, gy, 1120, 1, 2, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=1, opacity=(0.014 if has_process else 0.018), stroke_opacity=0.0))
++    if not (has_chart or has_process):
++        objects.append(shape_obj(sid + "_route_primary", "route-line", 96, 250, 584, 6, 4, fill=system_pal(profile, "accent"), stroke=system_pal(profile, "accent"), shape="rect", priority=2, opacity=0.052, stroke_opacity=0.0))
++        objects.append(shape_obj(sid + "_route_secondary", "route-line", 178, 532, 470, 5, 4, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.040, stroke_opacity=0.0))
++        for n, (nx, ny, tone) in enumerate([(708, 250, "accent"), (704, 532, "positive"), (1160, 250, "warning")], start=1):
++            objects.append(shape_obj("%s_node_%d" % (sid, n), "map-node", nx, ny, 10, 10, 5, fill=system_tone_color(profile, tone), stroke=system_tone_color(profile, tone), shape="rect", priority=2, opacity=0.20, stroke_opacity=0.0))
+     objects.append(text_obj(sid + "_folio", "research-folio", "MARKET ATLAS / ZONE-%02d" % index, 80, 54, 300, 22, 10, 10, color=system_pal(profile, "muted"), bold=True, priority=2))
+-    objects.append(text_obj(sid + "_legend_1", "research-folio", "SIGNAL FIELD", 760, 206, 160, 18, 11, 9, color=system_pal(profile, "muted"), bold=True, priority=2))
+-    objects.append(text_obj(sid + "_legend_2", "research-folio", "ALLOCATION ROUTE", 92, 402, 220, 18, 11, 9, color=system_pal(profile, "positive"), bold=True, priority=2))
+-    if not slide.get("process"):
+-        # Make the atlas vocabulary functional: the route label must be backed by
+-        # a real allocation path, not a decorative caption floating over empty space.
++    if not has_process:
++        objects.append(text_obj(sid + "_legend_1", "research-folio", "SIGNAL FIELD", right_x + 18, 206, 160, 18, 11, 9, color=system_pal(profile, "muted"), bold=True, priority=2))
++    if not (has_chart or has_scenarios or has_process):
++        objects.append(text_obj(sid + "_legend_2", "research-folio", "ALLOCATION ROUTE", 96, 402, 220, 18, 11, 9, color=system_pal(profile, "positive"), bold=True, priority=2))
++    if not has_process and not has_chart:
+         route_y = 454
+         route_nodes = [(142, "DEF"), (332, "RISK"), (522, "HEDGE")]
+-        objects.append(shape_obj(sid + "_allocation_route_spine", "route-line", 148, route_y + 8, 392, 3, 74, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.24, stroke_opacity=0.0))
++        objects.append(shape_obj(sid + "_allocation_route_spine", "route-line", 148, route_y + 8, 392, 3, 74, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.22, stroke_opacity=0.0))
+         for ni, (nx, label) in enumerate(route_nodes, start=1):
+-            objects.append(shape_obj("%s_allocation_stop_%d" % (sid, ni), "map-node", nx, route_y, 18, 18, 76 + ni, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "positive" if ni != 2 else "accent"), shape="ellipse", priority=2, opacity=0.96, stroke_opacity=0.86))
++            objects.append(shape_obj("%s_allocation_stop_%d" % (sid, ni), "map-node", nx, route_y, 18, 18, 76 + ni, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "positive" if ni != 2 else "accent"), shape="ellipse", priority=2, opacity=0.94, stroke_opacity=0.80))
+             objects.append(text_obj("%s_allocation_stop_%d_label" % (sid, ni), "research-folio", label, nx - 22, route_y + 26, 70, 16, 80 + ni, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+-    objects.append(text_obj(sid + "_kicker", "kicker", slide.get("kicker", ""), 82, 84, 520, 24, 12, 11, color=system_pal(profile, "accent"), bold=True, priority=4))
++    objects.append(text_obj(sid + "_kicker", "kicker", slide.get("kicker", ""), 82, 78, 520, 18, 12, 10, color=system_pal(profile, "accent"), bold=True, priority=4))
+ 
+ 
+ def add_atlas_legend(objects, sid, x, y, z, profile, items):
+@@ -813,7 +944,7 @@ def add_atlas_signal_field_map(objects, sid, metrics, x, y, w, h, z, profile):
+         objects.append(shape_obj("%s_signal_point_%d" % (sid, i), "signal-node", px, py, 130, 58, z + 10 + i, fill=system_pal(profile, "paper"), stroke=tone, shape="roundRect", priority=3, opacity=0.90, stroke_opacity=0.62))
+         objects.append(text_obj("%s_signal_point_%d_label" % (sid, i), "metric-label", metric.get("label", ""), px + 12, py + 7, 102, 14, z + 20 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
+         objects.append(text_obj("%s_signal_point_%d_value" % (sid, i), "metric", metric.get("value", ""), px + 12, py + 23, 102, 20, z + 30 + i, 13, color=system_pal(profile, "ink"), bold=True, priority=5))
+-        objects.append(text_obj("%s_signal_point_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), px + 12, py + 42, 110, 12, z + 40 + i, 7, color=tone, priority=4))
++        objects.append(text_obj("%s_signal_point_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), px + 12, py + 42, 110, 12, z + 40 + i, 8, color=tone, priority=4))
+         # Connector from field point to regime core. Thin rectangles keep PPTX editable.
+         mx = px + 65
+         my = py + 29
+@@ -843,14 +974,14 @@ def add_atlas_budget_route_map(objects, sid, chart, x, y, w, h, z, profile):
+         col_x = [x + 126, x + 316, x + 506]
+         heads = [("CURRENT", "当前配置"), ("PROPOSED", "建议动作"), ("LIMIT", "风险上限")]
+         for i, (eng, zh) in enumerate(heads):
+-            objects.append(text_obj("%s_bridge_head_%d" % (sid, i + 1), "research-folio", eng, col_x[i] - 46, y + 42, 96, 12, z + 5 + i, 7, color=system_pal(profile, "muted"), bold=True, priority=3))
+-            objects.append(shape_obj("%s_bridge_node_%d" % (sid, i + 1), "map-node", col_x[i] - 18, y + 64, 36, 36, z + 10 + i, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive" if i < 2 else "warning"), shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.76))
+-            objects.append(text_obj("%s_bridge_node_label_%d" % (sid, i + 1), "research-folio", zh, col_x[i] - 44, y + 104, 90, 12, z + 12 + i, 7, color=system_pal(profile, "ink"), bold=True, priority=3))
++            objects.append(text_obj("%s_bridge_head_%d" % (sid, i + 1), "research-folio", eng, col_x[i] - 46, y + 48, 96, 12, z + 5 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=3))
++            objects.append(shape_obj("%s_bridge_node_%d" % (sid, i + 1), "map-node", col_x[i] - 18, y + 70, 36, 36, z + 10 + i, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive" if i < 2 else "warning"), shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.76))
++            objects.append(text_obj("%s_bridge_node_label_%d" % (sid, i + 1), "research-folio", zh, col_x[i] - 44, y + 110, 90, 12, z + 12 + i, 8, color=system_pal(profile, "ink"), bold=True, priority=3))
+         for i in [0, 1]:
+-            objects.append(shape_obj("%s_bridge_route_%d" % (sid, i + 1), "route-line", col_x[i] + 24, y + 80, col_x[i + 1] - col_x[i] - 48, 4, z + 14 + i, fill=system_pal(profile, "positive" if i == 0 else "warning"), stroke=system_pal(profile, "positive" if i == 0 else "warning"), shape="rect", priority=2, opacity=0.34, stroke_opacity=0.0))
+-            objects.append(text_obj("%s_bridge_route_label_%d" % (sid, i + 1), "metric-note", "加权益 / 控久期" if i == 0 else "护栏 / 不突破", col_x[i] + 54, y + 58, 118, 14, z + 18 + i, 7, color=system_pal(profile, "muted"), bold=True, priority=3))
++            objects.append(shape_obj("%s_bridge_route_%d" % (sid, i + 1), "route-line", col_x[i] + 24, y + 86, col_x[i + 1] - col_x[i] - 48, 4, z + 14 + i, fill=system_pal(profile, "positive" if i == 0 else "warning"), stroke=system_pal(profile, "positive" if i == 0 else "warning"), shape="rect", priority=2, opacity=0.34, stroke_opacity=0.0))
++            objects.append(text_obj("%s_bridge_route_label_%d" % (sid, i + 1), "metric-note", "加权益 / 控久期" if i == 0 else "护栏 / 不突破", col_x[i] + 54, y + 64, 118, 14, z + 18 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=3))
+ 
+-        lane_y = [y + 138, y + 160, y + 182]
++        lane_y = [y + 124, y + 146, y + 168]
+         for j, ser in enumerate(series[:3]):
+             tone = system_tone_color(profile, ser.get("tone"))
+             vals = [float(v) for v in ser.get("values", [0, 0, 0])[:3]]
+@@ -858,23 +989,23 @@ def add_atlas_budget_route_map(objects, sid, chart, x, y, w, h, z, profile):
+             objects.append(text_obj("%s_bridge_asset_%d" % (sid, j + 1), "metric-label", ser.get("name", ""), x + 20, yy - 5, 72, 14, z + 34 + j, 8, color=tone, bold=True, priority=4))
+             for i, v in enumerate(vals):
+                 objects.append(shape_obj("%s_bridge_asset_%d_stop_%d" % (sid, j + 1, i + 1), "signal-chip", col_x[i] - 34, yy - 8, 68, 18, z + 38 + j * 3 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.82, stroke_opacity=0.46))
+-                objects.append(text_obj("%s_bridge_asset_%d_val_%d" % (sid, j + 1, i + 1), "metric-note", "%d%%" % int(v), col_x[i] - 18, yy - 5, 38, 12, z + 42 + j * 3 + i, 7, color=system_pal(profile, "ink"), bold=True, priority=4))
++                objects.append(text_obj("%s_bridge_asset_%d_val_%d" % (sid, j + 1, i + 1), "metric-note", "%d%%" % int(v), col_x[i] - 18, yy - 5, 38, 12, z + 42 + j * 3 + i, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
+             delta = int(vals[1] - vals[0])
+-            objects.append(text_obj("%s_bridge_asset_%d_delta" % (sid, j + 1), "metric-note", "%+dpct" % delta, col_x[0] + 86, yy - 5, 58, 12, z + 52 + j, 7, color=tone, bold=True, priority=4))
++            objects.append(text_obj("%s_bridge_asset_%d_delta" % (sid, j + 1), "metric-note", "%+dpct" % delta, col_x[0] + 86, yy - 5, 58, 12, z + 52 + j, 8, color=tone, bold=True, priority=4))
+ 
+-        objects.append(shape_obj(sid + "_bridge_guardrail", "guardrail", x + w - 102, y + 44, 2, h - 78, z + 64, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=3, opacity=0.46, stroke_opacity=0.0))
+-        objects.append(text_obj(sid + "_bridge_guardrail_label", "research-folio", "DD GUARDRAIL", x + w - 140, y + 36, 108, 12, z + 65, 7, color=system_pal(profile, "warning"), bold=True, priority=3))
+-        objects.append(text_obj(sid + "_bridge_limit_rule", "metric-note", "上限：权益≤62；固收≥30；另类现金≥8（尾部对冲底仓）", x + 20, y + 118, w - 60, 16, z + 70, 7, color=system_pal(profile, "ink"), bold=True, priority=4))
+-        objects.append(text_obj(sid + "_bridge_dd_rule", "metric-note", "回撤>5%或周撤>3%：停加权益，回建议仓位", x + 20, y + 204, w - 60, 16, z + 71, 7, color=system_pal(profile, "warning"), bold=True, priority=4))
++        objects.append(shape_obj(sid + "_bridge_guardrail", "guardrail", x + w - 102, y + 52, 2, h - 86, z + 64, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=3, opacity=0.46, stroke_opacity=0.0))
++        objects.append(text_obj(sid + "_bridge_guardrail_label", "research-folio", "DD GUARDRAIL", x + w - 140, y + 42, 108, 12, z + 65, 8, color=system_pal(profile, "warning"), bold=True, priority=3))
++        objects.append(text_obj(sid + "_bridge_limit_rule", "metric-note", "上限：权益≤62；固收≥30；另类现金≥8（尾部对冲底仓）", x + 20, y + 28, w - 60, 16, z + 70, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
++        objects.append(text_obj(sid + "_bridge_dd_rule", "metric-note", "回撤>5%或周撤>3%：停加权益，回建议仓位", x + 20, y + h - 20, w - 60, 16, z + 71, 8, color=system_pal(profile, "warning"), bold=True, priority=4))
+         if chart.get("source"):
+-            objects.append(text_obj(sid + "_budget_source", "research-folio", "Source: 投研/Wind/Bloomberg", x + w - 244, y + 14, 218, 12, z + 72, 7, color=system_pal(profile, "muted"), priority=2))
++            objects.append(text_obj(sid + "_budget_source", "research-folio", "Source: 投研/Wind/Bloomberg", x + w - 244, y + 14, 218, 12, z + 72, 8, color=system_pal(profile, "muted"), priority=2))
+         return
+ 
+     # Slide02: macro decision route. The route is signal-gated, not month-driven.
+     route_x = x + 38
+-    route_y = y + 36
++    route_y = y + 34
+     route_w = w - 76
+-    route_h = h - 86
++    route_h = h - 96
+     n = max(1, len(cats))
+     first_vals = [float(ser.get("values", [0] * n)[0]) for ser in series[:3]]
+     last_vals = [float(ser.get("values", [0] * n)[n - 1]) for ser in series[:3]]
+@@ -904,54 +1035,54 @@ def add_atlas_budget_route_map(objects, sid, chart, x, y, w, h, z, profile):
+     node_centers = []
+     for i, zd in enumerate(zone_defs, start=1):
+         zx = route_x + (i - 1) * (zone_w + 12)
+-        zy = route_y + 22 + (6 if i == 2 else 0)
++        zy = route_y + 10 + (4 if i == 2 else 0)
+         tone = system_tone_color(profile, zd["tone"])
+-        objects.append(shape_obj("%s_macro_zone_%d" % (sid, i), "route-map", zx, zy, zone_w, 72, z + 3 + i, fill=tone, stroke=tone, shape="roundRect", priority=3, opacity=0.13 + i * 0.018, stroke_opacity=0.0))
+-        objects.append(text_obj("%s_macro_zone_%d_label" % (sid, i), "research-folio", "%s / %s" % (zd["eng"], zd["zh"]), zx + 12, zy + 8, zone_w - 24, 14, z + 8 + i, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
+-        objects.append(text_obj("%s_macro_zone_%d_if" % (sid, i), "metric-note", zd["if"], zx + 12, zy + 30, zone_w - 24, 14, z + 12 + i, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
+-        objects.append(text_obj("%s_macro_zone_%d_then" % (sid, i), "metric-note", zd["then"], zx + 12, zy + 50, zone_w - 24, 14, z + 16 + i, 6, color=tone, bold=True, priority=4))
++        objects.append(shape_obj("%s_macro_zone_%d" % (sid, i), "route-map", zx, zy, zone_w, 64, z + 3 + i, fill=tone, stroke=tone, shape="roundRect", priority=3, opacity=0.13 + i * 0.018, stroke_opacity=0.0))
++        objects.append(text_obj("%s_macro_zone_%d_label" % (sid, i), "research-folio", "%s / %s" % (zd["eng"], zd["zh"]), zx + 12, zy + 7, zone_w - 24, 14, z + 8 + i, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
++        objects.append(text_obj("%s_macro_zone_%d_if" % (sid, i), "metric-note", zd["if"], zx + 12, zy + 27, zone_w - 24, 14, z + 12 + i, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
++        objects.append(text_obj("%s_macro_zone_%d_then" % (sid, i), "metric-note", zd["then"], zx + 12, zy + 45, zone_w - 24, 14, z + 16 + i, 8, color=tone, bold=True, priority=4))
+         cx = zx + zone_w / 2
+-        cy = zy + 88
++        cy = zy + 76
+         node_centers.append((cx, cy, tone))
+         objects.append(shape_obj("%s_macro_station_%d" % (sid, i), "map-node", cx - 12, cy - 12, 24, 24, z + 30 + i, fill=system_pal(profile, "paper"), stroke=tone, shape="ellipse", priority=3, opacity=0.98, stroke_opacity=0.92))
+-        objects.append(text_obj("%s_macro_station_%d_name" % (sid, i), "research-folio", zd["eng"], cx - 30, cy + 15, 64, 12, z + 34 + i, 6, color=system_pal(profile, "muted"), bold=True, priority=3))
++        objects.append(text_obj("%s_macro_station_%d_name" % (sid, i), "research-folio", zd["eng"], cx - 30, cy + 13, 64, 10, z + 34 + i, 7, color=system_pal(profile, "muted"), bold=True, priority=2))
+ 
+     # Forward business route: signal-confirmed stages.
+     for i in range(2):
+         x1, y1, tone1 = node_centers[i]
+         x2, y2, tone2 = node_centers[i + 1]
+         objects.append(shape_obj("%s_macro_route_%d" % (sid, i + 1), "route-line", x1 + 16, y1 - 2, x2 - x1 - 32, 4, z + 44 + i, fill=tone2, stroke=tone2, shape="rect", priority=3, opacity=0.36, stroke_opacity=0.0))
+-        objects.append(text_obj("%s_macro_route_%d_rule" % (sid, i + 1), "metric-note", "触发确认" if i == 0 else "条件满足", x1 + 56, y1 - 20, 74, 12, z + 46 + i, 7, color=tone2, bold=True, priority=4))
++        objects.append(text_obj("%s_macro_route_%d_rule" % (sid, i + 1), "research-folio", "触发确认" if i == 0 else "条件满足", x1 + 56, y1 - 20, 74, 12, z + 46 + i, 8, color=tone2, bold=True, priority=2))
+ 
+     # Rollback / fail path makes this a risk route, not a one-way timeline.
+-    rb_y = y + h - 58
++    rb_y = y + h - 82
+     objects.append(shape_obj(sid + "_macro_rollback_route", "route-line", node_centers[2][0] - 18, rb_y, node_centers[0][0] - node_centers[2][0] + 36, 3, z + 46, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=3, opacity=0.24, stroke_opacity=0.0))
+-    objects.append(text_obj(sid + "_macro_rollback_label", "metric-note", "ROLLBACK PATH", route_x + route_w - 102, rb_y - 12, 96, 12, z + 48, 6, color=system_pal(profile, "warning"), bold=True, priority=4))
++    objects.append(text_obj(sid + "_macro_rollback_label", "research-folio", "ROLLBACK PATH", route_x + route_w - 112, rb_y + 4, 106, 12, z + 48, 8, color=system_pal(profile, "warning"), bold=True, priority=2))
+ 
+-    # Current state and signal-to-route mapping.
+-    now_x = node_centers[1][0] - 52
+-    now_y = route_y + 6
+-    objects.append(shape_obj(sid + "_macro_now_card", "trigger-row", now_x, now_y, 126, 36, z + 56, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.84, stroke_opacity=0.54))
+-    objects.append(text_obj(sid + "_macro_now_text", "metric-note", "NOW: CONFIRM EARLY\n当前处于确认初期", now_x + 8, now_y + 5, 110, 27, z + 58, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
++    # Current state marker stays in the chrome above the active card; it must not cover card body.
++    now_x = node_centers[1][0] - 46
++    now_y = route_y + 2
++    objects.append(shape_obj(sid + "_macro_now_card", "trigger-row", now_x, now_y, 124, 22, z + 56, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.84, stroke_opacity=0.54))
++    objects.append(text_obj(sid + "_macro_now_text", "metric-note", "NOW CONFIRM", now_x + 8, now_y + 5, 108, 12, z + 58, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
+ 
+     target = "/".join(str(int(v)) for v in last_vals)
+-    target_label = "%s = 权益/固收/另类" % target if len(asset_names) >= 3 else "Target " + target
+-    matrix_y = y + h - 48
+-    objects.append(shape_obj(sid + "_macro_rule_matrix", "trigger-row", x + 18, matrix_y, w - 36, 46, z + 60, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.78, stroke_opacity=0.30))
++    target_label = "%s 权/固/另类" % target if len(asset_names) >= 3 else "Target " + target
++    matrix_y = y + h - 62
++    objects.append(shape_obj(sid + "_macro_rule_matrix", "trigger-row", x + 18, matrix_y, w - 36, 62, z + 60, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="roundRect", priority=3, opacity=0.78, stroke_opacity=0.30))
+     cols = [x + 30, x + 170, x + 306, x + 462]
+     matrix = [
+-        ("SCORE", "增长+1 流动性+2 估值-1\n政策VETO=0 → +2"),
+-        ("STAGE", "+2 = CONFIRM EARLY\n≥3+盈利确认 = DEPLOY"),
+-        ("ACTION", target_label + "\n分段靠近目标"),
+-        ("ROLLBACK", "政策/流动性收紧 → WATCH\n盈利失败 → CONFIRM"),
++        ("SCORE", "增长+1 流动性+2\n估值-1\n政策VETO=0"),
++        ("STAGE", "+2 CONFIRM EARLY\n≥3 DEPLOY"),
++        ("ACTION", target_label + "\n分段执行"),
++        ("ROLLBACK", "政策收紧→WATCH\n盈利失败→CONFIRM"),
+     ]
+     for mi, (head, body) in enumerate(matrix):
+         mw = [126, 126, 146, 154][mi]
+         tone = ["muted", "positive", "accent", "warning"][mi]
+-        objects.append(text_obj("%s_macro_matrix_%d_head" % (sid, mi + 1), "research-folio", head, cols[mi], matrix_y + 5, mw, 10, z + 62 + mi, 6, color=system_tone_color(profile, tone) if tone != "muted" else system_pal(profile, "muted"), bold=True, priority=3))
+-        objects.append(text_obj("%s_macro_matrix_%d_body" % (sid, mi + 1), "metric-note", body, cols[mi], matrix_y + 16, mw, 26, z + 66 + mi, 6, color=system_pal(profile, "ink"), bold=True, priority=4))
++        objects.append(text_obj("%s_macro_matrix_%d_head" % (sid, mi + 1), "research-folio", head, cols[mi], matrix_y + 5, mw, 10, z + 62 + mi, 8, color=system_tone_color(profile, tone) if tone != "muted" else system_pal(profile, "muted"), bold=True, priority=3))
++        objects.append(text_obj("%s_macro_matrix_%d_body" % (sid, mi + 1), "metric-note", body, cols[mi], matrix_y + 17, mw, 42, z + 66 + mi, 8, color=system_pal(profile, "ink"), bold=True, priority=4))
+     if chart.get("source"):
+-        objects.append(text_obj(sid + "_budget_source", "research-folio", "Source: 投研/Wind/Bloomberg", x + w - 244, y + 14, 218, 12, z + 66, 7, color=system_pal(profile, "muted"), priority=2))
++        objects.append(text_obj(sid + "_budget_source", "research-folio", "Source: 投研/Wind/Bloomberg", x + w - 244, y + 14, 218, 12, z + 66, 8, color=system_pal(profile, "muted"), priority=2))
+ 
+ 
+ def add_atlas_scenario_map(objects, sid, metrics, scenarios, x, y, w, h, z, profile):
+@@ -960,7 +1091,7 @@ def add_atlas_scenario_map(objects, sid, metrics, scenarios, x, y, w, h, z, prof
+     start_x = x + 52
+     start_y = y + h / 2
+     objects.append(shape_obj(sid + "_scenario_origin", "map-node", start_x - 16, start_y - 16, 32, 32, z + 8, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "positive"), shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.78))
+-    objects.append(text_obj(sid + "_scenario_origin_label", "research-folio", "CURRENT\nBOOK", start_x - 28, start_y + 22, 70, 28, z + 9, 7, color=system_pal(profile, "muted"), bold=True, priority=2))
++    objects.append(text_obj(sid + "_scenario_origin_label", "research-folio", "CURRENT\nBOOK", start_x - 28, start_y + 22, 70, 28, z + 9, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+     row_y = [y + 52, y + 138, y + 224]
+     tones = ["positive", "warning", "accent"]
+     for i, sc in enumerate(scenarios[:3], start=1):
+@@ -970,56 +1101,86 @@ def add_atlas_scenario_map(objects, sid, metrics, scenarios, x, y, w, h, z, prof
+         tone = system_tone_color(profile, tone_name)
+         # Branch connector from origin to scenario zone.
+         objects.append(shape_obj("%s_scenario_branch_%d" % (sid, i), "scenario-branch", start_x + 14, start_y - 1 if ry >= start_y else ry + 44, 116, 3, z + 4 + i, fill=tone, stroke=tone, shape="rect", priority=2, opacity=0.28, stroke_opacity=0.0))
+-        objects.append(shape_obj("%s_scenario_zone_%d" % (sid, i), "scenario-zone", x + 184, ry, w - 220, 70, z + 20 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.96, stroke_opacity=0.76))
++        objects.append(shape_obj("%s_scenario_zone_%d" % (sid, i), "scenario-zone", x + 184, ry, w - 178, 78, z + 20 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.96, stroke_opacity=0.76))
+         objects.append(shape_obj("%s_scenario_zone_%d_pin" % (sid, i), "map-node", x + 198, ry + 14, 12, 12, z + 30 + i, fill=tone, stroke=tone, shape="ellipse", priority=2, opacity=0.88, stroke_opacity=0.0))
+-        objects.append(text_obj("%s_scenario_zone_%d_name" % (sid, i), "body", sc.get("name", ""), x + 218, ry + 8, 58, 18, z + 31 + i, 11, color=system_pal(profile, "ink"), bold=True, priority=5))
+-        objects.append(text_obj("%s_scenario_zone_%d_prob_label" % (sid, i), "metric-label", metric.get("label", ""), x + 276, ry + 6, 72, 14, z + 32 + i, 7, color=system_pal(profile, "muted"), bold=True, priority=4))
+-        objects.append(text_obj("%s_scenario_zone_%d_prob" % (sid, i), "metric", metric.get("value", ""), x + 276, ry + 22, 62, 22, z + 33 + i, 13, color=tone, bold=True, priority=5))
+-        objects.append(text_obj("%s_scenario_zone_%d_impact" % (sid, i), "metric", sc.get("impact", ""), x + 344, ry + 8, 148, 22, z + 34 + i, 12, color=system_pal(profile, "ink"), bold=True, priority=5))
+-        objects.append(text_obj("%s_scenario_zone_%d_trigger" % (sid, i), "metric-note", metric.get("delta", ""), x + 218, ry + 43, 150, 18, z + 35 + i, 8, color=system_pal(profile, "muted"), priority=4))
+-        objects.append(text_obj("%s_scenario_zone_%d_action" % (sid, i), "body", sc.get("action", ""), x + 372, ry + 43, 130, 18, z + 36 + i, 9, color=tone, bold=True, priority=5))
++        objects.append(text_obj("%s_scenario_zone_%d_name" % (sid, i), "body", sc.get("name", ""), x + 218, ry + 8, 54, 18, z + 31 + i, 11, color=system_pal(profile, "ink"), bold=True, priority=5))
++        objects.append(text_obj("%s_scenario_zone_%d_prob_label" % (sid, i), "metric-label", metric.get("label", ""), x + 286, ry + 6, 68, 14, z + 32 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
++        objects.append(text_obj("%s_scenario_zone_%d_prob" % (sid, i), "metric", metric.get("value", ""), x + 286, ry + 24, 58, 22, z + 33 + i, 13, color=tone, bold=True, priority=5))
++        objects.append(text_obj("%s_scenario_zone_%d_impact" % (sid, i), "metric", sc.get("impact", ""), x + 356, ry + 8, 112, 30, z + 34 + i, 10, color=system_pal(profile, "ink"), bold=True, priority=5))
++        objects.append(text_obj("%s_scenario_zone_%d_trigger" % (sid, i), "metric-note", metric.get("delta", ""), x + 218, ry + 52, 138, 18, z + 35 + i, 8, color=system_pal(profile, "muted"), priority=4))
++        objects.append(text_obj("%s_scenario_zone_%d_action" % (sid, i), "body", sc.get("action", ""), x + 366, ry + 52, 96, 18, z + 36 + i, 9, color=tone, bold=True, priority=5))
+     add_atlas_legend(objects, sid + "_scenario", x + 18, y + h - 24, z + 80, profile, [("基准", "positive"), ("紧缩", "warning"), ("衰退", "accent")])
+ 
+ 
+ def add_atlas_process_state_machine(objects, sid, process, metrics, x, y, w, h, z, profile):
+-    """Execution page: state machine + real signal field, not fake matrix."""
+-    # Fill the otherwise empty SIGNAL FIELD zone with native trigger evidence.
+-    sf_x, sf_y, sf_w, sf_h = 748, 232, 426, 92
+-    objects.append(shape_obj(sid + "_process_signal_field_panel", "signal-field", sf_x, sf_y, sf_w, sf_h, z + 2, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="roundRect", priority=3, opacity=0.94, stroke_opacity=0.42))
+-    for i, metric in enumerate(metrics[:3], start=1):
+-        chip_w = 130
+-        chip_x = sf_x + 14 + (i - 1) * 136
+-        chip_y = sf_y + 24
+-        tone = system_tone_color(profile, metric.get("tone"))
+-        objects.append(shape_obj("%s_process_signal_%d" % (sid, i), "signal-chip", chip_x, chip_y, chip_w, 54, z + 8 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.86, stroke_opacity=0.60))
+-        objects.append(text_obj("%s_process_signal_%d_label" % (sid, i), "metric-label", metric.get("label", ""), chip_x + 10, chip_y + 6, 106, 14, z + 12 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
+-        objects.append(text_obj("%s_process_signal_%d_value" % (sid, i), "metric", metric.get("value", ""), chip_x + 10, chip_y + 22, 42, 20, z + 16 + i, 13, color=tone, bold=True, priority=5))
+-        objects.append(text_obj("%s_process_signal_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), chip_x + 54, chip_y + 16, 68, 34, z + 20 + i, 7, color=system_pal(profile, "ink"), priority=4))
++    """Execution page: state machine with step-mapped signal windows.
+ 
++    The signal field is intentionally embedded into the process panel and mapped
++    1:1 to the four state-machine nodes. This prevents a floating right-rail
++    reading and makes the visual grammar auditable: signal window -> step node.
++    """
+     objects.append(shape_obj(sid + "_process_map_panel", "process-state-map", x, y, w, h, z + 30, fill=system_pal(profile, "paper"), stroke=system_pal(profile, "stroke_soft"), shape="rect", priority=3, opacity=0.98, stroke_opacity=0.54))
+     objects.append(text_obj(sid + "_process_map_title", "research-folio", "EXECUTION STATE MACHINE / TRIGGER-GATED LOOP", x + 18, y + 14, 330, 16, z + 31, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+-    nodes = [(x + 92, y + 82), (x + 286, y + 82), (x + 480, y + 82), (x + 674, y + 82)]
++
++    signal_x = x + 18
++    signal_y = y + 42
++    signal_w = 758
++    signal_h = 82
++    objects.append(shape_obj(sid + "_process_signal_field_panel", "signal-field", signal_x, signal_y, signal_w, signal_h, z + 32, fill=system_pal(profile, "background"), stroke=system_pal(profile, "rule"), shape="roundRect", priority=3, opacity=0.62, stroke_opacity=0.24))
++    objects.append(text_obj(sid + "_process_signal_field_title", "research-folio", "STEP SIGNAL WINDOWS / 与四步执行节点一一对应", signal_x + 12, signal_y + 8, 330, 14, z + 34, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
++
++    nodes = [(x + 92, y + 158), (x + 286, y + 158), (x + 480, y + 158), (x + 674, y + 158)]
++    window_specs = []
++    tones = ["positive", "accent", "warning", "positive"]
++    for i in range(4):
++        metric = metrics[i] if i < len(metrics) else {}
++        step = process[i] if i < len(process) else {}
++        if i < len(metrics):
++            label = metric.get("label", step.get("title", ""))
++            value = metric.get("value", step.get("title", ""))
++            delta = metric.get("delta", step.get("text", ""))
++        else:
++            label = step.get("title", "")
++            value = "月度"
++            delta = "偏离阈值即复盘"
++        window_specs.append(("%02d" % (i + 1), label, value, delta, tones[i]))
++
++    chip_w = 170
++    chip_gap = 14
++    chip_y = signal_y + 28
++    for i, (step_no, label, value, delta, tone_name) in enumerate(window_specs, start=1):
++        chip_x = signal_x + 12 + (i - 1) * (chip_w + chip_gap)
++        tone = system_tone_color(profile, tone_name)
++        objects.append(shape_obj("%s_process_signal_%d" % (sid, i), "signal-chip", chip_x, chip_y, chip_w, 42, z + 38 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="roundRect", priority=3, opacity=0.84, stroke_opacity=0.50))
++        objects.append(text_obj("%s_process_signal_%d_step" % (sid, i), "process-step", step_no, chip_x + 8, chip_y + 5, 18, 14, z + 40 + i, 8, color=tone, bold=True, priority=4))
++        objects.append(text_obj("%s_process_signal_%d_label" % (sid, i), "metric-label", label, chip_x + 34, chip_y + 5, 80, 14, z + 42 + i, 8, color=system_pal(profile, "muted"), bold=True, priority=4))
++        objects.append(text_obj("%s_process_signal_%d_value" % (sid, i), "metric", value, chip_x + 118, chip_y + 4, 42, 16, z + 46 + i, 9, color=tone, bold=True, priority=5))
++        objects.append(text_obj("%s_process_signal_%d_delta" % (sid, i), "metric-note", delta, chip_x + 8, chip_y + 23, chip_w - 16, 14, z + 50 + i, 8, color=system_pal(profile, "ink"), priority=4))
++        nx, ny = nodes[i - 1]
++        cx = chip_x + chip_w / 2
++        objects.append(shape_obj("%s_process_signal_to_node_%d" % (sid, i), "signal-vector", cx - 1, chip_y + 36, 2, max(18, ny - chip_y - 62), z + 36 + i, fill=tone, stroke=tone, shape="rect", priority=2, opacity=0.18, stroke_opacity=0.0))
++
+     for i in range(len(nodes) - 1):
+         x1, y1 = nodes[i]
+         x2, y2 = nodes[i + 1]
+-        objects.append(shape_obj("%s_state_route_%d" % (sid, i + 1), "route-line", x1 + 44, y1 - 2, x2 - x1 - 88, 4, z + 34 + i, fill=system_pal(profile, "positive" if i < 1 else "accent"), stroke=system_pal(profile, "positive" if i < 1 else "accent"), shape="rect", priority=2, opacity=0.30, stroke_opacity=0.0))
++        objects.append(shape_obj("%s_state_route_%d" % (sid, i + 1), "route-line", x1 + 44, y1 - 2, x2 - x1 - 88, 4, z + 58 + i, fill=system_pal(profile, "positive" if i < 1 else "accent"), stroke=system_pal(profile, "positive" if i < 1 else "accent"), shape="rect", priority=2, opacity=0.30, stroke_opacity=0.0))
+     # Feedback loop makes it a state machine, not a one-way checklist.
+-    objects.append(shape_obj(sid + "_state_feedback_route", "route-line", x + 160, y + 176, 570, 3, z + 34, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=2, opacity=0.18, stroke_opacity=0.0))
+-    objects.append(text_obj(sid + "_state_feedback_label", "research-folio", "月度复盘 / 授权覆核 / 再平衡", x + 420, y + 184, 250, 14, z + 36, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
++    objects.append(shape_obj(sid + "_state_feedback_route", "route-line", x + 160, y + 126, 570, 3, z + 58, fill=system_pal(profile, "warning"), stroke=system_pal(profile, "warning"), shape="rect", priority=2, opacity=0.16, stroke_opacity=0.0))
++    objects.append(text_obj(sid + "_state_feedback_label", "research-folio", "月度复盘 / 授权覆核 / 再平衡", x + 420, y + 132, 250, 14, z + 60, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+     for i, step in enumerate(process[:4], start=1):
+         nx, ny = nodes[i - 1]
+-        tone_name = ["positive", "accent", "warning", "positive"][i - 1]
++        tone_name = tones[i - 1]
+         tone = system_tone_color(profile, tone_name)
+-        objects.append(shape_obj("%s_state_node_%d" % (sid, i), "process-node", nx - 24, ny - 24, 48, 48, z + 40 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.82))
+-        objects.append(text_obj("%s_state_num_%d" % (sid, i), "process-step", step.get("step", ""), nx - 13, ny - 11, 30, 20, z + 44 + i, 10, color=tone, bold=True, priority=5))
+-        objects.append(text_obj("%s_state_title_%d" % (sid, i), "process-step", step.get("title", ""), nx - 58, ny + 34, 116, 18, z + 48 + i, 10, color=system_pal(profile, "ink"), bold=True, priority=5))
+-        objects.append(text_obj("%s_state_text_%d" % (sid, i), "process-step", step.get("text", ""), nx - 74, ny + 58, 148, 44, z + 52 + i, 8, color=system_pal(profile, "muted"), priority=5))
++        objects.append(shape_obj("%s_state_node_%d" % (sid, i), "process-node", nx - 24, ny - 24, 48, 48, z + 64 + i, fill=system_pal(profile, "panel"), stroke=tone, shape="ellipse", priority=3, opacity=0.96, stroke_opacity=0.82))
++        objects.append(text_obj("%s_state_num_%d" % (sid, i), "process-step", step.get("step", ""), nx - 13, ny - 11, 30, 20, z + 68 + i, 10, color=tone, bold=True, priority=5))
++        objects.append(text_obj("%s_state_title_%d" % (sid, i), "process-step", step.get("title", ""), nx - 58, ny + 34, 116, 18, z + 72 + i, 10, color=system_pal(profile, "ink"), bold=True, priority=5))
++        objects.append(text_obj("%s_state_text_%d" % (sid, i), "process-step", step.get("text", ""), nx - 74, ny + 58, 148, 44, z + 76 + i, 8, color=system_pal(profile, "muted"), priority=5))
+ 
+-    # Compact governance strip replaces the unreadable pseudo-matrix.
++    # Compact governance strip remains inside the process panel as the right-side control rail.
+     gx = x + 820
+-    gy = y + 46
+-    objects.append(shape_obj(sid + "_governance_strip", "trigger-row", gx - 16, gy - 14, 238, 154, z + 42, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "rule"), shape="roundRect", priority=3, opacity=0.70, stroke_opacity=0.28))
+-    objects.append(text_obj(sid + "_governance_head", "research-folio", "GOVERNANCE", gx, gy - 2, 120, 14, z + 50, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
++    gy = y + 66
++    objects.append(shape_obj(sid + "_governance_strip", "trigger-row", gx - 16, gy - 14, 238, 154, z + 62, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "rule"), shape="roundRect", priority=3, opacity=0.70, stroke_opacity=0.28))
++    objects.append(text_obj(sid + "_governance_head", "research-folio", "GOVERNANCE", gx, gy - 2, 120, 14, z + 70, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+     rows = [
+         ("Trigger", "PMI>50 / 盈利确认"),
+         ("Budget", "单周新增≤8%"),
+@@ -1028,9 +1189,9 @@ def add_atlas_process_state_machine(objects, sid, process, metrics, x, y, w, h,
+     ]
+     for i, (k, v) in enumerate(rows, start=1):
+         ry = gy + 18 + (i - 1) * 28
+-        objects.append(text_obj("%s_governance_%d_k" % (sid, i), "research-folio", k, gx, ry, 68, 15, z + 52 + i, 8, color=system_pal(profile, "accent"), bold=True, priority=2))
+-        objects.append(text_obj("%s_governance_%d_v" % (sid, i), "body", v, gx + 72, ry, 138, 18, z + 56 + i, 8, color=system_pal(profile, "ink"), priority=5))
+-    add_atlas_legend(objects, sid + "_process", x + 18, y + h - 24, z + 80, profile, [("当前节点", "positive"), ("风险部署", "accent"), ("风控闸门", "warning")])
++        objects.append(text_obj("%s_governance_%d_k" % (sid, i), "research-folio", k, gx, ry, 68, 15, z + 72 + i, 8, color=system_pal(profile, "accent"), bold=True, priority=2))
++        objects.append(text_obj("%s_governance_%d_v" % (sid, i), "body", v, gx + 72, ry, 138, 18, z + 76 + i, 8, color=system_pal(profile, "ink"), priority=5))
++    add_atlas_legend(objects, sid + "_process", x + 804, y + 224, z + 100, profile, [("当前节点", "positive"), ("风险部署", "accent"), ("风控闸门", "warning")])
+ 
+ 
+ def compile_paper_slide(slide, index):
+@@ -1046,17 +1207,27 @@ def compile_paper_slide(slide, index):
+     paper_title_size = 23 if index == 1 else 28
+     title_size = fit_title_size_no_orphan(slide["title"], paper_title_w, paper_title_size, min_size=20)
+     title_h = max(76, estimate_text_height(slide["title"], paper_title_w, title_size) + 8)
+-    objects.append(text_obj(sid + "_title", "title", slide["title"], 96, 126, paper_title_w, title_h, 20, title_size, color=system_pal(profile, "ink"), bold=True, priority=5))
++    title_y = 126
++    objects.append(text_obj(sid + "_title", "title", slide["title"], 96, title_y, paper_title_w, title_h, 20, title_size, color=system_pal(profile, "ink"), bold=True, priority=5))
++    subtitle_y = title_y + title_h + 12
+     if slide.get("subtitle"):
+-        objects.append(text_obj(sid + "_subtitle", "body", slide.get("subtitle", ""), 98, 126 + title_h + 8, 780, 32, 21, 13, color=system_pal(profile, "muted"), priority=5))
+-    objects.append(shape_obj(sid + "_body_rule", "editorial-rule", 96, 244, 812, 1, 24, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=2, opacity=0.75, stroke_opacity=0.0))
+-    objects.append(text_obj(sid + "_exhibit_label", "research-folio", "EXHIBIT %02d / EVIDENCE CHAIN" % index, 96, 224, 280, 18, 25, 8, color=system_pal(profile, "accent"), bold=True, priority=2))
+-    add_body_paragraphs(objects, sid, body, 104, 268, 710, 42, 30, size=15, max_items=3, gap=10, profile={"palette": {"text": system_pal(profile, "ink"), "muted": system_pal(profile, "muted")}, "fonts": profile.get("fonts", {})})
+-    objects.append(shape_obj(sid + "_analyst_note_box", "analyst-note", 690, 268, 176, 96, 38, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "rule"), shape="rect", priority=3, opacity=1.0, stroke_opacity=0.55))
+-    objects.append(text_obj(sid + "_analyst_note_k", "research-folio", "ANALYST NOTE", 704, 280, 140, 16, 39, 8, color=system_pal(profile, "accent"), bold=True, priority=2))
+-    objects.append(text_obj(sid + "_analyst_note_t", "body", "结论优先，证据随后；所有数值保留为可编辑对象。", 704, 304, 140, 42, 40, 9, color=system_pal(profile, "muted"), priority=2))
++        objects.append(text_obj(sid + "_subtitle", "body", slide.get("subtitle", ""), 98, subtitle_y, 760, 34, 21, 13, color=system_pal(profile, "muted"), priority=5))
++    body_rule_y = max(252, subtitle_y + (48 if slide.get("subtitle") else 28))
++    body_y = body_rule_y + 24
++    objects.append(shape_obj(sid + "_body_rule", "editorial-rule", 96, body_rule_y, 812, 1, 24, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=2, opacity=0.75, stroke_opacity=0.0))
++    objects.append(text_obj(sid + "_exhibit_label", "research-folio", "EXHIBIT %02d / EVIDENCE CHAIN" % index, 96, body_rule_y - 22, 280, 18, 25, 8, color=system_pal(profile, "accent"), bold=True, priority=2))
++    # The analyst note is a right-column sidebar. Body text must never flow under it.
++    # Chart pages reserve the lower half for editable axes/labels, so keep all
++    # source paragraphs native but use a tighter research-brief rhythm.
++    body_line_h = 34 if slide.get("chart") else 42
++    body_size = 13 if slide.get("chart") else 15
++    body_gap = 6 if slide.get("chart") else 10
++    add_body_paragraphs(objects, sid, body, 104, body_y, 548, body_line_h, 30, size=body_size, max_items=3, gap=body_gap, profile={"palette": {"text": system_pal(profile, "ink"), "muted": system_pal(profile, "muted")}, "fonts": profile.get("fonts", {})})
++    objects.append(shape_obj(sid + "_analyst_note_box", "analyst-note", 676, body_y, 190, 106, 38, fill=system_pal(profile, "panel"), stroke=system_pal(profile, "rule"), shape="rect", priority=3, opacity=1.0, stroke_opacity=0.55))
++    objects.append(text_obj(sid + "_analyst_note_k", "research-folio", "ANALYST NOTE", 692, body_y + 12, 150, 16, 39, 8, color=system_pal(profile, "accent"), bold=True, priority=2))
++    objects.append(text_obj(sid + "_analyst_note_t", "body", "结论优先，证据随后；所有数值保留为可编辑对象。", 692, body_y + 36, 150, 48, 40, 9, color=system_pal(profile, "muted"), priority=2))
+     for i, metric in enumerate(metrics[:4], start=1):
+-        add_system_metric(objects, "%s_metric_%d" % (sid, i), metric, 892, 110 + (i - 1) * 96, 286, 90, 42 + i * 10, profile, role="ledger-metric")
++        add_system_metric(objects, "%s_metric_%d" % (sid, i), metric, 906, 112 + (i - 1) * 104, 272, 92, 42 + i * 10, profile, role="ledger-metric")
+     if slide.get("chart"):
+         objects.append(chart_obj(sid + "_chart", slide["chart"], 96, 394, 770, 196, 70, chart_profile_for_system(profile)))
+     elif slide.get("scenarios"):
+@@ -1081,7 +1252,7 @@ def compile_paper_slide(slide, index):
+         objects.append(shape_obj(sid + "_source_band", "research-folio", 82, 606, 1116, 1, 890, fill=system_pal(profile, "rule"), stroke=system_pal(profile, "rule"), shape="rect", priority=2, opacity=0.72, stroke_opacity=0.0))
+         objects.append(text_obj(sid + "_risk_note", "risk", slide["risk_note"], 86, 618, 1092, 28, 900, 9, color=system_pal(profile, "muted"), priority=5))
+     apply_text_dna(objects, profile)
+-    return {"id": sid, "objects": normalize_z(objects)}
++    return slide_ir(sid, objects)
+ 
+ 
+ def compile_atlas_slide(slide, index):
+@@ -1091,25 +1262,28 @@ def compile_atlas_slide(slide, index):
+     body = slide.get("body", [])
+     metrics = slide.get("metrics", [])
+     atlas_frame(objects, sid, index, slide)
+-    atlas_title_w = 600
+-    title_size = fit_title_size_no_orphan(slide["title"], atlas_title_w, 23, min_size=20)
+-    title_h = max(70, estimate_text_height(slide["title"], atlas_title_w, title_size) + 8)
+-    objects.append(text_obj(sid + "_title", "title", slide["title"], 82, 112, atlas_title_w, title_h, 20, title_size, color=system_pal(profile, "ink"), bold=True, priority=5))
++    atlas_title_w = 640
++    title_size = fit_title_size_no_orphan(slide["title"], atlas_title_w, 21, min_size=17)
++    title_h = min(72, max(54, estimate_text_height(slide["title"], atlas_title_w, title_size) + 10))
++    title_y = 98
++    objects.append(text_obj(sid + "_title", "title", slide["title"], 82, title_y, atlas_title_w, title_h, 20, title_size, color=system_pal(profile, "ink"), bold=True, priority=5))
++    subtitle_y = title_y + title_h + 8
+     if slide.get("subtitle"):
+-        objects.append(text_obj(sid + "_subtitle", "body", slide.get("subtitle", ""), 84, 112 + title_h + 8, 560, 46, 21, 12, color=system_pal(profile, "muted"), priority=5))
++        objects.append(text_obj(sid + "_subtitle", "body", slide.get("subtitle", ""), 84, subtitle_y, 600, 34, 21, 11, color=system_pal(profile, "muted"), priority=5))
++    body_y = 222
+     if slide.get("process"):
+         # Process slides already carry the main warning in the subtitle. Preserve
+         # same-content body text natively, but move it into the Signal Field note
+         # zone so the left narrative column does not create orphan punctuation.
+         if body:
+-            objects.append(text_obj(sid + "_signal_note", "body", body[0], 84, 250, 560, 32, 42, 9, color=system_pal(profile, "muted"), priority=5))
++            objects.append(text_obj(sid + "_signal_note", "body", body[0], 84, body_y + 22, 560, 34, 42, 9, color=system_pal(profile, "muted"), priority=5))
+     else:
+-        add_body_paragraphs(objects, sid, body, 88, 238, 470, 38, 30, size=14, max_items=3, gap=10, profile={"palette": {"text": system_pal(profile, "ink"), "muted": system_pal(profile, "muted")}})
++        add_body_paragraphs(objects, sid, body, 88, body_y, 500, 34, 30, size=12, max_items=3, gap=8, profile={"palette": {"text": system_pal(profile, "ink"), "muted": system_pal(profile, "muted")}})
+     if slide.get("chart") and len(metrics) >= 4:
+-        add_atlas_signal_field_map(objects, sid, metrics, 746, 232, 420, 268, 42, profile)
++        add_atlas_signal_field_map(objects, sid, metrics, 748, 236, 418, 268, 42, profile)
+     elif not slide.get("scenarios") and not slide.get("process"):
+         # Cover / thesis pages keep compact signal chips, but they no longer masquerade as a full Atlas map.
+-        tile_positions = [(742, 232), (898, 232), (1054, 232)]
++        tile_positions = [(748, 236), (904, 236), (1060, 236)]
+         for i, metric in enumerate(metrics[:3], start=1):
+             x, y = tile_positions[i - 1]
+             tone = system_tone_color(profile, metric.get("tone"))
+@@ -1119,7 +1293,7 @@ def compile_atlas_slide(slide, index):
+             objects.append(text_obj("%s_metric_%d_delta" % (sid, i), "metric-note", metric.get("delta", ""), x + 12, y + 54, 114, 22, 46 + i * 10, 8, color=tone, priority=4))
+         # Fill the lower half of the right panel with a real decision map.
+         # Allocation pages need an auditable if/then chain instead of repeated KPI cards.
+-        map_x, map_y = 748, 338
++        map_x, map_y = 748, 342
+         is_allocation_chart = bool(slide.get("chart")) and (slide.get("chart", {}).get("categories", [])[:3] == ["当前", "建议", "上限"])
+         objects.append(text_obj(sid + "_right_field_head", "research-folio", "DECISION CHAIN / LIMIT GUARDRAIL" if is_allocation_chart else "BUDGET CORRIDOR / DECISION MAP", map_x, map_y, 330, 16, 74, 8, color=system_pal(profile, "muted"), bold=True, priority=2))
+         if is_allocation_chart:
+@@ -1159,17 +1333,17 @@ def compile_atlas_slide(slide, index):
+                 objects.append(text_obj("%s_decision_rule_%d_key" % (sid, j), "research-folio", key, map_x, yy, 76, 14, 104 + j, 8, color=system_pal(profile, "accent"), bold=True, priority=3))
+                 objects.append(text_obj("%s_decision_rule_%d_val" % (sid, j), "body", val, map_x + 82, yy, 300, 16, 108 + j, 8, color=system_pal(profile, "ink"), priority=5))
+     if slide.get("chart"):
+-        add_atlas_budget_route_map(objects, sid, slide["chart"], 88, 392, 640, 196, 78, profile)
++        add_atlas_budget_route_map(objects, sid, slide["chart"], 88, 398, 610, 204, 78, profile)
+     elif slide.get("scenarios"):
+-        add_atlas_scenario_map(objects, sid, metrics, slide.get("scenarios", []), 710, 228, 486, 352, 78, profile)
++        add_atlas_scenario_map(objects, sid, metrics, slide.get("scenarios", []), 724, 232, 468, 344, 78, profile)
+     elif slide.get("process"):
+-        add_atlas_process_state_machine(objects, sid, slide.get("process", []), metrics, 88, 344, 1088, 244, 78, profile)
++        add_atlas_process_state_machine(objects, sid, slide.get("process", []), metrics, 88, 306, 1088, 278, 78, profile)
+     if slide.get("risk_note"):
+-        objects.append(shape_obj(sid + "_footer_mask", "footer-mask", 76, 600, 1128, 54, 888, fill=system_pal(profile, "background"), stroke=system_pal(profile, "background"), shape="rect", priority=1, opacity=0.94, stroke_opacity=0.0))
+-        objects.append(shape_obj(sid + "_source_band", "route-line", 76, 604, 1128, 2, 890, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.08, stroke_opacity=0.0))
+-        objects.append(text_obj(sid + "_risk_note", "risk", slide["risk_note"], 84, 618, 1090, 26, 900, 9, color=system_pal(profile, "muted"), priority=5))
++        objects.append(shape_obj(sid + "_footer_mask", "footer-mask", 80, 620, 1120, 34, 888, fill=system_pal(profile, "background"), stroke=system_pal(profile, "background"), shape="rect", priority=1, opacity=0.78, stroke_opacity=0.0))
++        objects.append(shape_obj(sid + "_source_band", "route-line", 80, 622, 1120, 1, 890, fill=system_pal(profile, "positive"), stroke=system_pal(profile, "positive"), shape="rect", priority=2, opacity=0.04, stroke_opacity=0.0))
++        objects.append(text_obj(sid + "_risk_note", "risk", slide["risk_note"], 88, 630, 1080, 20, 900, 9, color=system_pal(profile, "muted"), priority=5))
+     apply_text_dna(objects, profile)
+-    return {"id": sid, "objects": normalize_z(objects)}
++    return slide_ir(sid, objects)
+ 
+ 
+ def compile_visual_system_contract(contract):
+diff --git a/workspace/ultimate-pptx-builder/scripts/validate_skill.py b/workspace/ultimate-pptx-builder/scripts/validate_skill.py
+index b8accc9..d56697e 100644
+--- a/workspace/ultimate-pptx-builder/scripts/validate_skill.py
++++ b/workspace/ultimate-pptx-builder/scripts/validate_skill.py
+@@ -30,6 +30,7 @@ REQUIRED = [
+     "references/pptx-capability-matrix.md",
+     "references/qa-loop.md",
+     "references/layout-text-safety.md",
++    "references/text-spacing-and-alignment-qa.md",
+     "references/layout-defect-taxonomy.md",
+     "references/finance-benchmark-decks.md",
+     "references/visual-quality-rubric.md",
+@@ -82,6 +83,9 @@ REQUIRED = [
+     "scripts/compare_slide_images.py",
+     "scripts/run_visual_fidelity.py",
+     "scripts/check_layout_safety.py",
++    "scripts/check_text_spacing.py",
++    "scripts/check_alignment_graph.py",
++    "scripts/check_component_layout_contract.py",
+     "scripts/check_visual_layout_architecture.py",
+     "scripts/check_visual_aesthetic_contract.py",
+     "scripts/check_narrative_safety.py",
+@@ -91,6 +95,10 @@ REQUIRED = [
+     "scripts/validate_visual_systems.py",
+     "scripts/validate_glass_showcase.py",
+     "scripts/validate_glass_benchmark.py",
++    "tests/test_visual_aesthetic_contract.py",
++    "tests/test_pptx_alpha_export.py",
++    "tests/test_text_spacing_and_alignment_gates.py",
++    "tests/test_component_layout_contract.py",
+ ]
+ CRITICAL_ROLES = {"title", "body", "risk", "source", "footnote"}
+ 
+@@ -137,6 +145,7 @@ def check_acceptance_language():
+         "references/phase3-pptx-export.md",
+         "references/phase4-qa-report.md",
+         "references/layout-text-safety.md",
++        "references/text-spacing-and-alignment-qa.md",
+         "references/layout-defect-taxonomy.md",
+         "references/phase4b-visual-fidelity.md",
+         "references/style-glass-fintech-pptx.md",
+@@ -543,6 +552,38 @@ def check_visual_systems():
+         fail("multi-visual-system validator did not report PASS")
+     print("PASS multi-visual-system generalization")
+ 
++
++def check_visual_aesthetic_contract_tests():
++    cmd = [sys.executable, "-m", "unittest", "tests/test_visual_aesthetic_contract.py", "-v"]
++    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
++    if proc.returncode != 0:
++        fail("visual aesthetic contract regression tests failed: " + (proc.stderr or proc.stdout))
++    print("PASS visual aesthetic contract regression tests")
++
++
++def check_pptx_alpha_export_tests():
++    cmd = [sys.executable, "-m", "unittest", "tests/test_pptx_alpha_export.py", "-v"]
++    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
++    if proc.returncode != 0:
++        fail("pptx alpha export regression tests failed: " + (proc.stderr or proc.stdout))
++    print("PASS pptx alpha export regression tests")
++
++def check_text_spacing_alignment_tests():
++    cmd = [sys.executable, "-m", "unittest", "tests/test_text_spacing_and_alignment_gates.py", "-v"]
++    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
++    if proc.returncode != 0:
++        fail("text spacing/alignment graph regression tests failed: " + (proc.stderr or proc.stdout))
++    print("PASS text spacing/alignment graph regression tests")
++
++
++def check_component_layout_contract_tests():
++    cmd = [sys.executable, "-m", "unittest", "tests/test_component_layout_contract.py", "-v"]
++    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
++    if proc.returncode != 0:
++        fail("component layout contract regression tests failed: " + (proc.stderr or proc.stdout))
++    print("PASS component layout contract regression tests")
++
++
+ def main():
+     check_required_files()
+     check_skill_frontmatter()
+@@ -560,6 +601,10 @@ def main():
+     check_narrative_visual_orthogonality()
+     check_glass_variants()
+     check_visual_systems()
++    check_visual_aesthetic_contract_tests()
++    check_pptx_alpha_export_tests()
++    check_text_spacing_alignment_tests()
++    check_component_layout_contract_tests()
+     print("ALL CHECKS PASSED")
+ 
+ if __name__ == "__main__":
+diff --git a/workspace/ultimate-pptx-builder/scripts/validate_visual_systems.py b/workspace/ultimate-pptx-builder/scripts/validate_visual_systems.py
+index d38bb77..9af48e1 100644
+--- a/workspace/ultimate-pptx-builder/scripts/validate_visual_systems.py
++++ b/workspace/ultimate-pptx-builder/scripts/validate_visual_systems.py
+@@ -175,6 +175,9 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
+     pptx_path = build / ("%s.pptx" % style_program)
+     narrative_path = build / ("%s-narrative-safety-report.json" % style_program)
+     layout_path = build / ("%s-layout-safety-report.json" % style_program)
++    text_spacing_path = build / ("%s-text-spacing-report.json" % style_program)
++    alignment_graph_path = build / ("%s-alignment-graph-report.json" % style_program)
++    component_layout_path = build / ("%s-component-layout-contract-report.json" % style_program)
+     visual_layout_path = build / ("%s-visual-layout-architecture-report.json" % style_program)
+     aesthetic_path = build / ("%s-visual-aesthetic-contract-report.json" % style_program)
+     export_path = build / ("%s-export-report.json" % style_program)
+@@ -193,6 +196,18 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
+     layout = load_json(layout_path)
+     if layout.get("release_decision") != "pass" or layout.get("blocking_count", 0):
+         fail("%s layout safety failed: %s" % (style_program, layout_path.relative_to(ROOT)))
++    run([sys.executable, str(ROOT / "scripts" / "check_text_spacing.py"), str(ir_path), "--report", str(text_spacing_path)])
++    text_spacing = load_json(text_spacing_path)
++    if text_spacing.get("release_decision") != "pass" or text_spacing.get("blocking_count", 0):
++        fail("%s text spacing failed: %s" % (style_program, text_spacing_path.relative_to(ROOT)))
++    run([sys.executable, str(ROOT / "scripts" / "check_alignment_graph.py"), str(ir_path), "--report", str(alignment_graph_path)])
++    alignment_graph = load_json(alignment_graph_path)
++    if alignment_graph.get("release_decision") != "pass" or alignment_graph.get("blocking_count", 0):
++        fail("%s alignment graph failed: %s" % (style_program, alignment_graph_path.relative_to(ROOT)))
++    run([sys.executable, str(ROOT / "scripts" / "check_component_layout_contract.py"), str(ir_path), "--report", str(component_layout_path)])
++    component_layout = load_json(component_layout_path)
++    if component_layout.get("release_decision") != "pass" or component_layout.get("blocking_count", 0):
++        fail("%s component layout contract failed: %s" % (style_program, component_layout_path.relative_to(ROOT)))
+     run([sys.executable, str(ROOT / "scripts" / "check_visual_layout_architecture.py"), str(ir_path), "--report", str(visual_layout_path)])
+     visual_layout = load_json(visual_layout_path)
+     if visual_layout.get("release_decision") != "pass" or visual_layout.get("blocking_count", 0):

@@ -175,6 +175,9 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     pptx_path = build / ("%s.pptx" % style_program)
     narrative_path = build / ("%s-narrative-safety-report.json" % style_program)
     layout_path = build / ("%s-layout-safety-report.json" % style_program)
+    text_spacing_path = build / ("%s-text-spacing-report.json" % style_program)
+    alignment_graph_path = build / ("%s-alignment-graph-report.json" % style_program)
+    component_layout_path = build / ("%s-component-layout-contract-report.json" % style_program)
     visual_layout_path = build / ("%s-visual-layout-architecture-report.json" % style_program)
     aesthetic_path = build / ("%s-visual-aesthetic-contract-report.json" % style_program)
     export_path = build / ("%s-export-report.json" % style_program)
@@ -193,6 +196,18 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     layout = load_json(layout_path)
     if layout.get("release_decision") != "pass" or layout.get("blocking_count", 0):
         fail("%s layout safety failed: %s" % (style_program, layout_path.relative_to(ROOT)))
+    run([sys.executable, str(ROOT / "scripts" / "check_text_spacing.py"), str(ir_path), "--report", str(text_spacing_path)])
+    text_spacing = load_json(text_spacing_path)
+    if text_spacing.get("release_decision") != "pass" or text_spacing.get("blocking_count", 0):
+        fail("%s text spacing failed: %s" % (style_program, text_spacing_path.relative_to(ROOT)))
+    run([sys.executable, str(ROOT / "scripts" / "check_alignment_graph.py"), str(ir_path), "--report", str(alignment_graph_path)])
+    alignment_graph = load_json(alignment_graph_path)
+    if alignment_graph.get("release_decision") != "pass" or alignment_graph.get("blocking_count", 0):
+        fail("%s alignment graph failed: %s" % (style_program, alignment_graph_path.relative_to(ROOT)))
+    run([sys.executable, str(ROOT / "scripts" / "check_component_layout_contract.py"), str(ir_path), "--report", str(component_layout_path)])
+    component_layout = load_json(component_layout_path)
+    if component_layout.get("release_decision") != "pass" or component_layout.get("blocking_count", 0):
+        fail("%s component layout contract failed: %s" % (style_program, component_layout_path.relative_to(ROOT)))
     run([sys.executable, str(ROOT / "scripts" / "check_visual_layout_architecture.py"), str(ir_path), "--report", str(visual_layout_path)])
     visual_layout = load_json(visual_layout_path)
     if visual_layout.get("release_decision") != "pass" or visual_layout.get("blocking_count", 0):

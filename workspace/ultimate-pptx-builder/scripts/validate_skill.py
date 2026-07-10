@@ -30,6 +30,9 @@ REQUIRED = [
     "references/pptx-capability-matrix.md",
     "references/qa-loop.md",
     "references/layout-text-safety.md",
+    "references/text-spacing-and-alignment-qa.md",
+    "references/component-contract-dsl.md",
+    "references/authored-layout-graph.md",
     "references/layout-defect-taxonomy.md",
     "references/finance-benchmark-decks.md",
     "references/visual-quality-rubric.md",
@@ -56,6 +59,7 @@ REQUIRED = [
     "schemas/qa-report.schema.json",
     "schemas/narrative-kernel.schema.json",
     "schemas/visual-anchor.schema.json",
+    "schemas/component-contract.schema.json",
     "examples/minimal-deck.ir.json",
     "examples/swiss-grid-pptx.style.json",
     "examples/glass-fintech-pptx.style.json",
@@ -68,6 +72,7 @@ REQUIRED = [
     "examples/visual-anchors/glass-fintech-pptx.anchor.json",
     "examples/visual-anchors/paper-analyst-report.anchor.json",
     "examples/visual-anchors/market-atlas-infographic.anchor.json",
+    "examples/component-contracts/atlas-route-map.contract.json",
     "examples/variants/glass-fintech-matte-institutional.contract.json",
     "examples/variants/glass-fintech-luminous-glass.contract.json",
     "examples/variants/glass-fintech-terminal-cockpit.contract.json",
@@ -82,6 +87,10 @@ REQUIRED = [
     "scripts/compare_slide_images.py",
     "scripts/run_visual_fidelity.py",
     "scripts/check_layout_safety.py",
+    "scripts/check_text_spacing.py",
+    "scripts/check_alignment_graph.py",
+    "scripts/check_component_layout_contract.py",
+    "scripts/check_component_contracts.py",
     "scripts/check_visual_layout_architecture.py",
     "scripts/check_visual_aesthetic_contract.py",
     "scripts/check_narrative_safety.py",
@@ -91,6 +100,12 @@ REQUIRED = [
     "scripts/validate_visual_systems.py",
     "scripts/validate_glass_showcase.py",
     "scripts/validate_glass_benchmark.py",
+    "tests/test_visual_aesthetic_contract.py",
+    "tests/test_pptx_alpha_export.py",
+    "tests/test_text_spacing_and_alignment_gates.py",
+    "tests/test_component_layout_contract.py",
+    "tests/test_component_contract_dsl.py",
+    "tests/test_authored_layout_graph.py",
 ]
 CRITICAL_ROLES = {"title", "body", "risk", "source", "footnote"}
 
@@ -137,6 +152,7 @@ def check_acceptance_language():
         "references/phase3-pptx-export.md",
         "references/phase4-qa-report.md",
         "references/layout-text-safety.md",
+        "references/text-spacing-and-alignment-qa.md",
         "references/layout-defect-taxonomy.md",
         "references/phase4b-visual-fidelity.md",
         "references/style-glass-fintech-pptx.md",
@@ -543,6 +559,55 @@ def check_visual_systems():
         fail("multi-visual-system validator did not report PASS")
     print("PASS multi-visual-system generalization")
 
+
+def check_visual_aesthetic_contract_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_visual_aesthetic_contract.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("visual aesthetic contract regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS visual aesthetic contract regression tests")
+
+
+def check_pptx_alpha_export_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_pptx_alpha_export.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("pptx alpha export regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS pptx alpha export regression tests")
+
+def check_text_spacing_alignment_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_text_spacing_and_alignment_gates.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("text spacing/alignment graph regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS text spacing/alignment graph regression tests")
+
+
+def check_component_layout_contract_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_component_layout_contract.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("component layout contract regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS component layout contract regression tests")
+
+
+
+
+def check_component_contract_dsl_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_component_contract_dsl.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("component contract DSL regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS component contract DSL regression tests")
+
+
+def check_authored_layout_graph_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_authored_layout_graph.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("authored layout graph regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS authored layout graph regression tests")
+
 def main():
     check_required_files()
     check_skill_frontmatter()
@@ -560,6 +625,12 @@ def main():
     check_narrative_visual_orthogonality()
     check_glass_variants()
     check_visual_systems()
+    check_visual_aesthetic_contract_tests()
+    check_pptx_alpha_export_tests()
+    check_text_spacing_alignment_tests()
+    check_component_layout_contract_tests()
+    check_component_contract_dsl_tests()
+    check_authored_layout_graph_tests()
     print("ALL CHECKS PASSED")
 
 if __name__ == "__main__":

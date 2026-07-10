@@ -150,6 +150,7 @@ def main():
     html_path = BUILD / "glass-fintech-showcase.html"
     pptx_path = BUILD / "glass-fintech-showcase.pptx"
     export_report_path = BUILD / "glass-fintech-export-report.json"
+    aesthetic_report_path = BUILD / "glass-fintech-visual-aesthetic-contract-report.json"
     visual_report_path = BUILD / "glass-fintech-visual-fidelity-report.json"
     qa_report_path = BUILD / "glass-fintech-qa-report.json"
     run([sys.executable, str(ROOT / "scripts" / "compile_spec_to_ir.py"), str(ROOT / "examples" / "glass-fintech-showcase.contract.json"), str(ir_path)])
@@ -157,6 +158,10 @@ def main():
     check_ir(ir)
     run([sys.executable, str(ROOT / "scripts" / "render_ir_html.py"), str(ir_path), str(html_path)])
     check_html_trace(ir, html_path)
+    run([sys.executable, str(ROOT / "scripts" / "check_visual_aesthetic_contract.py"), str(ir_path), "--report", str(aesthetic_report_path)])
+    aesthetic = load_json(aesthetic_report_path) or {}
+    if aesthetic.get("release_decision") != "pass" or aesthetic.get("blocking_count", 0):
+        fail("HTML-stage visual aesthetic contract failed")
     run([sys.executable, str(ROOT / "scripts" / "export_ir_pptx.py"), str(ir_path), str(pptx_path), "--report", str(export_report_path)])
     export_report = load_json(export_report_path)
     if export_report.get("release_decision") != "pass" or export_report.get("blocking_issues"):

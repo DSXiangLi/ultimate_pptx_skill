@@ -1,0 +1,203 @@
+{
+  "gate": "alignment_graph",
+  "release_decision": "pass",
+  "blocking_count": 0,
+  "warning_count": 13,
+  "issues": [
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls02",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls02_budget_map_title",
+          "ls02_macro_matrix_1_body"
+        ],
+        "delta": 12.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls04",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls04_scenario_zone_1_impact",
+          "ls04_scenario_zone_1_action"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls04",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls04_scenario_zone_1_impact",
+          "ls04_scenario_zone_2_action"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls04",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls04_scenario_zone_1_impact",
+          "ls04_scenario_zone_3_action"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls04",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls04_scenario_zone_1_action",
+          "ls04_scenario_zone_2_impact"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls04",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls04_scenario_zone_1_action",
+          "ls04_scenario_zone_3_impact"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls04",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls04_scenario_zone_2_impact",
+          "ls04_scenario_zone_2_action"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls05",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls05_process_signal_1_label",
+          "ls05_state_num_1"
+        ],
+        "delta": 15.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls05",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls05_process_signal_2_step",
+          "ls05_state_text_2"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls05",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls05_process_signal_2_delta",
+          "ls05_state_text_2"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls05",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls05_process_signal_3_step",
+          "ls05_state_title_3"
+        ],
+        "delta": 16.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls05",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls05_process_signal_3_label",
+          "ls05_state_title_3"
+        ],
+        "delta": 10.0
+      }
+    },
+    {
+      "code": "INFERRED_ALIGNMENT_NEAR_MISS",
+      "severity": "warning",
+      "slide_id": "ls05",
+      "relation_id": "inferred-left-edge",
+      "relation_type": "inferred",
+      "message": "priority objects have near-miss left edges",
+      "evidence": {
+        "objects": [
+          "ls05_process_signal_3_delta",
+          "ls05_state_title_3"
+        ],
+        "delta": 16.0
+      }
+    }
+  ]
+}

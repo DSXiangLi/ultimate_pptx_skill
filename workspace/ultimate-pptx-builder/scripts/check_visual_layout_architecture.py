@@ -76,6 +76,13 @@ def area(b):
     return max(0.0, float(b.get("w", 0))) * max(0.0, float(b.get("h", 0)))
 
 
+def overlap_area(a, b):
+    x1 = max(float(a.get("x", 0)), float(b.get("x", 0)))
+    y1 = max(float(a.get("y", 0)), float(b.get("y", 0)))
+    x2 = min(right(a), right(b))
+    y2 = min(bottom(a), bottom(b))
+    return max(0.0, x2 - x1) * max(0.0, y2 - y1)
+
 def intersects(a, b, pad=0.0):
     return not (
         right(a) <= float(b.get("x", 0)) - pad
@@ -87,6 +94,33 @@ def intersects(a, b, pad=0.0):
 
 def style_size(o):
     return float((o.get("style") or {}).get("size", 0) or 0)
+
+
+def union_box(boxes):
+    boxes = [b for b in boxes if b]
+    if not boxes:
+        return None
+    x1 = min(float(b.get("x", 0)) for b in boxes)
+    y1 = min(float(b.get("y", 0)) for b in boxes)
+    x2 = max(right(b) for b in boxes)
+    y2 = max(bottom(b) for b in boxes)
+    return {"x": x1, "y": y1, "w": x2 - x1, "h": y2 - y1}
+
+
+def near_any(value, anchors, tolerance=6):
+    return any(abs(float(value) - float(a)) <= tolerance for a in anchors)
+
+
+def is_atlas_primary_surface(o):
+    role = o.get("role")
+    oid = o.get("id", "")
+    return (
+        role in {"background", "route-map", "scenario-map", "process-state-map", "signal-field", "trigger-row"}
+        or oid.endswith("_zone_left")
+        or oid.endswith("_zone_right")
+        or oid.endswith("_zone_bottom")
+        or oid.endswith("_footer_mask")
+    )
 
 
 def load_deck(path: Path):
@@ -176,6 +210,102 @@ def check_deck(deck):
                         risk.get("id"), "S",
                         "Add a dedicated footer-mask above decorative motifs and below risk/source text.",
                     )
+            zones = [o for o in objects if o.get("role") == "background" and "_zone_" in o.get("id", "")]
+            for i, a in enumerate(zones):
+                for b in zones[i + 1:]:
+                    oa = overlap_area(box(a), box(b))
+                    if oa > 1800:
+                        issue(
+                            issues, deck, slide,
+                            "ATLAS_CONTENT_ZONE_OVERLAP", "blocking",
+                            f"Atlas content zones overlap by {oa:.0f}px²; stacked translucent masks create muddy opacity and fake container collisions.",
+                            f"{a.get('id')} / {b.get('id')}", "S",
+                            "Use non-overlapping functional islands aligned to title/body/chart/right-field regions.",
+                        )
+            right_zone = next((o for o in zones if o.get("id", "").endswith("_zone_right")), None)
+            bottom_zone = next((o for o in zones if o.get("id", "").endswith("_zone_bottom")), None)
+            if right_zone and bottom_zone and overlap_area(box(right_zone), box(bottom_zone)) > 0:
+                issue(
+                    issues, deck, slide,
+                    "ATLAS_RIGHT_PANEL_BOTTOM_BAND_COLLISION", "blocking",
+                    "Right signal/decision panel intersects the bottom allocation band; this reads as a card sitting inside another translucent container.",
+                    f"{right_zone.get('id')} / {bottom_zone.get('id')}", "S",
+                    "Separate right panel and bottom band with a visible gutter; do not let background masks run behind semantic cards.",
+                )
+
+            # Institution-grade Atlas grammar: stable two-column grid, light title band,
+            # weak footer rail, and controlled information density. These checks catch
+            # defects that geometric overlap/fidelity scores miss.
+            subtitles = [o for o in objects if o.get("role") == "body" and o.get("id", "").endswith("_subtitle")]
+            title_zone = union_box([box(o) for o in titles + subtitles])
+            if title_zone and bottom(title_zone) > 214:
+                issue(
+                    issues, deck, slide,
+                    "ATLAS_TITLE_ZONE_OVERWEIGHT", "blocking",
+                    f"Atlas title/subtitle band extends to y={bottom(title_zone):.0f}; title zone is visually too heavy and pushes the map grammar down.",
+                    title.get("id") if title else None, "S",
+                    "Keep Atlas title+subtitle inside a light header band ending by y=214; main content should start from a stable body grid.",
+                )
+            if title_zone:
+                for zone in zones:
+                    oa = overlap_area(box(zone), title_zone)
+                    if oa > 3200:
+                        issue(
+                            issues, deck, slide,
+                            "ATLAS_TITLE_ZONE_MASK_INTRUSION", "blocking",
+                            f"Atlas content mask overlaps title band by {oa:.0f}px²; this makes the header read like a heavy container instead of a light map caption.",
+                            zone.get("id"), "S",
+                            "Content masks should start below the title band; do not place large translucent panels behind title/subtitle copy.",
+                        )
+            for rz in [o for o in zones if o.get("id", "").endswith("_zone_right")]:
+                x = float(box(rz).get("x", 0))
+                if x < 720 or x > 748:
+                    issue(
+                        issues, deck, slide,
+                        "ATLAS_RIGHT_PANEL_FLOATING", "blocking",
+                        f"Atlas right panel starts at x={x:.0f}; it drifts off the intended right-column grid and reads as a floating card.",
+                        rz.get("id"), "S",
+                        "Align right decision/signal panels to a stable right-column x around 724–744 with a consistent gutter from the left map column.",
+                    )
+            for fm in footer_masks:
+                fb = box(fm)
+                op = float(fm.get("opacity", 1) or 1)
+                if float(fb.get("h", 0)) > 44 or op > 0.90:
+                    issue(
+                        issues, deck, slide,
+                        "ATLAS_FOOTER_DOMINANCE", "blocking",
+                        f"Atlas footer mask h={float(fb.get('h', 0)):.0f}, opacity={op:.2f}; footer rail is too visually dominant for finance review pages.",
+                        fm.get("id"), "S",
+                        "Use a thin low-emphasis footer rail: h<=44, opacity<=0.90, with risk text separated from the main map field.",
+                    )
+            atlas_microtext = [
+                o for o in objects
+                if o.get("role") in {"metric-note", "process-step", "body"}
+                and style_size(o) and style_size(o) < 8
+            ]
+            if len(atlas_microtext) > 4:
+                issue(
+                    issues, deck, slide,
+                    "ATLAS_DENSITY_PARITY_FAILURE", "blocking",
+                    f"Atlas slide has {len(atlas_microtext)} business text objects below 8px; density is being hidden as microtext instead of handled by layout grammar.",
+                    None, "S",
+                    "Increase component size/spacing, create a dedicated decision strip, or split density across map + right rail without deleting same-content evidence.",
+                )
+
+        if "paper-analyst" in style:
+            note_boxes = [o for o in objects if o.get("role") == "analyst-note" and o.get("type") == "shape" and o.get("id", "").endswith("_analyst_note_box")]
+            body_texts = [o for o in objects if o.get("role") == "body" and o.get("type") == "text" and "analyst_note" not in o.get("id", "")]
+            for note in note_boxes:
+                for text in body_texts:
+                    oa = overlap_area(box(note), box(text))
+                    if oa > 80:
+                        issue(
+                            issues, deck, slide,
+                            "PAPER_ANALYST_NOTE_COVERS_BODY", "blocking",
+                            f"Analyst note overlaps body text by {oa:.0f}px²; this is visible text/container collision, not acceptable editorial layering.",
+                            f"{note.get('id')} / {text.get('id')}", "S",
+                            "Reserve a dedicated sidebar column or reduce body text width; body paragraphs must not flow beneath notes.",
+                        )
 
         # Decorative layer must stay subordinate to content. Strong map grids/routes
         # and large glows can pass geometry checks while still making the slide feel

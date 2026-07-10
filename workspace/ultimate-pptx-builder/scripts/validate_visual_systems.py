@@ -180,6 +180,7 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     component_layout_path = build / ("%s-component-layout-contract-report.json" % style_program)
     visual_layout_path = build / ("%s-visual-layout-architecture-report.json" % style_program)
     aesthetic_path = build / ("%s-visual-aesthetic-contract-report.json" % style_program)
+    visual_dna_path = build / ("%s-visual-dna-realization-report.json" % style_program)
     export_path = build / ("%s-export-report.json" % style_program)
     visual_path = build / ("%s-visual-fidelity-report.json" % style_program)
     qa_path = build / ("%s-qa-report.json" % style_program)
@@ -216,6 +217,10 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     aesthetic = load_json(aesthetic_path)
     if aesthetic.get("release_decision") != "pass" or aesthetic.get("blocking_count", 0):
         fail("%s visual aesthetic contract failed: %s" % (style_program, aesthetic_path.relative_to(ROOT)))
+    run([sys.executable, str(ROOT / "scripts" / "check_visual_dna_realization.py"), str(ir_path), "--report", str(visual_dna_path)])
+    visual_dna = load_json(visual_dna_path)
+    if visual_dna.get("release_decision") != "pass" or visual_dna.get("blocking_count", 0):
+        fail("%s visual DNA realization failed: %s" % (style_program, visual_dna_path.relative_to(ROOT)))
     run([sys.executable, str(ROOT / "scripts" / "export_ir_pptx.py"), str(ir_path), str(pptx_path), "--report", str(export_path)])
     run([sys.executable, str(ROOT / "scripts" / "check_pptx_package.py"), str(pptx_path)])
     export = load_json(export_path)

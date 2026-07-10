@@ -50,6 +50,7 @@ REQUIRED = [
     "references/visual-variant-distinctiveness.md",
     "references/visual-system-generalization.md",
     "references/visual-dna-model.md",
+    "references/visual-dna-realization-gate.md",
     "docs/learning/README.md",
     "docs/learning/phase4b-visual-rendering.md",
     "docs/learning/glass-fintech-showcase.md",
@@ -93,6 +94,7 @@ REQUIRED = [
     "scripts/check_component_contracts.py",
     "scripts/check_visual_layout_architecture.py",
     "scripts/check_visual_aesthetic_contract.py",
+    "scripts/check_visual_dna_realization.py",
     "scripts/check_narrative_safety.py",
     "scripts/check_visual_anchor.py",
     "scripts/check_narrative_visual_orthogonality.py",
@@ -106,6 +108,7 @@ REQUIRED = [
     "tests/test_component_layout_contract.py",
     "tests/test_component_contract_dsl.py",
     "tests/test_authored_layout_graph.py",
+    "tests/test_visual_dna_realization.py",
 ]
 CRITICAL_ROLES = {"title", "body", "risk", "source", "footnote"}
 
@@ -608,6 +611,14 @@ def check_authored_layout_graph_tests():
         fail("authored layout graph regression tests failed: " + (proc.stderr or proc.stdout))
     print("PASS authored layout graph regression tests")
 
+
+def check_visual_dna_realization_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_visual_dna_realization.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("visual DNA realization regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS visual DNA realization regression tests")
+
 def main():
     check_required_files()
     check_skill_frontmatter()
@@ -631,6 +642,7 @@ def main():
     check_component_layout_contract_tests()
     check_component_contract_dsl_tests()
     check_authored_layout_graph_tests()
+    check_visual_dna_realization_tests()
     print("ALL CHECKS PASSED")
 
 if __name__ == "__main__":

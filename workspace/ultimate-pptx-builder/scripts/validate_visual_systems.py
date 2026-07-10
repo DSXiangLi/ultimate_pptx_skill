@@ -181,6 +181,8 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     visual_layout_path = build / ("%s-visual-layout-architecture-report.json" % style_program)
     aesthetic_path = build / ("%s-visual-aesthetic-contract-report.json" % style_program)
     visual_dna_path = build / ("%s-visual-dna-realization-report.json" % style_program)
+    ooxml_path = build / ("%s-ooxml-visual-properties-report.json" % style_program)
+    rendered_perceptual_path = build / ("%s-rendered-perceptual-layout-report.json" % style_program)
     export_path = build / ("%s-export-report.json" % style_program)
     visual_path = build / ("%s-visual-fidelity-report.json" % style_program)
     qa_path = build / ("%s-qa-report.json" % style_program)
@@ -222,6 +224,10 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     if visual_dna.get("release_decision") != "pass" or visual_dna.get("blocking_count", 0):
         fail("%s visual DNA realization failed: %s" % (style_program, visual_dna_path.relative_to(ROOT)))
     run([sys.executable, str(ROOT / "scripts" / "export_ir_pptx.py"), str(ir_path), str(pptx_path), "--report", str(export_path)])
+    run([sys.executable, str(ROOT / "scripts" / "check_ooxml_visual_properties.py"), str(ir_path), str(pptx_path), "--report", str(ooxml_path)])
+    ooxml = load_json(ooxml_path)
+    if ooxml.get("release_decision") != "pass" or ooxml.get("blocking_count", 0):
+        fail("%s OOXML visual property audit failed: %s" % (style_program, ooxml_path.relative_to(ROOT)))
     run([sys.executable, str(ROOT / "scripts" / "check_pptx_package.py"), str(pptx_path)])
     export = load_json(export_path)
     if export.get("critical_raster_count"):
@@ -231,6 +237,10 @@ def validate_system(style_program: str, config: dict, base_fingerprint: str, exp
     score = visual.get("visual_fidelity", {}).get("overall_score", 0)
     if score < THRESHOLD:
         fail("%s visual fidelity below threshold: %.2f" % (style_program, score))
+    run([sys.executable, str(ROOT / "scripts" / "check_rendered_perceptual_layout.py"), str(build / "visual-fidelity" / "actual"), "--report", str(rendered_perceptual_path)])
+    rendered_perceptual = load_json(rendered_perceptual_path)
+    if rendered_perceptual.get("release_decision") != "pass" or rendered_perceptual.get("blocking_count", 0):
+        fail("%s rendered perceptual layout failed: %s" % (style_program, rendered_perceptual_path.relative_to(ROOT)))
     run([sys.executable, str(ROOT / "scripts" / "run_qa.py"), str(ir_path), str(export_path), str(qa_path), "--pptx", str(pptx_path), "--visual-report", str(visual_path)])
     qa = load_json(qa_path)
     edit_score = qa.get("scores", {}).get("editability", 0)

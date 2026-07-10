@@ -41,6 +41,7 @@ REQUIRED = [
     "references/phase1-ir-compiler.md",
     "references/phase2-html-preview.md",
     "references/phase3-pptx-export.md",
+    "references/ooxml-and-rendered-perceptual-qa.md",
     "references/phase4-qa-report.md",
     "references/phase4b-visual-fidelity.md",
     "references/style-glass-fintech-pptx.md",
@@ -95,6 +96,8 @@ REQUIRED = [
     "scripts/check_visual_layout_architecture.py",
     "scripts/check_visual_aesthetic_contract.py",
     "scripts/check_visual_dna_realization.py",
+    "scripts/check_ooxml_visual_properties.py",
+    "scripts/check_rendered_perceptual_layout.py",
     "scripts/check_narrative_safety.py",
     "scripts/check_visual_anchor.py",
     "scripts/check_narrative_visual_orthogonality.py",
@@ -109,6 +112,7 @@ REQUIRED = [
     "tests/test_component_contract_dsl.py",
     "tests/test_authored_layout_graph.py",
     "tests/test_visual_dna_realization.py",
+    "tests/test_ooxml_and_rendered_qa.py",
 ]
 CRITICAL_ROLES = {"title", "body", "risk", "source", "footnote"}
 
@@ -619,6 +623,14 @@ def check_visual_dna_realization_tests():
         fail("visual DNA realization regression tests failed: " + (proc.stderr or proc.stdout))
     print("PASS visual DNA realization regression tests")
 
+
+def check_ooxml_and_rendered_qa_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_ooxml_and_rendered_qa.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("OOXML/rendered perceptual QA regression tests failed: " + (proc.stderr or proc.stdout))
+    print("PASS OOXML/rendered perceptual QA regression tests")
+
 def main():
     check_required_files()
     check_skill_frontmatter()
@@ -643,6 +655,7 @@ def main():
     check_component_contract_dsl_tests()
     check_authored_layout_graph_tests()
     check_visual_dna_realization_tests()
+    check_ooxml_and_rendered_qa_tests()
     print("ALL CHECKS PASSED")
 
 if __name__ == "__main__":

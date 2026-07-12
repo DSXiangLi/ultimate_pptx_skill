@@ -1,0 +1,11 @@
+{
+  "gate": "ooxml_visual_properties",
+  "release_decision": "pass",
+  "blocking_count": 0,
+  "warning_count": 0,
+  "evidence": {
+    "alpha_xml_count": 554,
+    "translucent_native_object_count": 0
+  },
+  "issues": []
+}

@@ -1,0 +1,61 @@
+{
+  "gate": "visual_dna_realization",
+  "style_program": "market-atlas-infographic",
+  "release_decision": "pass",
+  "blocking_count": 0,
+  "warning_count": 0,
+  "realization_score": 100.0,
+  "evidence": {
+    "role_counts": {
+      "atlas-canvas": 5,
+      "background": 11,
+      "atlas-gridline": 70,
+      "route-line": 22,
+      "map-node": 26,
+      "research-folio": 72,
+      "kicker": 5,
+      "title": 5,
+      "body": 31,
+      "signal-chip": 19,
+      "metric-label": 20,
+      "metric": 21,
+      "metric-note": 44,
+      "route-map": 8,
+      "footer-mask": 5,
+      "risk": 5,
+      "atlas-axis": 2,
+      "signal-node": 4,
+      "signal-vector": 8,
+      "trigger-row": 8,
+      "guardrail": 1,
+      "scenario-map": 1,
+      "scenario-branch": 3,
+      "scenario-zone": 3,
+      "legend-marker": 6,
+      "process-state-map": 1,
+      "signal-field": 1,
+      "process-step": 16,
+      "process-node": 4
+    },
+    "information_roles_present": [
+      "guardrail",
+      "map-node",
+      "process-state-map",
+      "route-map",
+      "scenario-map",
+      "signal-field",
+      "signal-node",
+      "trigger-row"
+    ],
+    "decorative_roles_present": [
+      "atlas-canvas",
+      "atlas-gridline",
+      "background",
+      "legend-marker",
+      "route-line"
+    ],
+    "required_groups_total": 3,
+    "missing_groups_count": 0
+  },
+  "issues": []
+}

@@ -1,0 +1,195 @@
+{
+  "gate": "rendered_perceptual_layout",
+  "release_decision": "pass",
+  "blocking_count": 0,
+  "warning_count": 5,
+  "slides": [
+    {
+      "path": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-01.png",
+      "w": 1281,
+      "h": 720,
+      "foreground_count": 279505,
+      "foreground_bbox": {
+        "x": 80,
+        "y": 0,
+        "w": 1201,
+        "h": 720
+      },
+      "bottom_gap_px": 0,
+      "issues": [
+        {
+          "code": "RENDERED_SIDE_EDGE_PRESSURE",
+          "severity": "warning",
+          "message": "Rendered foreground is close to horizontal edge",
+          "evidence": {
+            "slide": "slide-01.png",
+            "left_gap_px": 80,
+            "right_gap_px": 0,
+            "required_px": 7
+          }
+        }
+      ]
+    },
+    {
+      "path": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-02.png",
+      "w": 1281,
+      "h": 720,
+      "foreground_count": 247244,
+      "foreground_bbox": {
+        "x": 80,
+        "y": 0,
+        "w": 1201,
+        "h": 720
+      },
+      "bottom_gap_px": 0,
+      "issues": [
+        {
+          "code": "RENDERED_SIDE_EDGE_PRESSURE",
+          "severity": "warning",
+          "message": "Rendered foreground is close to horizontal edge",
+          "evidence": {
+            "slide": "slide-02.png",
+            "left_gap_px": 80,
+            "right_gap_px": 0,
+            "required_px": 7
+          }
+        }
+      ]
+    },
+    {
+      "path": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-03.png",
+      "w": 1281,
+      "h": 720,
+      "foreground_count": 240578,
+      "foreground_bbox": {
+        "x": 80,
+        "y": 0,
+        "w": 1201,
+        "h": 720
+      },
+      "bottom_gap_px": 0,
+      "issues": [
+        {
+          "code": "RENDERED_SIDE_EDGE_PRESSURE",
+          "severity": "warning",
+          "message": "Rendered foreground is close to horizontal edge",
+          "evidence": {
+            "slide": "slide-03.png",
+            "left_gap_px": 80,
+            "right_gap_px": 0,
+            "required_px": 7
+          }
+        }
+      ]
+    },
+    {
+      "path": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-04.png",
+      "w": 1281,
+      "h": 720,
+      "foreground_count": 227935,
+      "foreground_bbox": {
+        "x": 80,
+        "y": 0,
+        "w": 1201,
+        "h": 720
+      },
+      "bottom_gap_px": 0,
+      "issues": [
+        {
+          "code": "RENDERED_SIDE_EDGE_PRESSURE",
+          "severity": "warning",
+          "message": "Rendered foreground is close to horizontal edge",
+          "evidence": {
+            "slide": "slide-04.png",
+            "left_gap_px": 80,
+            "right_gap_px": 0,
+            "required_px": 7
+          }
+        }
+      ]
+    },
+    {
+      "path": "/home/lixiang/workspace/ultimate-pptx-builder/build/visual-system-market-atlas-infographic/visual-fidelity/actual/slide-05.png",
+      "w": 1281,
+      "h": 720,
+      "foreground_count": 179117,
+      "foreground_bbox": {
+        "x": 80,
+        "y": 0,
+        "w": 1201,
+        "h": 720
+      },
+      "bottom_gap_px": 0,
+      "issues": [
+        {
+          "code": "RENDERED_SIDE_EDGE_PRESSURE",
+          "severity": "warning",
+          "message": "Rendered foreground is close to horizontal edge",
+          "evidence": {
+            "slide": "slide-05.png",
+            "left_gap_px": 80,
+            "right_gap_px": 0,
+            "required_px": 7
+          }
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "code": "RENDERED_SIDE_EDGE_PRESSURE",
+      "severity": "warning",
+      "message": "Rendered foreground is close to horizontal edge",
+      "evidence": {
+        "slide": "slide-01.png",
+        "left_gap_px": 80,
+        "right_gap_px": 0,
+        "required_px": 7
+      }
+    },
+    {
+      "code": "RENDERED_SIDE_EDGE_PRESSURE",
+      "severity": "warning",
+      "message": "Rendered foreground is close to horizontal edge",
+      "evidence": {
+        "slide": "slide-02.png",
+        "left_gap_px": 80,
+        "right_gap_px": 0,
+        "required_px": 7
+      }
+    },
+    {
+      "code": "RENDERED_SIDE_EDGE_PRESSURE",
+      "severity": "warning",
+      "message": "Rendered foreground is close to horizontal edge",
+      "evidence": {
+        "slide": "slide-03.png",
+        "left_gap_px": 80,
+        "right_gap_px": 0,
+        "required_px": 7
+      }
+    },
+    {
+      "code": "RENDERED_SIDE_EDGE_PRESSURE",
+      "severity": "warning",
+      "message": "Rendered foreground is close to horizontal edge",
+      "evidence": {
+        "slide": "slide-04.png",
+        "left_gap_px": 80,
+        "right_gap_px": 0,
+        "required_px": 7
+      }
+    },
+    {
+      "code": "RENDERED_SIDE_EDGE_PRESSURE",
+      "severity": "warning",
+      "message": "Rendered foreground is close to horizontal edge",
+      "evidence": {
+        "slide": "slide-05.png",
+        "left_gap_px": 80,
+        "right_gap_px": 0,
+        "required_px": 7
+      }
+    }
+  ]
+}

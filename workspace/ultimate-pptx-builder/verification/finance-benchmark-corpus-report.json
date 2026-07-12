@@ -1,0 +1,18 @@
+{
+  "gate": "finance_benchmark_corpus",
+  "release_decision": "pass",
+  "blocking_count": 0,
+  "warning_count": 0,
+  "coverage": {
+    "cases": 9,
+    "scenario_density_pairs": 9,
+    "style_programs": 3,
+    "content_pressures": [
+      "high",
+      "low",
+      "medium"
+    ],
+    "required_gate_reports": 11
+  },
+  "issues": []
+}

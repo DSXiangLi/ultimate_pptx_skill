@@ -432,6 +432,19 @@ def main():
         results.append(validate_system(style_program, config, base_fingerprint, expected_texts))
     check_cross_system_distance(results)
     check_visual_dna_depth(results)
+    corpus_report_path = ROOT / "verification" / "finance-benchmark-corpus-report.json"
+    run([
+        sys.executable,
+        str(ROOT / "scripts" / "check_finance_benchmark_corpus.py"),
+        str(ROOT / "examples" / "benchmarks" / "finance-pptx-benchmark-corpus.json"),
+        "--build-root",
+        str(ROOT / "build"),
+        "--report",
+        str(corpus_report_path),
+    ])
+    corpus_report = load_json(corpus_report_path)
+    if corpus_report.get("release_decision") != "pass" or corpus_report.get("blocking_count", 0):
+        fail("finance benchmark corpus failed: %s" % corpus_report_path.relative_to(ROOT))
     print("PASS visual systems same_content=1 count=%d %s" % (len(results), "; ".join("%s score=%.2f edit=%.2f" % (r["style_program"], r["score"], r["editability"]) for r in results)))
 
 

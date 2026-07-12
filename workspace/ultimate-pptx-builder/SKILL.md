@@ -312,6 +312,7 @@ The visual/design critique starts at HTML preview time. If the HTML already show
 - [ ] `scripts/check_visual_dna_realization.py` runs inside multi-system validation and blocks shallow style anchors that are realized mainly through decoration instead of information-bearing chart/table/card/route-map/source-risk grammar.
 - [ ] `scripts/check_ooxml_visual_properties.py` audits exported PPTX XML so native alpha/critical text evidence survives materialization instead of existing only in IR/HTML previews.
 - [ ] `scripts/check_rendered_perceptual_layout.py` runs on rendered slide PNGs and blocks meaningful bottom-edge pressure that object-level IR gates may miss.
+- [ ] `examples/benchmarks/finance-pptx-benchmark-corpus.json` and `scripts/check_finance_benchmark_corpus.py` validate scenario × density × style coverage and require all formal gate reports before accepting multi-system regression.
 - [ ] `scripts/check_alignment_graph.py` validates declared `layout_relations` so PPTX QA can check alignment intent rather than relying only on overlap or a few hard-coded component names.
 - [ ] `scripts/check_component_layout_contract.py` validates complex component slots and semantic overlap policy so route-map bands, floating badges, guardrails, and footer annotations cannot pass as legal parent/child containment.
 - [ ] `scripts/check_component_contracts.py`, `schemas/component-contract.schema.json`, and `examples/component-contracts/*.contract.json` keep component contracts declarative instead of one-off hard-coded Python rules.

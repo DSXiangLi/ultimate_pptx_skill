@@ -35,6 +35,7 @@ REQUIRED = [
     "references/authored-layout-graph.md",
     "references/layout-defect-taxonomy.md",
     "references/finance-benchmark-decks.md",
+    "references/finance-benchmark-corpus.md",
     "references/visual-quality-rubric.md",
     "references/conversion-rules.md",
     "references/implementation-plan.md",
@@ -70,6 +71,7 @@ REQUIRED = [
     "examples/content-contract.sample.json",
     "examples/glass-fintech-showcase.contract.json",
     "examples/glass-fintech-benchmark.contract.json",
+    "examples/benchmarks/finance-pptx-benchmark-corpus.json",
     "examples/narrative-kernel.finance.json",
     "examples/visual-anchors/glass-fintech-pptx.anchor.json",
     "examples/visual-anchors/paper-analyst-report.anchor.json",
@@ -98,6 +100,7 @@ REQUIRED = [
     "scripts/check_visual_dna_realization.py",
     "scripts/check_ooxml_visual_properties.py",
     "scripts/check_rendered_perceptual_layout.py",
+    "scripts/check_finance_benchmark_corpus.py",
     "scripts/check_narrative_safety.py",
     "scripts/check_visual_anchor.py",
     "scripts/check_narrative_visual_orthogonality.py",
@@ -113,6 +116,7 @@ REQUIRED = [
     "tests/test_authored_layout_graph.py",
     "tests/test_visual_dna_realization.py",
     "tests/test_ooxml_and_rendered_qa.py",
+    "tests/test_finance_benchmark_corpus.py",
 ]
 CRITICAL_ROLES = {"title", "body", "risk", "source", "footnote"}
 
@@ -631,6 +635,18 @@ def check_ooxml_and_rendered_qa_tests():
         fail("OOXML/rendered perceptual QA regression tests failed: " + (proc.stderr or proc.stdout))
     print("PASS OOXML/rendered perceptual QA regression tests")
 
+
+def check_finance_benchmark_corpus_tests():
+    cmd = [sys.executable, "-m", "unittest", "tests/test_finance_benchmark_corpus.py", "-v"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("finance benchmark corpus regression tests failed: " + (proc.stderr or proc.stdout))
+    cmd = [sys.executable, "scripts/check_finance_benchmark_corpus.py", "examples/benchmarks/finance-pptx-benchmark-corpus.json", "--build-root", "build", "--report", "verification/finance-benchmark-corpus-report.json"]
+    proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+    if proc.returncode != 0:
+        fail("finance benchmark corpus build-root validation failed: " + (proc.stderr or proc.stdout))
+    print("PASS finance benchmark corpus regression tests")
+
 def main():
     check_required_files()
     check_skill_frontmatter()
@@ -656,6 +672,7 @@ def main():
     check_authored_layout_graph_tests()
     check_visual_dna_realization_tests()
     check_ooxml_and_rendered_qa_tests()
+    check_finance_benchmark_corpus_tests()
     print("ALL CHECKS PASSED")
 
 if __name__ == "__main__":

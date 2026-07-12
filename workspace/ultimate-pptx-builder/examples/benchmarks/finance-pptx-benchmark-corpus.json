@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "name": "finance-pptx-benchmark-corpus",
+  "description": "Regression corpus for finance-grade PPTX visual compiler: multi-scenario, multi-density, multi-style coverage with formal gate-report requirements.",
+  "required_style_programs": [
+    "glass-fintech-pptx",
+    "paper-analyst-report",
+    "market-atlas-infographic"
+  ],
+  "required_scenarios": [
+    "macro-review",
+    "fund-comparison",
+    "allocation-decision"
+  ],
+  "required_density_modes": [
+    "executive",
+    "analyst",
+    "dense"
+  ],
+  "required_gate_reports": [
+    "layout-safety",
+    "text-spacing",
+    "alignment-graph",
+    "component-layout-contract",
+    "visual-layout-architecture",
+    "visual-aesthetic-contract",
+    "visual-dna-realization",
+    "ooxml-visual-properties",
+    "rendered-perceptual-layout",
+    "visual-fidelity",
+    "qa-report"
+  ],
+  "cases": [
+    {
+      "id": "macro-exec",
+      "scenario": "macro-review",
+      "density_mode": "executive",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "low",
+      "must_preserve": ["conclusion", "source", "risk"]
+    },
+    {
+      "id": "macro-analyst",
+      "scenario": "macro-review",
+      "density_mode": "analyst",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "medium",
+      "must_preserve": ["evidence", "logic", "source", "risk"]
+    },
+    {
+      "id": "macro-dense",
+      "scenario": "macro-review",
+      "density_mode": "dense",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "high",
+      "must_preserve": ["conclusion", "evidence", "logic", "source", "risk"]
+    },
+    {
+      "id": "fund-exec",
+      "scenario": "fund-comparison",
+      "density_mode": "executive",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "low",
+      "must_preserve": ["recommendation", "source", "risk"]
+    },
+    {
+      "id": "fund-analyst",
+      "scenario": "fund-comparison",
+      "density_mode": "analyst",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "medium",
+      "must_preserve": ["recommendation", "evidence", "logic", "source", "risk"]
+    },
+    {
+      "id": "fund-dense",
+      "scenario": "fund-comparison",
+      "density_mode": "dense",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "high",
+      "must_preserve": ["recommendation", "evidence", "logic", "source", "risk"]
+    },
+    {
+      "id": "alloc-exec",
+      "scenario": "allocation-decision",
+      "density_mode": "executive",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "low",
+      "must_preserve": ["decision", "source", "risk"]
+    },
+    {
+      "id": "alloc-analyst",
+      "scenario": "allocation-decision",
+      "density_mode": "analyst",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "medium",
+      "must_preserve": ["decision", "evidence", "logic", "source", "risk"]
+    },
+    {
+      "id": "alloc-dense",
+      "scenario": "allocation-decision",
+      "density_mode": "dense",
+      "style_programs": ["glass-fintech-pptx", "paper-analyst-report", "market-atlas-infographic"],
+      "content_pressure": "high",
+      "must_preserve": ["decision", "evidence", "logic", "source", "risk"]
+    }
+  ]
+}

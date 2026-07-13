@@ -1,8 +1,10 @@
-# PPTX Cloner / Reverse Compiler
+# PPTX Cloner / Template Abstraction Reverse Compiler
 
 ## Purpose
 
-Use this sub-skill when the user provides one or more `.pptx` files and wants to clone the deck's **core visual effect**, extract a reusable visual system, or improve `ultimate-pptx-builder` by learning from high-quality real PowerPoint templates.
+Use this sub-skill when the user provides one or more `.pptx` files and wants to learn from the deck's **core visual effect**, extract a reusable visual/layout/component system, or improve `ultimate-pptx-builder` by learning from high-quality real PowerPoint templates.
+
+The product goal is **not** to reproduce or copy the original PPTX as the user-facing deliverable. The source deck is evidence. The deliverable is a reusable, editable template system that lets the user build **new PPTX decks with new content** while preserving the source deck's recognizable visual DNA, layout grammar, component vocabulary, information hierarchy, and PPTX material behavior.
 
 The cloner is a reverse compiler:
 
@@ -18,17 +20,18 @@ existing PPTX specimen
 → benchmark/gate/learning promotion
 ```
 
-A 1:1 clone is a **fidelity test**, not the end product. Direct duplication is easier if the user only wants a copy. The real product is a reusable, editable PPTX generator that preserves the specimen's visual language with new content.
+A 1:1 rebuild is a **diagnostic fidelity test**, not the end product. Direct duplication is easier if the user only wants a copy. The real product is a reusable, editable PPTX generator/template family that preserves the specimen's visual language with new content.
 
 ## Non-Negotiables
 
-1. **Do not promise arbitrary PPTX → perfect reusable template.** Promise a staged clone of the core visual effect, with explicit fidelity/editability budgets and documented fallbacks.
+1. **Do not promise arbitrary PPTX → perfect reusable template.** Promise staged extraction of the core visual system, with explicit fidelity/editability budgets and documented fallbacks.
 2. **Separate visual fidelity from reusable abstraction.** The rebuild can be near 1:1 while the reusable generator intentionally abstracts photos, icons, or brand-specific assets.
 3. **Extract evidence before naming semantics.** Do not call something a `risk-rail`, `fund-comparison-card`, or `roadmap-node` until object geometry, text, style, and repeated placement support that interpretation.
 4. **Keep critical text native.** Title/body/data/source/risk text must remain editable unless the user explicitly accepts an image-only artifact.
 5. **Do not promote one-off decoration.** A motif becomes skill DNA only if it affects layout rhythm, component grammar, information hierarchy, chart/table treatment, or source/risk/footer treatment.
 6. **Preserve provenance.** Keep source URL, license, SHA256, original filename, and embedded-media caveats with every specimen.
 7. **Checkpoint before each semantic change set.** The user expects rollback points before modifying the skill, visual systems, runtime contracts, or gates.
+8. **Never optimize for source duplication over future usability.** If a decorative source feature blocks robust new-content generation, classify it as optional/fallback material rather than forcing brittle imitation.
 
 ## Inputs
 
@@ -60,7 +63,7 @@ specimens/<deck_id>/
   master-layout-inventory.json
   asset-inventory.json
   decompiled.raw.ir.json
-  rebuilt.pptx
+  rebuilt.pptx                 # internal fidelity/diagnostic artifact, not final product
   rebuilt-rendered/
   rebuild-fidelity-report.json
   clone-notes.md
@@ -158,6 +161,8 @@ Acceptance targets:
 
 Rebuild the source deck from decompiled IR, render original and rebuilt, then compare.
 
+This phase exists to prove the extractor/compiler understands PPTX mechanics. Passing C3 does **not** mean the template system is done; it only authorizes C4–C7 abstraction work. Do not ship `rebuilt.pptx` as the final cloner output unless the user explicitly asked for a copy.
+
 ```text
 original.pptx → decompiled.raw.ir.json → rebuilt.pptx
 original render + rebuilt render → visual diff + text recall + editability audit
@@ -234,6 +239,8 @@ Every contract must include slot geometry, spacing policy, semantic overlap rule
 ### Phase C7 — Generalized Template Generator
 
 Build a generator that accepts new content and keeps the cloned visual language recognizable.
+
+The generator is the actual user-facing cloner product. It should expose content slots, page-role choices, component variants, density modes, and fallbacks so users can create new decks, not merely re-render the old one.
 
 Acceptance:
 
@@ -358,12 +365,12 @@ Run the existing forward-compiler gates plus clone-specific gates:
 7. **Layout/text safety** — CJK-safe spacing, no overlaps, source/risk/footer readable.
 8. **Practicality** — file size, Office/WPS rendering, font fallback, attribution/license notes.
 
-## Clone Report Template
+## Template Abstraction Report Template
 
-Every clone iteration should end with:
+Every cloner iteration should end with:
 
 ```markdown
-# Clone Report: <template/deck id>
+# Template Abstraction Report: <template/deck id>
 
 ## Source
 - file:
@@ -372,11 +379,13 @@ Every clone iteration should end with:
 - slide count:
 
 ## Goal
-- 1:1 pages:
-- abstractable pages:
+- intended new-deck use cases:
+- diagnostic rebuild pages:
+- abstractable page roles:
 - critical editable fields:
 
 ## Fidelity Result
+- purpose: internal diagnostic, not final deliverable
 - visual fidelity:
 - text recall:
 - object recall:

@@ -86,6 +86,67 @@ templates/<template_id>/
 
 ## Workflow
 
+### Acceptance Loop Principle — Fail → Diagnose → Optimize → Re-run
+
+Cloner work must run as an acceptance loop, not a one-pass analysis. Every phase emits a machine-readable report with:
+
+```yaml
+release_decision: pass | fail
+blocking_count: integer
+gates: list of gate results
+optimization_queue: concrete failures mapped to owner/action
+next_phase_allowed: boolean
+next_phase: named phase if allowed
+```
+
+If `release_decision != pass`, do not advance to the next semantic phase. Fix the highest-leverage blocker, rerun the same command, and repeat until the gate passes or the loop declares the failure stalled because the same blockers repeat without an engineering change.
+
+Executable C1/C2 loop:
+
+```bash
+python3 scripts/run_pptx_cloner_loop.py \
+  research/pptx-template-library/files/<template-id>.pptx \
+  --deck-id <template-id> \
+  --out specimens/<template-id> \
+  --require-render \
+  --max-iterations 3
+```
+
+For unit tests or environments without LibreOffice rendering, use `--skip-render`; do not use skipped renders as evidence for visual/template abstraction quality.
+
+Current C1/C2 passing condition:
+
+- specimen evidence pack exists;
+- source slide XML unpacks and is traceable;
+- full-size renders/contact sheet exist when required;
+- raw IR exists;
+- slide recall is 100%;
+- object recall is 100%;
+- source text recall is 100%;
+- every IR object carries source/editability/render-policy fields;
+- text-bearing objects are native/editable priority >= 4.
+
+Loop output:
+
+```text
+specimens/<template-id>/cloner-loop-report.json
+```
+
+Use the `optimization_queue` in that report as the next implementation backlog. Do not replace it with vague prose such as “improve fidelity”; every item must name the failed gate, owner, concrete action, and evidence.
+
+Future phases must plug into the same loop contract:
+
+| Phase | Loop gate | Blocking failure example | Optimization response |
+|---|---|---|---|
+| C3 diagnostic rebuild | source IR → rebuilt PPTX → strict package/text/object/render report | rebuilt package fails strict Office gate | fix exporter/package relationships, rerun C3 |
+| C4 archetype mining | repeated layout/component evidence report | claimed component appears on only one slide | demote to specimen note or compare more slides |
+| C5 visual DNA | DNA claim → object evidence → PPTX translation rule | palette/background changes but card/chart grammar unchanged | extract deeper grammar or reject promotion |
+| C6 component contracts | contract schema + slot/regression examples | slot overlap or unsupported density | tighten contract/validator and rerun examples |
+| C7 generator | new-content deck through forward QA | source family not recognizable or critical text rasterized | update generator/style program/contracts and rerun |
+| C8 learning promotion | tests/schemas/gates/docs updated | discovery only exists in notes | convert learning to executable gate or contract |
+
+This loop is intentionally stricter than “looks close.” SOTA cloner quality comes from repeated gate failures being converted into compiler improvements, not from manually polishing one template.
+
 ### Phase C0 — Select Specimens Intentionally
 
 Before implementation, choose a small batch with distinct grammar families. For the current curated library, use `references/pptx-template-research-library.md` and start with:

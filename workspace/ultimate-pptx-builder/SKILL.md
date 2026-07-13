@@ -204,11 +204,25 @@ source.pptx
 → benchmark/gate/learning promotion
 ```
 
+Start with the executable acceptance loop, then use the report's `optimization_queue` as the implementation backlog:
+
+```bash
+python3 scripts/run_pptx_cloner_loop.py \
+  research/pptx-template-library/files/<template-id>.pptx \
+  --deck-id <template-id> \
+  --out specimens/<template-id> \
+  --require-render \
+  --max-iterations 3
+```
+
+If `specimens/<template-id>/cloner-loop-report.json` has `release_decision: fail`, fix the named blocker and rerun the same loop. Do not proceed to C3 rebuild, visual DNA extraction, component contracts, or reusable generator work until the current phase passes. Use `--skip-render` only for tests or render-unavailable environments; skipped renders are not valid evidence for visual abstraction quality.
+
 Use `references/pptx-template-research-library.md` when selecting templates from `research/pptx-template-library/`. Do not clone every template equally. Start with a small P0 batch that covers distinct grammar families: dark executive, enterprise proposal, compliance tech, roadmap/journey infographic, finance explainer, tech brand system, and KPI scorecard.
 
 **Acceptance Gate 2F: Clone Learning**
 
 - [ ] A checkpoint exists before modifying this skill, visual systems, runtime contracts, validators, or benchmark boundaries.
+- [ ] The cloner acceptance loop has run and the current phase report has `release_decision: pass` before advancing.
 - [ ] The source PPTX provenance is recorded: original path, source URL/license if known, SHA256, slide count, theme/master/layout counts, and embedded-media caveats.
 - [ ] Original slides render to full-size PNGs/contact sheets before abstraction begins.
 - [ ] Decompiled IR preserves slide count, critical text, coordinates, z-order, object class, and source XML/object references.

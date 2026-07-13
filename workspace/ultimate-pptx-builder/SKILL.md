@@ -1,6 +1,6 @@
 ---
 name: ultimate-pptx-builder
-description: Use when creating high-end editable PowerPoint decks from rich visual concepts, HTML-like previews, financial narratives, or programmable design systems. Builds PPTX via IR-first authoring, explicit editability budgets, native/vector/raster conversion policy, and mandatory QA gates.
+description: Use when creating high-end editable PowerPoint decks from rich visual concepts, HTML-like previews, financial narratives, programmable design systems, or existing PPTX files/templates that need cloning into reusable editable visual systems. Builds PPTX via IR-first authoring and a dual forward/reverse compiler with explicit fidelity, editability, design, practicality, and clone-learning QA gates.
 version: 0.1.0
 author: Hermes Agent
 license: MIT
@@ -14,21 +14,29 @@ metadata:
 
 ## Overview
 
-This skill builds **editable, finance-grade PPTX decks** from rich visual concepts without pretending that arbitrary HTML can be perfectly converted to editable PowerPoint. The core architecture is **IR-first**:
+This skill builds **editable, finance-grade PPTX decks** from rich visual concepts and learns from excellent existing PPTX decks without pretending that arbitrary HTML or arbitrary PPTX can be magically converted into perfect editable PowerPoint. The core architecture is **IR-first** and now supports a dual compiler:
 
 ```text
-Content Contract → Narrative Topology → Style Program → Slide IR
-       ↓                  ↓                  ↓             ↓
-Compliance          Layout Grammar      Visual DNA     HTML Preview + PPTX Export
-                                                        ↓
-                                      Fidelity / Editability / Design / Practicality QA
+Forward Compiler:
+  Content Contract → Narrative Topology → Style Program → Slide IR
+         ↓                  ↓                  ↓             ↓
+  Compliance          Layout Grammar      Visual DNA     HTML Preview + PPTX Export
+                                                          ↓
+                                        Fidelity / Editability / Design / Practicality QA
+
+Reverse Compiler / PPTX Cloner:
+  Existing PPTX → OOXML/theme/master/object inventory → Decompiled IR
+        ↓                 ↓                                  ↓
+  1:1 rebuild fidelity → archetype mining → visual DNA/component contracts
+        ↓
+  reusable generator + benchmark/gate/learning promotion
 ```
 
-HTML is allowed as a preview and layout engine, but it is not the source of truth. The source of truth is a typed **Slide IR** containing native PowerPoint objects, vector islands, raster islands, and explicit editability budgets.
+HTML is allowed as a preview and layout engine, but it is not the source of truth. The source of truth is a typed **Slide IR** containing native PowerPoint objects, vector islands, raster islands, and explicit editability budgets. For clone work, the original PPTX is evidence; the decompiled/rebuilt IR is the test harness; the reusable style program and component contracts are the product.
 
 ## Learning Notes Rule
 
-Before modifying an area with prior discoveries, read `docs/learning/` first. When development reveals and solves a new issue, add a learning note with context, symptom, root cause, fix, verification command, affected files, and prevention rule. Current visual-rendering learnings live in `docs/learning/phase4b-visual-rendering.md`; glass showcase learnings live in `docs/learning/glass-fintech-showcase.md`; Atlas/Glass aesthetic regression learnings live in `docs/learning/atlas-glass-aesthetic-regression.md`.
+Before modifying an area with prior discoveries, read `docs/learning/` first. When development reveals and solves a new issue, add a learning note with context, symptom, root cause, fix, verification command, affected files, and prevention rule. Current visual-rendering learnings live in `docs/learning/phase4b-visual-rendering.md`; glass showcase learnings live in `docs/learning/glass-fintech-showcase.md`; Atlas/Glass aesthetic regression learnings live in `docs/learning/atlas-glass-aesthetic-regression.md`; PPTX reverse-compiler roadmap notes live in `docs/learning/pptx-template-decompiler-roadmap.md`.
 
 ## When to Use
 
@@ -40,12 +48,15 @@ Use this skill when the user asks for:
 - A reusable PPTX generation workflow or skill.
 - Converting an existing HTML/visual concept into an editable PowerPoint architecture.
 - Building deck style systems that should not collapse into one-off templates.
+- Cloning an existing `.pptx` into a reusable editable visual system, not just duplicating the file. For this workflow, follow `references/pptx-cloner.md`.
+- Collecting, selecting, or learning from high-quality PPTX template/reference libraries. For this workflow, follow `references/pptx-template-research-library.md`.
 
 Do **not** use this skill for:
 
 - Simple one-off slides where standard `powerpoint` skill is sufficient.
 - Pure image posters where editability is irrelevant.
 - Promising arbitrary DOM/CSS perfect native PowerPoint conversion.
+- Promising arbitrary PPTX → perfect reusable template conversion without staged specimen analysis, rebuild fidelity testing, and explicit fallbacks.
 
 ## Core Contract
 
@@ -178,6 +189,35 @@ python3 scripts/validate_visual_systems.py
 - [ ] Real `.pptx` files are exported and rendered; layout safety, editability, and visual fidelity must pass for every system.
 
 
+### Step 2F — PPTX Cloner / Reverse Compiler
+
+When the user provides an existing PPTX, or when improving this skill from the curated template library, run the reverse-compiler workflow in `references/pptx-cloner.md` before trying to create a new forward style.
+
+```text
+source.pptx
+→ specimen analysis pack
+→ OOXML/theme/master/layout/object inventory
+→ decompiled raw Slide IR
+→ 1:1 rebuilt PPTX + visual/text/editability fidelity report
+→ layout archetypes + visual DNA + component contracts
+→ reusable generator
+→ benchmark/gate/learning promotion
+```
+
+Use `references/pptx-template-research-library.md` when selecting templates from `research/pptx-template-library/`. Do not clone every template equally. Start with a small P0 batch that covers distinct grammar families: dark executive, enterprise proposal, compliance tech, roadmap/journey infographic, finance explainer, tech brand system, and KPI scorecard.
+
+**Acceptance Gate 2F: Clone Learning**
+
+- [ ] A checkpoint exists before modifying this skill, visual systems, runtime contracts, validators, or benchmark boundaries.
+- [ ] The source PPTX provenance is recorded: original path, source URL/license if known, SHA256, slide count, theme/master/layout counts, and embedded-media caveats.
+- [ ] Original slides render to full-size PNGs/contact sheets before abstraction begins.
+- [ ] Decompiled IR preserves slide count, critical text, coordinates, z-order, object class, and source XML/object references.
+- [ ] 1:1 rebuild fidelity is measured before claiming reusable abstraction quality.
+- [ ] Critical title/body/data/source/risk text remains native/editable in clone and generator modes.
+- [ ] Every promoted visual DNA or component contract has specimen evidence, not just aesthetic impression.
+- [ ] New learnings are promoted into scripts, schemas, component contracts, benchmark cases, gates, or learning notes; do not leave important clone discoveries as prose only.
+
+
 ### Step 2D — Layout and Text Safety Gate
 
 Before calling any long-form PPTX deck accepted, run the executable layout/typesetting gate:
@@ -296,7 +336,9 @@ The visual/design critique starts at HTML preview time. If the HTML already show
 
 ## Verification Checklist
 
-- [ ] `references/architecture.md` explains the IR-first architecture.
+- [ ] `references/architecture.md` explains the IR-first architecture and dual forward/reverse compiler boundary.
+- [ ] `references/pptx-cloner.md` defines the PPTX Cloner / Reverse Compiler workflow, clone-specific QA gates, and learning promotion rules.
+- [ ] `references/pptx-template-research-library.md` defines the curated template library policy and first-batch clone candidates.
 - [ ] `references/acceptance-matrix.md` defines phase gates and blocking failures.
 - [ ] `references/slide-ir-schema.md` defines all core object types.
 - [ ] `references/editability-policy.md` defines priority and fallback rules.
@@ -326,3 +368,4 @@ The visual/design critique starts at HTML preview time. If the HTML already show
 - [ ] `schemas/*.json` are valid JSON.
 - [ ] `examples/minimal-deck.ir.json` passes `scripts/validate_skill.py`.
 - [ ] No document promises arbitrary HTML → perfectly editable PPTX.
+- [ ] No document promises arbitrary PPTX → perfect reusable template conversion without staged clone fidelity testing and explicit fallback policy.

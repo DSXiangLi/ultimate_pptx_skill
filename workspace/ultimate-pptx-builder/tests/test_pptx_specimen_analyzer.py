@@ -12,6 +12,7 @@ from pathlib import Path
 
 from PIL import Image
 from pptx import Presentation
+from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches, Pt
 
@@ -33,6 +34,9 @@ def make_sample_png(path: Path) -> None:
 def make_sample_pptx(path: Path) -> None:
     prs = Presentation()
     slide = prs.slides.add_slide(prs.slide_layouts[6])
+    bg = slide.background.fill
+    bg.solid()
+    bg.fore_color.rgb = RGBColor(0x12, 0x34, 0x56)
     title = slide.shapes.add_textbox(Inches(0.6), Inches(0.4), Inches(5.5), Inches(0.8))
     title.name = "sample_title"
     title.text_frame.text = "Clone Analyzer Title"

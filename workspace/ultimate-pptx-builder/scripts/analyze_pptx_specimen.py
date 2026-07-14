@@ -141,7 +141,57 @@ def picture_relationships(pptx: Path, slide_index: int) -> Dict[str, Dict[str, s
                 "target": rel.get("target", ""),
                 "package_path": rel.get("package_path", ""),
             }
+    for sp in root.findall(".//{}sp".format(P_NS)):
+        c_nv_pr = sp.find(".//{}cNvPr".format(P_NS))
+        blip = sp.find(".//{}blip".format(A_NS))
+        if c_nv_pr is None or blip is None:
+            continue
+        shape_id = c_nv_pr.attrib.get("id", "")
+        rid = blip.attrib.get(R_NS + "embed") or blip.attrib.get(R_NS + "link") or ""
+        if shape_id and rid:
+            rel = rels.get(rid, {})
+            out[shape_id] = {
+                "relationship_id": rid,
+                "relationship_type": rel.get("type", ""),
+                "target": rel.get("target", ""),
+                "package_path": rel.get("package_path", ""),
+            }
     return out
+
+
+def slide_background(pptx: Path, slide_index: int) -> Dict[str, Any]:
+    """Extract slide-level background material from p:cSld/p:bg.
+
+    C3.2 starts with solid RGB backgrounds because the observed visual defect is
+    dark/colored slides collapsing to white during rebuild. Other background
+    classes are classified for later compiler increments instead of being
+    silently ignored.
+    """
+    slide_part = "ppt/slides/slide{}.xml".format(slide_index)
+    try:
+        with zipfile.ZipFile(str(pptx)) as zf:
+            root = ET.fromstring(zf.read(slide_part))
+    except Exception:
+        return {"kind": "unknown", "source_xml_path": slide_part}
+
+    bg = root.find("{}cSld/{}bg".format(P_NS, P_NS))
+    if bg is None:
+        return {"kind": "default", "source_xml_path": slide_part}
+    bg_pr = bg.find("{}bgPr".format(P_NS))
+    if bg_pr is None:
+        bg_ref = bg.find("{}bgRef".format(P_NS))
+        return {"kind": "reference" if bg_ref is not None else "unknown", "source_xml_path": slide_part}
+    solid = bg_pr.find("{}solidFill".format(A_NS))
+    if solid is not None:
+        rgb_val = hex_color_from_node(solid)
+        if rgb_val:
+            return {"kind": "solid", "rgb": rgb_val.upper(), "source_xml_path": slide_part}
+        return {"kind": "solid-unresolved", "source_xml_path": slide_part}
+    if bg_pr.find("{}gradFill".format(A_NS)) is not None:
+        return {"kind": "gradient", "source_xml_path": slide_part, "degradation": "gradient background not yet reconstructed"}
+    if bg_pr.find("{}blipFill".format(A_NS)) is not None:
+        return {"kind": "image", "source_xml_path": slide_part, "degradation": "image background not yet reconstructed"}
+    return {"kind": "unknown", "source_xml_path": slide_part}
 
 
 def shape_text(shape: Any) -> str:
@@ -202,6 +252,7 @@ def inventory_objects(pptx: Path) -> Dict[str, Any]:
     object_count = 0
     for slide_index, slide in enumerate(prs.slides, start=1):
         image_rels = picture_relationships(pptx, slide_index)
+        background = slide_background(pptx, slide_index)
         objects: List[Dict[str, Any]] = []
         for z, shape in enumerate(slide.shapes, start=1):
             text = shape_text(shape)
@@ -240,11 +291,18 @@ def inventory_objects(pptx: Path) -> Dict[str, Any]:
                 obj["image_relationship_type"] = rel.get("relationship_type", "")
                 obj["image_target"] = rel.get("target", "")
                 obj["image_package_path"] = rel.get("package_path", "")
+            elif image_rels.get(str(shape.shape_id)):
+                rel = image_rels.get(str(shape.shape_id), {})
+                obj["fill_image_relationship_id"] = rel.get("relationship_id", "")
+                obj["fill_image_relationship_type"] = rel.get("relationship_type", "")
+                obj["fill_image_target"] = rel.get("target", "")
+                obj["fill_image_package_path"] = rel.get("package_path", "")
             objects.append(obj)
             object_count += 1
         slides.append({
             "index": slide_index,
             "source_xml_path": "ppt/slides/slide{}.xml".format(slide_index),
+            "background": background,
             "object_count": len(objects),
             "objects": objects,
         })

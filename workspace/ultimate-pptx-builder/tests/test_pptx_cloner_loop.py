@@ -7,6 +7,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
+import zipfile
 from pathlib import Path
 
 from tests.test_pptx_specimen_analyzer import make_sample_pptx
@@ -14,6 +16,15 @@ from tests.test_pptx_specimen_analyzer import make_sample_pptx
 ROOT = Path(__file__).resolve().parents[1]
 LOOP = ROOT / "scripts" / "run_pptx_cloner_loop.py"
 sys.path.insert(0, str(ROOT / "scripts"))
+P_NS = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
+A_NS = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+
+
+def slide_background_rgb(pptx: Path, slide_index: int = 1) -> str:
+    with zipfile.ZipFile(str(pptx)) as zf:
+        root = ET.fromstring(zf.read("ppt/slides/slide{}.xml".format(slide_index)))
+    bg = root.find("{0}cSld/{0}bg/{0}bgPr/{1}solidFill/{1}srgbClr".format(P_NS, A_NS))
+    return bg.attrib.get("val", "") if bg is not None else ""
 
 
 class PptxClonerLoopTests(unittest.TestCase):
@@ -54,6 +65,7 @@ class PptxClonerLoopTests(unittest.TestCase):
             self.assertTrue((out / "decompiled.raw.ir.json").exists())
             self.assertTrue((out / "rebuilt.pptx").exists())
             self.assertTrue((out / "rebuild-report.json").exists())
+            self.assertEqual(slide_background_rgb(out / "rebuilt.pptx"), "123456")
             rebuild_report = json.loads((out / "rebuild-report.json").read_text(encoding="utf-8"))
             produced_by_type = {
                 item["type"]: item["produced"]
@@ -73,6 +85,34 @@ class PptxClonerLoopTests(unittest.TestCase):
             self.assertIn("C3-STRICT-PACKAGE", gate_ids)
             self.assertIn("C3-REBUILT-TEXT-RECALL", gate_ids)
             self.assertIn("c3_artifacts", data)
+
+    def test_loop_materializes_picture_fill_shapes_as_native_images(self):
+        pptx = ROOT / "research" / "pptx-template-library" / "files" / "it-software-sales-proposal-slides.pptx"
+        if not pptx.exists():
+            self.skipTest("template library fixture is unavailable")
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td) / "specimen"
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    str(LOOP),
+                    str(pptx),
+                    "--deck-id",
+                    "it-software-sales-proposal-slides",
+                    "--out",
+                    str(out),
+                    "--skip-render",
+                    "--max-iterations",
+                    "2",
+                ],
+                cwd=str(ROOT),
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            rebuild_report = json.loads((out / "rebuild-report.json").read_text(encoding="utf-8"))
+            shape315 = next(item for item in rebuild_report["objects"] if item.get("source_shape_id") == "315")
+            self.assertEqual(shape315["produced"], "native-picture-fill-shape-image")
 
     def test_evaluator_fails_with_actionable_queue_for_missing_ir(self):
         from run_pptx_cloner_loop import evaluate_c1_c2  # type: ignore

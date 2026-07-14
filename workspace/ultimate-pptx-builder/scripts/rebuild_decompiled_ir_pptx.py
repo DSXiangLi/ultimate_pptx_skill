@@ -49,6 +49,19 @@ def blank_layout(prs):
     return prs.slide_layouts[6]
 
 
+def apply_slide_background(slide, background: Dict[str, Any]) -> Dict[str, Any]:
+    """Apply reconstructable slide-level background material."""
+    kind = (background or {}).get("kind")
+    if kind == "solid" and (background or {}).get("rgb"):
+        fill = slide.background.fill
+        fill.solid()
+        fill.fore_color.rgb = rgb(background.get("rgb"), "FFFFFF")
+        return {"kind": "solid", "rgb": str(background.get("rgb")).upper(), "produced": "native-slide-background"}
+    if kind and kind not in {"default", "unknown"}:
+        return {"kind": kind, "produced": "classified-background-degradation", "reason": background.get("degradation", "background kind not reconstructed yet")}
+    return {"kind": kind or "default", "produced": "default"}
+
+
 def box_emu(obj: Dict[str, Any]) -> Tuple[Emu, Emu, Emu, Emu]:
     box = obj.get("box") or {}
     return (
@@ -149,6 +162,21 @@ def add_native_image(slide, obj: Dict[str, Any], source_pptx: Path) -> str:
     return "native-image"
 
 
+def add_picture_fill_shape_as_image(slide, obj: Dict[str, Any], source_pptx: Path) -> str:
+    fill_ref = obj.get("fill_image_ref") or {}
+    package_path = str(fill_ref.get("package_path") or "").lstrip("/")
+    if not package_path:
+        raise ValueError("fill_image_ref.package_path is missing")
+    if not source_pptx.exists():
+        raise FileNotFoundError(str(source_pptx))
+    with zipfile.ZipFile(str(source_pptx)) as zf:
+        blob = zf.read(package_path)
+    stream = io.BytesIO(blob)
+    shp = slide.shapes.add_picture(stream, *box_emu(obj))
+    shp.name = (str(obj.get("id") or "rebuilt_picture_fill_shape") + "__picture_fill")[:250]
+    return "native-picture-fill-shape-image"
+
+
 def add_placeholder_label(slide, obj: Dict[str, Any], label: str) -> None:
     # Keep label tiny and non-critical. It is diagnostic metadata, not source content.
     x, y, w, h = box_emu(obj)
@@ -182,9 +210,14 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
     materialization: List[Dict[str, Any]] = []
     unsupported: List[Dict[str, Any]] = []
     critical_failures: List[Dict[str, Any]] = []
+    backgrounds: List[Dict[str, Any]] = []
 
     for slide_ir in slides_ir:
         slide = prs.slides.add_slide(layout)
+        background_result = apply_slide_background(slide, slide_ir.get("background") or {})
+        background_result["slide_id"] = slide_ir.get("id")
+        background_result["source_xml_path"] = slide_ir.get("source_xml_path")
+        backgrounds.append(background_result)
         objects = sorted(slide_ir.get("objects") or [], key=lambda o: o.get("z", 0))
         for obj in objects:
             typ = obj.get("type") or "unknown"
@@ -196,6 +229,8 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
                     produced = add_native_text(slide, obj)
                 elif typ == "image":
                     produced = add_native_image(slide, obj, source_pptx)
+                elif obj.get("fill_image_ref"):
+                    produced = add_picture_fill_shape_as_image(slide, obj, source_pptx)
                 elif typ == "shape":
                     produced = add_native_shape(slide, obj)
                 else:
@@ -241,6 +276,7 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
         "materialized_count": len(materialization),
         "unsupported_count": len(unsupported),
         "unsupported_objects": unsupported[:200],
+        "backgrounds": backgrounds,
         "critical_failures": critical_failures,
         "objects": materialization,
         "release_decision": "pass" if not critical_failures else "fail",

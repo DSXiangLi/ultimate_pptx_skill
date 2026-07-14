@@ -37,6 +37,8 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             self.assertEqual(len(data["deck"]["slides"]), 1)
             slide = data["deck"]["slides"][0]
             self.assertEqual(slide["source_xml_path"], "ppt/slides/slide1.xml")
+            self.assertEqual(slide["background"]["kind"], "solid")
+            self.assertEqual(slide["background"]["rgb"], "123456")
             self.assertGreaterEqual(len(slide["objects"]), 3)
 
             texts = "\n".join(obj.get("text", "") for obj in slide["objects"])
@@ -67,6 +69,27 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             critical_text = [obj for obj in slide["objects"] if obj.get("text")]
             self.assertTrue(all(obj["editability"]["priority"] >= 4 for obj in critical_text))
             self.assertTrue(all(obj["render_policy"] == "native" for obj in critical_text))
+
+    def test_decompiler_preserves_picture_fill_shape_media_reference(self):
+        pptx = ROOT / "research" / "pptx-template-library" / "files" / "it-software-sales-proposal-slides.pptx"
+        if not pptx.exists():
+            self.skipTest("template library fixture is unavailable")
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td) / "decompiled.raw.ir.json"
+            proc = subprocess.run(
+                [sys.executable, str(DECOMPILER), str(pptx), "--out", str(out), "--deck-id", "it-software-sales-proposal-slides"],
+                cwd=str(ROOT),
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            data = json.loads(out.read_text(encoding="utf-8"))
+            slide10 = data["deck"]["slides"][9]
+            shape315 = next(obj for obj in slide10["objects"] if obj.get("source_shape_id") == "315")
+            fill_ref = shape315.get("fill_image_ref") or {}
+            self.assertEqual(shape315["type"], "shape")
+            self.assertRegex(fill_ref.get("relationship_id", ""), r"^rId\d+$")
+            self.assertEqual(fill_ref.get("package_path"), "ppt/media/image12.png")
 
 
 if __name__ == "__main__":

@@ -85,6 +85,13 @@ def raw_ir_object(obj: Dict[str, Any]) -> Dict[str, Any]:
             "target": obj.get("image_target", ""),
             "package_path": obj.get("image_package_path", ""),
         }
+    if obj.get("fill_image_package_path"):
+        out["fill_image_ref"] = {
+            "relationship_id": obj.get("fill_image_relationship_id", ""),
+            "relationship_type": obj.get("fill_image_relationship_type", ""),
+            "target": obj.get("fill_image_target", ""),
+            "package_path": obj.get("fill_image_package_path", ""),
+        }
     return out
 
 
@@ -97,6 +104,7 @@ def decompile(pptx: Path, deck_id: Optional[str] = None) -> Dict[str, Any]:
             "id": "slide-{:02d}".format(slide["index"]),
             "index": slide["index"],
             "source_xml_path": slide["source_xml_path"],
+            "background": slide.get("background", {"kind": "default"}),
             "objects": [raw_ir_object(obj) for obj in slide["objects"]],
         })
     return {

@@ -250,55 +250,76 @@ def inventory_objects(pptx: Path) -> Dict[str, Any]:
     slide_h = int(prs.slide_height)
     slides: List[Dict[str, Any]] = []
     object_count = 0
+
+    def object_from_shape(slide_index: int, shape: Any, z: float, image_rels: Dict[str, Dict[str, str]], parent_group: Optional[Dict[str, Any]] = None, depth: int = 0) -> Dict[str, Any]:
+        text = shape_text(shape)
+        obj_id = "slide{:02d}_shape{:03d}".format(slide_index, int(shape.shape_id))
+        obj = {
+            "id": obj_id,
+            "name": getattr(shape, "name", ""),
+            "type": shape_type(shape),
+            "shape_type": str(shape.shape_type),
+            "z": z,
+            "box": {
+                "x_px": emu_to_px(shape.left, slide_w, 1280),
+                "y_px": emu_to_px(shape.top, slide_h, 720),
+                "w_px": emu_to_px(shape.width, slide_w, 1280),
+                "h_px": emu_to_px(shape.height, slide_h, 720),
+                "x_emu": int(shape.left),
+                "y_emu": int(shape.top),
+                "w_emu": int(shape.width),
+                "h_emu": int(shape.height),
+            },
+            "text": text,
+            "style": style_summary(shape),
+            "font": font_summary(shape),
+            "source_xml_path": "ppt/slides/slide{}.xml".format(slide_index),
+            "source_shape_id": str(shape.shape_id),
+            "source_shape_name": getattr(shape, "name", ""),
+        }
+        if parent_group:
+            obj["group_id"] = parent_group.get("id", "")
+            obj["parent_group_name"] = parent_group.get("name", "")
+            obj["group_depth"] = depth
+        if obj["type"] == "image":
+            try:
+                obj["image_content_type"] = shape.image.content_type
+                obj["image_ext"] = shape.image.ext
+                obj["image_sha1"] = shape.image.sha1
+            except Exception:
+                pass
+            rel = image_rels.get(str(shape.shape_id), {})
+            obj["image_relationship_id"] = rel.get("relationship_id", "")
+            obj["image_relationship_type"] = rel.get("relationship_type", "")
+            obj["image_target"] = rel.get("target", "")
+            obj["image_package_path"] = rel.get("package_path", "")
+        elif image_rels.get(str(shape.shape_id)):
+            rel = image_rels.get(str(shape.shape_id), {})
+            obj["fill_image_relationship_id"] = rel.get("relationship_id", "")
+            obj["fill_image_relationship_type"] = rel.get("relationship_type", "")
+            obj["fill_image_target"] = rel.get("target", "")
+            obj["fill_image_package_path"] = rel.get("package_path", "")
+        if obj["type"] == "group" and hasattr(shape, "shapes"):
+            try:
+                obj["child_count"] = len(list(shape.shapes))
+            except Exception:
+                obj["child_count"] = 0
+        return obj
+
+    def append_shape_tree(slide_index: int, shape: Any, z: float, image_rels: Dict[str, Dict[str, str]], objects: List[Dict[str, Any]], parent_group: Optional[Dict[str, Any]] = None, depth: int = 0) -> None:
+        obj = object_from_shape(slide_index, shape, z, image_rels, parent_group=parent_group, depth=depth)
+        objects.append(obj)
+        if obj["type"] == "group" and hasattr(shape, "shapes"):
+            for child_index, child in enumerate(shape.shapes, start=1):
+                append_shape_tree(slide_index, child, z + child_index / 1000.0, image_rels, objects, parent_group=obj, depth=depth + 1)
+
     for slide_index, slide in enumerate(prs.slides, start=1):
         image_rels = picture_relationships(pptx, slide_index)
         background = slide_background(pptx, slide_index)
         objects: List[Dict[str, Any]] = []
         for z, shape in enumerate(slide.shapes, start=1):
-            text = shape_text(shape)
-            obj = {
-                "id": "slide{:02d}_shape{:03d}".format(slide_index, int(shape.shape_id)),
-                "name": getattr(shape, "name", ""),
-                "type": shape_type(shape),
-                "shape_type": str(shape.shape_type),
-                "z": z,
-                "box": {
-                    "x_px": emu_to_px(shape.left, slide_w, 1280),
-                    "y_px": emu_to_px(shape.top, slide_h, 720),
-                    "w_px": emu_to_px(shape.width, slide_w, 1280),
-                    "h_px": emu_to_px(shape.height, slide_h, 720),
-                    "x_emu": int(shape.left),
-                    "y_emu": int(shape.top),
-                    "w_emu": int(shape.width),
-                    "h_emu": int(shape.height),
-                },
-                "text": text,
-                "style": style_summary(shape),
-                "font": font_summary(shape),
-                "source_xml_path": "ppt/slides/slide{}.xml".format(slide_index),
-                "source_shape_id": str(shape.shape_id),
-                "source_shape_name": getattr(shape, "name", ""),
-            }
-            if obj["type"] == "image":
-                try:
-                    obj["image_content_type"] = shape.image.content_type
-                    obj["image_ext"] = shape.image.ext
-                    obj["image_sha1"] = shape.image.sha1
-                except Exception:
-                    pass
-                rel = image_rels.get(str(shape.shape_id), {})
-                obj["image_relationship_id"] = rel.get("relationship_id", "")
-                obj["image_relationship_type"] = rel.get("relationship_type", "")
-                obj["image_target"] = rel.get("target", "")
-                obj["image_package_path"] = rel.get("package_path", "")
-            elif image_rels.get(str(shape.shape_id)):
-                rel = image_rels.get(str(shape.shape_id), {})
-                obj["fill_image_relationship_id"] = rel.get("relationship_id", "")
-                obj["fill_image_relationship_type"] = rel.get("relationship_type", "")
-                obj["fill_image_target"] = rel.get("target", "")
-                obj["fill_image_package_path"] = rel.get("package_path", "")
-            objects.append(obj)
-            object_count += 1
+            append_shape_tree(slide_index, shape, float(z), image_rels, objects)
+        object_count += len(objects)
         slides.append({
             "index": slide_index,
             "source_xml_path": "ppt/slides/slide{}.xml".format(slide_index),

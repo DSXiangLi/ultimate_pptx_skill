@@ -51,6 +51,12 @@ def make_sample_pptx(path: Path) -> None:
     pic = slide.shapes.add_picture(str(img), Inches(5.8), Inches(1.5), Inches(1.0), Inches(1.0))
     pic.name = "sample_picture"
 
+    group = slide.shapes.add_group_shape()
+    group.name = "sample_group"
+    grouped = group.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(1.0), Inches(3.4), Inches(2.2), Inches(0.55))
+    grouped.name = "sample_grouped_metric"
+    grouped.text = "Grouped Insight"
+
     prs.save(str(path))
 
 

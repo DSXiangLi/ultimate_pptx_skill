@@ -44,11 +44,18 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             texts = "\n".join(obj.get("text", "") for obj in slide["objects"])
             self.assertIn("Clone Analyzer Title", texts)
             self.assertIn("Metric 42%", texts)
+            self.assertIn("Grouped Insight", texts)
 
             object_types = {obj["type"] for obj in slide["objects"]}
             self.assertIn("text", object_types)
             self.assertIn("shape", object_types)
             self.assertIn("image", object_types)
+            self.assertIn("group", object_types)
+
+            grouped = [obj for obj in slide["objects"] if obj.get("text") == "Grouped Insight"]
+            self.assertTrue(grouped)
+            self.assertRegex(grouped[0].get("group_id", ""), r"^slide01_shape\d+$")
+            self.assertEqual(grouped[0].get("parent_group_name"), "sample_group")
 
             image_objs = [obj for obj in slide["objects"] if obj["type"] == "image"]
             self.assertTrue(image_objs)

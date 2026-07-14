@@ -77,6 +77,14 @@ class PptxClonerLoopTests(unittest.TestCase):
                 any(item["type"] == "image" for item in rebuild_report["unsupported_objects"]),
                 "image objects with source media references should be reconstructed, not placeholdered",
             )
+            grouped_child = next(item for item in rebuild_report["objects"] if item.get("parent_group_name") == "sample_group")
+            group_container = next(item for item in rebuild_report["objects"] if item.get("type") == "group")
+            self.assertEqual(group_container["produced"], "expanded-group-container")
+            self.assertFalse(
+                any(item["type"] == "group" for item in rebuild_report["unsupported_objects"]),
+                "groups with emitted children should not remain opaque placeholders in C3",
+            )
+            self.assertIn(grouped_child["produced"], {"native-text", "native-shape"})
             gate_ids = {gate["id"] for gate in data["gates"]}
             self.assertIn("C1-EVIDENCE-PACK", gate_ids)
             self.assertIn("C2-TEXT-RECALL", gate_ids)

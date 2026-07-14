@@ -85,6 +85,12 @@ def raw_ir_object(obj: Dict[str, Any]) -> Dict[str, Any]:
             "target": obj.get("image_target", ""),
             "package_path": obj.get("image_package_path", ""),
         }
+    if obj.get("group_id"):
+        out["group_id"] = obj.get("group_id")
+        out["parent_group_name"] = obj.get("parent_group_name", "")
+        out["group_depth"] = obj.get("group_depth", 0)
+    if obj.get("child_count") is not None:
+        out["child_count"] = obj.get("child_count")
     if obj.get("fill_image_package_path"):
         out["fill_image_ref"] = {
             "relationship_id": obj.get("fill_image_relationship_id", ""),

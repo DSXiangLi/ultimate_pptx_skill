@@ -227,6 +227,9 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
             try:
                 if (obj.get("text") or "").strip():
                     produced = add_native_text(slide, obj)
+                elif typ == "group" and int(obj.get("child_count") or 0) > 0:
+                    produced = "expanded-group-container"
+                    note = "group children were emitted as separate IR objects; container is structural only"
                 elif typ == "image":
                     produced = add_native_image(slide, obj, source_pptx)
                 elif obj.get("fill_image_ref"):
@@ -259,6 +262,9 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
                 "id": obj.get("id"),
                 "type": typ,
                 "source_shape_id": source_id,
+                "group_id": obj.get("group_id", ""),
+                "parent_group_name": obj.get("parent_group_name", ""),
+                "child_count": obj.get("child_count"),
                 "has_text": bool((obj.get("text") or "").strip()),
                 "editability_priority": (obj.get("editability") or {}).get("priority"),
                 "produced": produced,

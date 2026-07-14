@@ -94,6 +94,8 @@ Acceptance:
 
 Groups should not remain single opaque placeholders when their children are PPTX-native objects.
 
+Implemented first slice: C1 recursively emits group children with `group_id`, `parent_group_name`, and `group_depth`; C2 preserves those fields; C3 records group containers as `expanded-group-container` instead of drawing opaque placeholders when children are available.
+
 Approach:
 
 1. Recursively parse group shape trees.

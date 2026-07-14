@@ -356,6 +356,8 @@ The visual/design critique starts at HTML preview time. If the HTML already show
 - [ ] `references/pptx-cloner-c3-image-reconstruction.md` is consulted when C3 rebuilds show image placeholders; it records the OOXML slide relationship → media package path → native `add_picture` reconstruction pattern.
 - [ ] `references/pptx-cloner-c3-background-reconstruction.md` is consulted when rebuilt slides collapse to white or lose dark/colored template material; it records slide-level `p:bg` extraction and native background rebuild.
 - [ ] `references/pptx-cloner-c3-picture-fill-shapes.md` is consulted when image-like visuals are encoded as `<p:sp>` picture fills rather than `<p:pic>` objects.
+- [ ] `references/pptx-cloner-c3-group-recursion.md` is consulted when grouped icons/cards/decorative systems remain opaque placeholders; group containers should become traceable child objects before component mining.
+- [ ] `references/pptx-cloner-acceptance-loop.md` is consulted for the phase-gated fail → diagnose → optimize → rerun contract; do not advance cloner phases unless the current loop report has `release_decision: pass`.
 - [ ] `references/pptx-template-research-library.md` defines the curated template library policy and first-batch clone candidates.
 - [ ] `references/acceptance-matrix.md` defines phase gates and blocking failures.
 - [ ] `references/slide-ir-schema.md` defines all core object types.

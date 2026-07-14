@@ -15,8 +15,10 @@ First C3 slice:
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import sys
+import zipfile
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -132,6 +134,21 @@ def add_native_shape(slide, obj: Dict[str, Any], placeholder: bool = False) -> s
     return "native-placeholder" if placeholder else "native-shape"
 
 
+def add_native_image(slide, obj: Dict[str, Any], source_pptx: Path) -> str:
+    image_ref = obj.get("image_ref") or {}
+    package_path = str(image_ref.get("package_path") or "").lstrip("/")
+    if not package_path:
+        raise ValueError("image_ref.package_path is missing")
+    if not source_pptx.exists():
+        raise FileNotFoundError(str(source_pptx))
+    with zipfile.ZipFile(str(source_pptx)) as zf:
+        blob = zf.read(package_path)
+    stream = io.BytesIO(blob)
+    shp = slide.shapes.add_picture(stream, *box_emu(obj))
+    shp.name = str(obj.get("id") or "rebuilt_image")[:250]
+    return "native-image"
+
+
 def add_placeholder_label(slide, obj: Dict[str, Any], label: str) -> None:
     # Keep label tiny and non-critical. It is diagnostic metadata, not source content.
     x, y, w, h = box_emu(obj)
@@ -156,6 +173,7 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
         raise ValueError("raw IR has no slides")
 
     prs = Presentation()
+    source_pptx = Path(str(deck.get("source_pptx") or ""))
     size = deck.get("size") or {}
     prs.slide_width = Emu(int(size.get("w_emu") or SLIDE_W_EMU))
     prs.slide_height = Emu(int(size.get("h_emu") or SLIDE_H_EMU))
@@ -176,6 +194,8 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
             try:
                 if (obj.get("text") or "").strip():
                     produced = add_native_text(slide, obj)
+                elif typ == "image":
+                    produced = add_native_image(slide, obj, source_pptx)
                 elif typ == "shape":
                     produced = add_native_shape(slide, obj)
                 else:

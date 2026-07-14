@@ -80,6 +80,10 @@ def raw_ir_object(obj: Dict[str, Any]) -> Dict[str, Any]:
             "content_type": obj.get("image_content_type"),
             "ext": obj.get("image_ext"),
             "sha1": obj.get("image_sha1"),
+            "relationship_id": obj.get("image_relationship_id", ""),
+            "relationship_type": obj.get("image_relationship_type", ""),
+            "target": obj.get("image_target", ""),
+            "package_path": obj.get("image_package_path", ""),
         }
     return out
 

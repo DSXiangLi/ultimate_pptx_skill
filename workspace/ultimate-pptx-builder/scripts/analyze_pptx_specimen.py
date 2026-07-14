@@ -14,6 +14,7 @@ import argparse
 import datetime as _dt
 import hashlib
 import json
+import posixpath
 import shutil
 import sys
 import zipfile
@@ -81,6 +82,68 @@ def shape_type(shape: Any) -> str:
     return "shape"
 
 
+def resolve_package_target(source_part: str, target: str) -> str:
+    """Resolve an OOXML relationship target to a package-relative path."""
+    target = (target or "").replace("\\", "/")
+    if not target:
+        return ""
+    if target.startswith("/"):
+        return target.lstrip("/")
+    base = posixpath.dirname(source_part.replace("\\", "/"))
+    return posixpath.normpath(posixpath.join(base, target))
+
+
+def picture_relationships(pptx: Path, slide_index: int) -> Dict[str, Dict[str, str]]:
+    """Map picture cNvPr IDs on a slide to their image relationship target."""
+    slide_part = "ppt/slides/slide{}.xml".format(slide_index)
+    rels_part = "ppt/slides/_rels/slide{}.xml.rels".format(slide_index)
+    try:
+        with zipfile.ZipFile(str(pptx)) as zf:
+            names = set(zf.namelist())
+            slide_xml = zf.read(slide_part)
+            rels_xml = zf.read(rels_part) if rels_part in names else b""
+    except Exception:
+        return {}
+
+    rels: Dict[str, Dict[str, str]] = {}
+    if rels_xml:
+        try:
+            rel_root = ET.fromstring(rels_xml)
+            for rel in rel_root:
+                rid = rel.attrib.get("Id", "")
+                target = rel.attrib.get("Target", "")
+                if rid:
+                    rels[rid] = {
+                        "target": target,
+                        "type": rel.attrib.get("Type", ""),
+                        "package_path": resolve_package_target(slide_part, target),
+                    }
+        except Exception:
+            rels = {}
+
+    try:
+        root = ET.fromstring(slide_xml)
+    except Exception:
+        return {}
+    out: Dict[str, Dict[str, str]] = {}
+    for pic in root.findall(".//{}pic".format(P_NS)):
+        c_nv_pr = pic.find(".//{}cNvPr".format(P_NS))
+        blip = pic.find(".//{}blip".format(A_NS))
+        if c_nv_pr is None or blip is None:
+            continue
+        shape_id = c_nv_pr.attrib.get("id", "")
+        rid = blip.attrib.get(R_NS + "embed") or blip.attrib.get(R_NS + "link") or ""
+        if shape_id and rid:
+            rel = rels.get(rid, {})
+            out[shape_id] = {
+                "relationship_id": rid,
+                "relationship_type": rel.get("type", ""),
+                "target": rel.get("target", ""),
+                "package_path": rel.get("package_path", ""),
+            }
+    return out
+
+
 def shape_text(shape: Any) -> str:
     if getattr(shape, "has_text_frame", False):
         try:
@@ -138,6 +201,7 @@ def inventory_objects(pptx: Path) -> Dict[str, Any]:
     slides: List[Dict[str, Any]] = []
     object_count = 0
     for slide_index, slide in enumerate(prs.slides, start=1):
+        image_rels = picture_relationships(pptx, slide_index)
         objects: List[Dict[str, Any]] = []
         for z, shape in enumerate(slide.shapes, start=1):
             text = shape_text(shape)
@@ -171,6 +235,11 @@ def inventory_objects(pptx: Path) -> Dict[str, Any]:
                     obj["image_sha1"] = shape.image.sha1
                 except Exception:
                     pass
+                rel = image_rels.get(str(shape.shape_id), {})
+                obj["image_relationship_id"] = rel.get("relationship_id", "")
+                obj["image_relationship_type"] = rel.get("relationship_type", "")
+                obj["image_target"] = rel.get("target", "")
+                obj["image_package_path"] = rel.get("package_path", "")
             objects.append(obj)
             object_count += 1
         slides.append({

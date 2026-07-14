@@ -26,7 +26,8 @@ This does **not** mean high-fidelity visual cloning is solved. C3 now proves tha
   - Preserves slide count and source slide size.
   - Rebuilds text-bearing objects as native editable text boxes.
   - Rebuilds simple non-text shapes as native PPTX shapes.
-  - Materializes images/groups/charts/tables/unsupported classes as classified placeholders in the first baseline.
+  - C3.1 reconstructs image objects from slide relationship IDs and source package media parts.
+  - Materializes groups/charts/tables/unsupported classes as classified placeholders until their object coverage increments land.
   - Writes `rebuild-report.json` with unsupported object classifications and critical text failures.
 
 - `scripts/run_pptx_cloner_loop.py`
@@ -56,7 +57,7 @@ python3 -m unittest \
 Result:
 
 ```text
-Ran 5 tests in 2.219s
+Ran 5 tests in 8.836s
 OK
 ```
 
@@ -91,9 +92,17 @@ C3 details:
 
 ```text
 object_count: 165
-unsupported_count: 35
+unsupported_count: 16
+unsupported_by_type: group=16
 critical_failures: 0
-visual_score: 23.34
+visual_score: 27.72
+native_images: 19
+```
+
+Latest C3.1 visual comparison board:
+
+```text
+verification/cloner-visual-compare/dark-minimalist-business-c3-1-triptych.png
 ```
 
 C3 gates:
@@ -135,9 +144,17 @@ C3 details:
 
 ```text
 object_count: 175
-unsupported_count: 58
+unsupported_count: 50
+unsupported_by_type: group=49, table=1
 critical_failures: 0
-visual_score: 32.62
+visual_score: 36.33
+native_images: 8
+```
+
+Latest C3.1 visual comparison board:
+
+```text
+verification/cloner-visual-compare/it-software-sales-proposal-slides-c3-1-triptych.png
 ```
 
 C3 gates:
@@ -165,21 +182,21 @@ Current C3 pass means:
 Current C3 pass does **not** mean:
 
 - high visual fidelity is achieved;
-- images are restored natively;
 - groups/charts/tables are reconstructed;
 - layout/component archetypes are ready for promotion;
 - a reusable template generator exists.
 
-The low visual scores are expected for the first baseline because unsupported object classes are intentionally classified as placeholders rather than silently dropped.
+The low visual scores are expected for the current baseline because group/table reconstruction and slide/background-level styling are still incomplete. C3.1 proves media relationship recovery works: image objects are now native picture objects, not placeholders, but this alone is insufficient for full visual fidelity because many template-defining elements are still encoded as grouped objects or slide-level/master-level background material.
 
 ## Next Optimization Loop
 
 Before treating C4/C5/C6 promotions as strong evidence, improve C3 fidelity by reducing unsupported placeholders:
 
-1. Resolve image relationships from slide rels/object inventory and rebuild source images with correct crop/box where possible.
+1. Improve slide/background/master-level fill reconstruction so dark/gradient templates do not collapse to white slides.
 2. Improve shape geometry/fill/stroke extraction beyond rectangle placeholders.
 3. Classify and flatten groups with child object recovery instead of one placeholder.
 4. Add chart/table classification gates that distinguish native reconstruction vs placeholder fallback.
-5. Make visual fidelity threshold gradually blocking once unsupported image/group classes are materially reduced.
+5. Add crop/mask support for native images where source `a:srcRect`, transparency, or shape masks affect fidelity.
+6. Make visual fidelity threshold gradually blocking once unsupported group/background classes are materially reduced.
 
 The acceptance loop should continue to treat package/text/render failures as blocking. Visual score remains a recorded baseline until C3 has enough native object-class coverage to make a threshold fair.

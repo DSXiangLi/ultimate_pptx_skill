@@ -258,14 +258,15 @@ First C3 baseline blocking criteria:
 - rebuilt PPTX renders when `--require-render` is used;
 - source-vs-rebuilt visual diff report is produced.
 
-First C3 baseline non-blocking but required evidence:
+Current C3 baseline non-blocking but required evidence:
 
-- `rebuild-report.json` classifies unsupported images/groups/charts/tables instead of silently dropping them;
+- `rebuild-report.json` classifies unsupported groups/charts/tables/background/material classes instead of silently dropping them;
+- C3.1 image objects with source media relationships are reconstructed as native PPTX picture objects;
 - visual fidelity score is recorded but not yet threshold-blocking, because the first baseline uses placeholders for unsupported object classes.
 
 Acceptance targets for normal editable decks:
 
-- first baseline: strict package pass, slide recall = 100%, critical text recall = 100%, render baseline exists, and every unsupported object class is classified;
+- current baseline: strict package pass, slide recall = 100%, critical text recall = 100%, render baseline exists, image relationships are reconstructed, and every unsupported object class is classified;
 - mature clone mode: visual fidelity ≥ 97, or every miss is classified and accepted as a deliberate fallback;
 - critical text recall = 100%;
 - editability score ≥ 95%;
@@ -514,8 +515,8 @@ For the current skill, implement in this order:
 
 1. Build/validate C1 specimen analyzer on two P0 templates: `dark-minimalist-business` and `it-software-sales-proposal-slides`.
 2. Add C2 raw IR decompiler for text/shape/image first; charts/tables can be classified before full native reconstruction.
-3. Add C3 rebuild fidelity gate and visual diff reports. First C3 baseline is implemented as strict package/text/render validation with unsupported object classification.
-4. Continue C3 optimization by reducing unsupported image/group/chart/table placeholders before making visual score threshold-blocking.
+3. Add C3 rebuild fidelity gate and visual diff reports. C3 baseline is implemented as strict package/text/render validation with unsupported object classification.
+4. Continue C3 optimization: C3.1 image relationship reconstruction is implemented; next reduce slide/background/master styling, group, chart, and table placeholders before making visual score threshold-blocking.
 5. Only then start C4–C6 mining on the first 4–6 selected templates, with C3 unsupported/visual-score evidence attached to every promoted claim.
 6. Promote one template family end-to-end before expanding to many families.
 7. For each promotion, add benchmark evidence and update skill gates so the learning improves future generation.

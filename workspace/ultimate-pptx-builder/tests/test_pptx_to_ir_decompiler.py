@@ -48,6 +48,13 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             self.assertIn("shape", object_types)
             self.assertIn("image", object_types)
 
+            image_objs = [obj for obj in slide["objects"] if obj["type"] == "image"]
+            self.assertTrue(image_objs)
+            image_ref = image_objs[0].get("image_ref") or {}
+            self.assertRegex(image_ref.get("relationship_id", ""), r"^rId\d+$")
+            self.assertRegex(image_ref.get("package_path", ""), r"^ppt/media/.+\.png$")
+            self.assertEqual(image_ref.get("ext"), "png")
+
             for obj in slide["objects"]:
                 self.assertIn("id", obj)
                 self.assertIn("box", obj)

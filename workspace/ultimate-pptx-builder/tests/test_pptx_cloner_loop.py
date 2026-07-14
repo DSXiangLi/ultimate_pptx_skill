@@ -54,6 +54,17 @@ class PptxClonerLoopTests(unittest.TestCase):
             self.assertTrue((out / "decompiled.raw.ir.json").exists())
             self.assertTrue((out / "rebuilt.pptx").exists())
             self.assertTrue((out / "rebuild-report.json").exists())
+            rebuild_report = json.loads((out / "rebuild-report.json").read_text(encoding="utf-8"))
+            produced_by_type = {
+                item["type"]: item["produced"]
+                for item in rebuild_report["objects"]
+                if item["type"] == "image"
+            }
+            self.assertIn("native-image", set(produced_by_type.values()))
+            self.assertFalse(
+                any(item["type"] == "image" for item in rebuild_report["unsupported_objects"]),
+                "image objects with source media references should be reconstructed, not placeholdered",
+            )
             gate_ids = {gate["id"] for gate in data["gates"]}
             self.assertIn("C1-EVIDENCE-PACK", gate_ids)
             self.assertIn("C2-TEXT-RECALL", gate_ids)

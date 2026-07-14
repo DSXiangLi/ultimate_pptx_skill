@@ -49,13 +49,19 @@ class PptxClonerLoopTests(unittest.TestCase):
             self.assertEqual(data["release_decision"], "pass")
             self.assertEqual(data["blocking_count"], 0)
             self.assertTrue(data["next_phase_allowed"])
-            self.assertEqual(data["next_phase"], "C3 diagnostic rebuild fidelity")
+            self.assertEqual(data["next_phase"], "C4 template archetype mining")
             self.assertTrue((out / "original.pptx").exists())
             self.assertTrue((out / "decompiled.raw.ir.json").exists())
+            self.assertTrue((out / "rebuilt.pptx").exists())
+            self.assertTrue((out / "rebuild-report.json").exists())
             gate_ids = {gate["id"] for gate in data["gates"]}
             self.assertIn("C1-EVIDENCE-PACK", gate_ids)
             self.assertIn("C2-TEXT-RECALL", gate_ids)
             self.assertIn("C2-CRITICAL-TEXT-EDITABILITY", gate_ids)
+            self.assertIn("C3-REBUILD-PPTX", gate_ids)
+            self.assertIn("C3-STRICT-PACKAGE", gate_ids)
+            self.assertIn("C3-REBUILT-TEXT-RECALL", gate_ids)
+            self.assertIn("c3_artifacts", data)
 
     def test_evaluator_fails_with_actionable_queue_for_missing_ir(self):
         from run_pptx_cloner_loop import evaluate_c1_c2  # type: ignore

@@ -22,6 +22,8 @@ from analyze_pptx_specimen import inventory_objects, sha256_file  # noqa: E402
 def editability_for(obj: Dict[str, Any]) -> Dict[str, Any]:
     text = (obj.get("text") or "").strip()
     typ = obj.get("type")
+    if typ == "text" and not text:
+        return {"priority": 1, "reason": "empty/decorative text container; preserve as metadata only"}
     if text:
         return {"priority": 5, "reason": "source object contains text; preserve native editability"}
     if typ in {"shape", "table", "chart"}:
@@ -34,6 +36,8 @@ def editability_for(obj: Dict[str, Any]) -> Dict[str, Any]:
 def render_policy_for(obj: Dict[str, Any]) -> str:
     text = (obj.get("text") or "").strip()
     typ = obj.get("type")
+    if typ == "text" and not text:
+        return "skip"
     if text:
         return "native"
     if typ in {"text", "shape", "table", "chart"}:
@@ -43,6 +47,17 @@ def render_policy_for(obj: Dict[str, Any]) -> str:
     if typ == "group":
         return "hybrid"
     return "native"
+
+
+def classification_for(obj: Dict[str, Any]) -> Dict[str, Any]:
+    text = (obj.get("text") or "").strip()
+    typ = obj.get("type")
+    if typ == "text" and not text:
+        return {
+            "kind": "empty-text-container",
+            "reason": "text-frame object has no source text; treat as structural/decorative metadata rather than a visual placeholder",
+        }
+    return {"kind": "source-object"}
 
 
 def box_for(obj: Dict[str, Any]) -> Dict[str, Any]:
@@ -74,6 +89,7 @@ def raw_ir_object(obj: Dict[str, Any]) -> Dict[str, Any]:
         "source_shape_name": obj.get("source_shape_name") or obj.get("name", ""),
         "editability": editability_for(obj),
         "render_policy": render_policy_for(obj),
+        "classification": classification_for(obj),
     }
     if obj.get("type") == "image":
         out["image_ref"] = {

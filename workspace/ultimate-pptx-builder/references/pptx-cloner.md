@@ -265,7 +265,8 @@ Current C3 baseline non-blocking but required evidence:
 - C3.2 solid slide-level backgrounds from `p:cSld/p:bg/p:bgPr` are reconstructed as native PPTX slide backgrounds;
 - C3.3 picture-fill shapes encoded as `<p:sp>` with `<a:blip>` are reconstructed as native PPTX picture material;
 - C3.4 group recursion emits group children with `group_id` traceability and records child-bearing containers as structural `expanded-group-container` entries instead of opaque placeholders;
-- visual fidelity score is recorded but not yet threshold-blocking, because remaining gaps still include empty text containers, tables/charts, crop/mask/effects, and advanced shape styling.
+- C3.5 empty/decorative text containers are classified as metadata and skipped instead of becoming diagnostic placeholders;
+- visual fidelity score is recorded but not yet threshold-blocking, because remaining gaps still include tables/charts, crop/mask/effects, and advanced shape styling.
 
 Acceptance targets for normal editable decks:
 
@@ -519,7 +520,7 @@ For the current skill, implement in this order:
 1. Build/validate C1 specimen analyzer on two P0 templates: `dark-minimalist-business` and `it-software-sales-proposal-slides`.
 2. Add C2 raw IR decompiler for text/shape/image first; charts/tables can be classified before full native reconstruction.
 3. Add C3 rebuild fidelity gate and visual diff reports. C3 baseline is implemented as strict package/text/render validation with unsupported object classification.
-4. Continue C3 optimization: C3.1 image relationship reconstruction, C3.2 solid slide background reconstruction, C3.3 picture-fill shape reconstruction, and C3.4 group recursion are implemented; next reduce empty text placeholders, shape styling gaps, chart, and table placeholders before making visual score threshold-blocking.
+4. Continue C3 optimization: C3.1 image relationship reconstruction, C3.2 solid slide background reconstruction, C3.3 picture-fill shape reconstruction, C3.4 group recursion, and C3.5 empty text container classification are implemented; next reduce shape styling gaps, chart, and table placeholders before making visual score threshold-blocking.
 5. Only then start C4–C6 mining on the first 4–6 selected templates, with C3 unsupported/visual-score evidence attached to every promoted claim.
 6. Promote one template family end-to-end before expanding to many families.
 7. For each promotion, add benchmark evidence and update skill gates so the learning improves future generation.

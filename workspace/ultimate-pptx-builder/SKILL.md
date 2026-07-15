@@ -347,6 +347,7 @@ The visual/design critique starts at HTML preview time. If the HTML already show
 4. **Ignoring Office reality.** Fonts, charts, file size, print/PDF behavior, and corporate editing matter.
 5. **Skipping QA because the preview looks good.** PowerPoint text metrics and rendering differ from Chromium.
 6. **Trusting fidelity/editability scores as design acceptance.** Add layout/text safety and rendered-page review; a faithful PPTX can faithfully render a bad layout.
+7. **Optimizing a single clone instead of the PPTX system.** For cloner work, source/rebuilt decks are diagnostic evidence, not the product. Every fix should become a reusable reverse-compiler capability, template-system rule, component contract, benchmark, or gate before being considered complete.
 
 ## Verification Checklist
 
@@ -357,6 +358,7 @@ The visual/design critique starts at HTML preview time. If the HTML already show
 - [ ] `references/pptx-cloner-c3-background-reconstruction.md` is consulted when rebuilt slides collapse to white or lose dark/colored template material; it records slide-level `p:bg` extraction and native background rebuild.
 - [ ] `references/pptx-cloner-c3-picture-fill-shapes.md` is consulted when image-like visuals are encoded as `<p:sp>` picture fills rather than `<p:pic>` objects.
 - [ ] `references/pptx-cloner-c3-group-recursion.md` is consulted when grouped icons/cards/decorative systems remain opaque placeholders; group containers should become traceable child objects before component mining.
+- [ ] `references/pptx-cloner-c3-empty-text-containers.md` is consulted when C3 reports unsupported `text` objects after group recursion; empty/decorative text containers should be classified or skipped rather than drawn as placeholders.
 - [ ] `references/pptx-cloner-acceptance-loop.md` is consulted for the phase-gated fail → diagnose → optimize → rerun contract; do not advance cloner phases unless the current loop report has `release_decision: pass`.
 - [ ] `references/pptx-template-research-library.md` defines the curated template library policy and first-batch clone candidates.
 - [ ] `references/acceptance-matrix.md` defines phase gates and blocking failures.

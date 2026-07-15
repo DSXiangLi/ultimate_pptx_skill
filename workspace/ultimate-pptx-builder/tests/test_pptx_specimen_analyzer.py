@@ -57,6 +57,9 @@ def make_sample_pptx(path: Path) -> None:
     grouped.name = "sample_grouped_metric"
     grouped.text = "Grouped Insight"
 
+    empty = slide.shapes.add_textbox(Inches(4.2), Inches(3.4), Inches(1.2), Inches(0.4))
+    empty.name = "sample_empty_text_container"
+
     prs.save(str(path))
 
 

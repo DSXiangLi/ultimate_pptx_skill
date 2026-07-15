@@ -85,6 +85,12 @@ class PptxClonerLoopTests(unittest.TestCase):
                 "groups with emitted children should not remain opaque placeholders in C3",
             )
             self.assertIn(grouped_child["produced"], {"native-text", "native-shape"})
+            empty_text = next(item for item in rebuild_report["objects"] if item.get("source_shape_name") == "sample_empty_text_container")
+            self.assertEqual(empty_text["produced"], "skipped-empty-text-container")
+            self.assertFalse(
+                any(item["type"] == "text" for item in rebuild_report["unsupported_objects"]),
+                "empty/decorative text containers should be classified and skipped, not placeholdered",
+            )
             gate_ids = {gate["id"] for gate in data["gates"]}
             self.assertIn("C1-EVIDENCE-PACK", gate_ids)
             self.assertIn("C2-TEXT-RECALL", gate_ids)

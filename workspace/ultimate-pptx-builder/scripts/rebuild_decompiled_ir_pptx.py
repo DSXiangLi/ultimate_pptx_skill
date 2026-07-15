@@ -194,6 +194,10 @@ def is_critical_text(obj: Dict[str, Any]) -> bool:
     return bool((obj.get("text") or "").strip()) and int((obj.get("editability") or {}).get("priority") or 0) >= 4
 
 
+def is_empty_text_container(obj: Dict[str, Any]) -> bool:
+    return obj.get("type") == "text" and not (obj.get("text") or "").strip() and (obj.get("classification") or {}).get("kind") == "empty-text-container"
+
+
 def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str, Any]:
     deck = ir.get("deck") or {}
     slides_ir = deck.get("slides") or []
@@ -225,7 +229,10 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
             produced = "unsupported"
             note = ""
             try:
-                if (obj.get("text") or "").strip():
+                if is_empty_text_container(obj):
+                    produced = "skipped-empty-text-container"
+                    note = "empty/decorative text container classified in C2; no visual placeholder emitted"
+                elif (obj.get("text") or "").strip():
                     produced = add_native_text(slide, obj)
                 elif typ == "group" and int(obj.get("child_count") or 0) > 0:
                     produced = "expanded-group-container"
@@ -262,9 +269,11 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
                 "id": obj.get("id"),
                 "type": typ,
                 "source_shape_id": source_id,
+                "source_shape_name": obj.get("source_shape_name", ""),
                 "group_id": obj.get("group_id", ""),
                 "parent_group_name": obj.get("parent_group_name", ""),
                 "child_count": obj.get("child_count"),
+                "classification": (obj.get("classification") or {}).get("kind", ""),
                 "has_text": bool((obj.get("text") or "").strip()),
                 "editability_priority": (obj.get("editability") or {}).get("priority"),
                 "produced": produced,

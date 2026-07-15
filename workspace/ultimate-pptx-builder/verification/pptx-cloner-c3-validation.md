@@ -30,6 +30,7 @@ This does **not** mean high-fidelity visual cloning is solved. C3 now proves tha
   - C3.2 reconstructs solid slide-level backgrounds from `p:cSld/p:bg/p:bgPr` as native slide backgrounds.
   - C3.3 reconstructs picture-fill shapes (`<p:sp>` with `<a:blip>`) as native image material instead of grey native-shape fallbacks.
   - C3.4 recursively emits group children and records child-bearing group containers as structural `expanded-group-container` entries instead of opaque placeholders.
+  - C3.5 classifies empty/decorative text containers as metadata and skips materialization instead of drawing diagnostic placeholders.
   - Materializes charts/tables/unsupported classes as classified placeholders until their object coverage increments land.
   - Writes `rebuild-report.json` with unsupported object classifications and critical text failures.
 
@@ -95,20 +96,21 @@ C3 details:
 
 ```text
 object_count: 234
-unsupported_count: 11
-unsupported_by_type: text=11
+unsupported_count: 0
+unsupported_by_type: none
 critical_failures: 0
-visual_score: 96.50
+visual_score: 96.66
 native_images: 19
 native_slide_backgrounds: 21
 expanded_group_containers: 16
+skipped_empty_text_containers: 11
 objects_with_group_id: 69
 ```
 
-Latest C3.4 visual comparison board:
+Latest C3.5 visual comparison board:
 
 ```text
-verification/cloner-visual-compare/dark-minimalist-business-c3-4-triptych.png
+verification/cloner-visual-compare/dark-minimalist-business-c3-5-triptych.png
 ```
 
 C3 gates:
@@ -150,21 +152,22 @@ C3 details:
 
 ```text
 object_count: 314
-unsupported_count: 38
-unsupported_by_type: text=37, table=1
+unsupported_count: 1
+unsupported_by_type: table=1
 critical_failures: 0
-visual_score: 88.81
+visual_score: 88.95
 native_images: 8
 native_slide_backgrounds: 14
 native_picture_fill_shape_images: 24
 expanded_group_containers: 64
+skipped_empty_text_containers: 37
 objects_with_group_id: 139
 ```
 
-Latest C3.4 visual comparison board:
+Latest C3.5 visual comparison board:
 
 ```text
-verification/cloner-visual-compare/it-software-sales-proposal-slides-c3-4-triptych.png
+verification/cloner-visual-compare/it-software-sales-proposal-slides-c3-5-triptych.png
 ```
 
 C3 gates:
@@ -193,21 +196,19 @@ Current C3 pass does **not** mean:
 
 - high visual fidelity is achieved;
 - charts/tables are reconstructed;
-- empty/decorative text containers are fully classified;
 - layout/component archetypes are ready for promotion;
 - a reusable template generator exists.
 
-The remaining fidelity gaps are now much more specific. C3.1 proves media relationship recovery works: image objects are now native picture objects, not placeholders. C3.2 proves slide-level solid background recovery works: dark/colored templates no longer collapse to white. C3.3 proves picture-fill shapes can be recovered from `<p:sp>`/`<a:blip>` material instead of becoming grey rectangles. C3.4 proves groups can be opened into traceable child objects instead of opaque placeholders. Remaining visual misses are concentrated in empty text containers that should be skipped/classified, one table, shape styling details, gradients/theme references, and crop/mask/effect fidelity.
+The remaining fidelity gaps are now much more specific. C3.1 proves media relationship recovery works: image objects are now native picture objects, not placeholders. C3.2 proves slide-level solid background recovery works: dark/colored templates no longer collapse to white. C3.3 proves picture-fill shapes can be recovered from `<p:sp>`/`<a:blip>` material instead of becoming grey rectangles. C3.4 proves groups can be opened into traceable child objects instead of opaque placeholders. C3.5 proves empty/decorative text containers can be classified as metadata and skipped. Remaining visual misses are concentrated in one table, shape styling details, gradients/theme references, and crop/mask/effect fidelity.
 
 ## Next Optimization Loop
 
 Before treating C4/C5/C6 promotions as strong evidence, improve C3 fidelity by reducing unsupported placeholders:
 
-1. Skip or classify empty/decorative text containers instead of materializing them as placeholders.
+1. Add chart/table classification gates that distinguish native reconstruction vs placeholder fallback.
 2. Improve shape geometry/fill/stroke extraction beyond rectangle placeholders.
-3. Add chart/table classification gates that distinguish native reconstruction vs placeholder fallback.
-4. Add crop/mask support for native images where source `a:srcRect`, transparency, or shape masks affect fidelity.
-5. Extend background reconstruction from solid RGB to theme references, gradients, image backgrounds, and layout/master inheritance.
-6. Make visual fidelity threshold gradually blocking once unsupported text/table/shape/chart classes are materially reduced.
+3. Add crop/mask support for native images where source `a:srcRect`, transparency, or shape masks affect fidelity.
+4. Extend background reconstruction from solid RGB to theme references, gradients, image backgrounds, and layout/master inheritance.
+5. Make visual fidelity threshold gradually blocking once unsupported table/shape/chart/effect classes are materially reduced.
 
 The acceptance loop should continue to treat package/text/render failures as blocking. Visual score remains a recorded baseline until C3 has enough native object-class coverage to make a threshold fair.

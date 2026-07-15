@@ -57,6 +57,12 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             self.assertRegex(grouped[0].get("group_id", ""), r"^slide01_shape\d+$")
             self.assertEqual(grouped[0].get("parent_group_name"), "sample_group")
 
+            empty = next(obj for obj in slide["objects"] if obj.get("source_shape_name") == "sample_empty_text_container")
+            self.assertEqual(empty["type"], "text")
+            self.assertEqual(empty.get("classification", {}).get("kind"), "empty-text-container")
+            self.assertEqual(empty["render_policy"], "skip")
+            self.assertLessEqual(empty["editability"]["priority"], 1)
+
             image_objs = [obj for obj in slide["objects"] if obj["type"] == "image"]
             self.assertTrue(image_objs)
             image_ref = image_objs[0].get("image_ref") or {}

@@ -23,7 +23,8 @@ C3.0 package/text/render baseline
 → C3.2 slide/background/master material reconstruction
 → C3.3 shape visual-property reconstruction
 → C3.4 group recursion / child flattening
-→ C3.5 chart/table classification and partial native reconstruction
+→ C3.5 empty/decorative text container classification
+→ C3.6 chart/table classification and partial native reconstruction
 → C3.mature visual fidelity threshold
 ```
 
@@ -110,7 +111,19 @@ Acceptance:
 - child text/images/shapes inside groups contribute to recall;
 - z-order remains deterministic and traceable.
 
-## C3.5 — Chart/Table Classification and Partial Reconstruction
+## C3.5 — Empty / Decorative Text Container Classification
+
+After group recursion, many remaining `text` placeholders may be empty text-frame artifacts rather than missing content.
+
+Implemented first slice: C2 classifies empty `type: text` objects as `classification.kind == "empty-text-container"`, lowers editability priority to 1, and sets `render_policy: skip`; C3 records them as `skipped-empty-text-container` and does not draw placeholders or list them as unsupported.
+
+Acceptance:
+
+- unsupported `text` placeholders drop to zero when all text objects are empty/decorative;
+- critical text recall remains 100%;
+- skipped objects preserve source shape/group traceability in `rebuild-report.json`.
+
+## C3.6 — Chart/Table Classification and Partial Reconstruction
 
 Charts and tables can initially stay classified before full native reconstruction, but they must not be anonymous placeholders.
 

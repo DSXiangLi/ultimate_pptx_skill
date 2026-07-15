@@ -129,6 +129,8 @@ Charts and tables can initially stay classified before full native reconstructio
 
 Implemented first table slice: C1 extracts native PowerPoint table rows, columns, and cell text; C2 emits structured `table_ref` with `classification.kind == "native-table-candidate"`; C3 rebuilds simple native tables with `slide.shapes.add_table(...)` and records `produced: native-table`.
 
+Implemented first styling slice: C1 captures conservative cell-level solid fills, margins, alignment, and first-run font properties; C3 applies them during native table rebuild and reports `styled_table_cells`. Gradient/theme fills and borders remain later styling increments.
+
 Minimum classification:
 
 - chart XML relationship and chart type if available;

@@ -70,6 +70,15 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             self.assertEqual(table_ref.get("column_count"), 2)
             self.assertEqual(table_ref.get("cells", [])[0][0], "Driver")
             self.assertEqual(table_ref.get("cells", [])[1][1], "High")
+            cell_styles = table_ref.get("cell_styles") or []
+            self.assertEqual(cell_styles[0][0].get("fill_rgb"), "1A2B3C")
+            self.assertEqual(cell_styles[0][0].get("font", {}).get("name"), "Aptos Display")
+            self.assertEqual(cell_styles[0][0].get("font", {}).get("size_pt"), 14)
+            self.assertTrue(cell_styles[0][0].get("font", {}).get("bold"))
+            self.assertEqual(cell_styles[0][0].get("font", {}).get("color_rgb"), "FFFFFF")
+            self.assertEqual(cell_styles[0][0].get("alignment"), "CENTER")
+            self.assertEqual(cell_styles[0][0].get("margin_left_emu"), 91440)
+            self.assertEqual(cell_styles[1][0].get("fill_rgb"), "DDEEFF")
             self.assertEqual(table.get("classification", {}).get("kind"), "native-table-candidate")
 
             image_objs = [obj for obj in slide["objects"] if obj["type"] == "image"]

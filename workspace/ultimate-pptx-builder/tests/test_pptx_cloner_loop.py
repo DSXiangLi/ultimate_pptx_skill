@@ -11,6 +11,8 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+from pptx import Presentation
+
 from tests.test_pptx_specimen_analyzer import make_sample_pptx
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -93,10 +95,20 @@ class PptxClonerLoopTests(unittest.TestCase):
             )
             table = next(item for item in rebuild_report["objects"] if item.get("source_shape_name") == "sample_native_table")
             self.assertEqual(table["produced"], "native-table")
+            self.assertGreaterEqual(table.get("styled_table_cells") or 0, 4)
             self.assertFalse(
                 any(item["type"] == "table" for item in rebuild_report["unsupported_objects"]),
                 "simple native tables should be reconstructed, not placeholdered",
             )
+            rebuilt = Presentation(str(out / "rebuilt.pptx"))
+            rebuilt_table = next(shape.table for shape in rebuilt.slides[0].shapes if getattr(shape, "has_table", False))
+            rebuilt_header = rebuilt_table.cell(0, 0)
+            rebuilt_run = rebuilt_header.text_frame.paragraphs[0].runs[0]
+            self.assertEqual(str(rebuilt_header.fill.fore_color.rgb), "1A2B3C")
+            self.assertEqual(rebuilt_run.font.name, "Aptos Display")
+            self.assertEqual(round(float(rebuilt_run.font.size.pt)), 14)
+            self.assertTrue(rebuilt_run.font.bold)
+            self.assertEqual(str(rebuilt_run.font.color.rgb), "FFFFFF")
             gate_ids = {gate["id"] for gate in data["gates"]}
             self.assertIn("C1-EVIDENCE-PACK", gate_ids)
             self.assertIn("C2-TEXT-RECALL", gate_ids)

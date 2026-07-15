@@ -14,6 +14,7 @@ from PIL import Image
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.text import PP_PARAGRAPH_ALIGNMENT as PP_ALIGN
 from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,6 +67,31 @@ def make_sample_pptx(path: Path) -> None:
     table_shape.table.cell(0, 1).text = "Value"
     table_shape.table.cell(1, 0).text = "Speed"
     table_shape.table.cell(1, 1).text = "High"
+    for c in range(2):
+        cell = table_shape.table.cell(0, c)
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = RGBColor(0x1A, 0x2B, 0x3C)
+        cell.text_frame.margin_left = 91440
+        cell.text_frame.margin_right = 91440
+        cell.text_frame.margin_top = 45720
+        cell.text_frame.margin_bottom = 45720
+        para = cell.text_frame.paragraphs[0]
+        para.alignment = PP_ALIGN.CENTER
+        run = para.runs[0]
+        run.font.name = "Aptos Display"
+        run.font.size = Pt(14)
+        run.font.bold = True
+        run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+    for c in range(2):
+        cell = table_shape.table.cell(1, c)
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = RGBColor(0xDD, 0xEE, 0xFF)
+        para = cell.text_frame.paragraphs[0]
+        para.alignment = PP_ALIGN.CENTER
+        run = para.runs[0]
+        run.font.name = "Aptos"
+        run.font.size = Pt(12)
+        run.font.color.rgb = RGBColor(0x12, 0x34, 0x56)
 
     prs.save(str(path))
 

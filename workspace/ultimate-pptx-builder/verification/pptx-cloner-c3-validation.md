@@ -32,6 +32,7 @@ This does **not** mean high-fidelity visual cloning is solved. C3 now proves tha
   - C3.4 recursively emits group children and records child-bearing group containers as structural `expanded-group-container` entries instead of opaque placeholders.
   - C3.5 classifies empty/decorative text containers as metadata and skips materialization instead of drawing diagnostic placeholders.
   - C3.6 reconstructs simple native tables from structured `table_ref` IR as editable PowerPoint tables.
+  - C3.7 applies conservative native table styling: solid cell fills, margins, paragraph alignment, and first-run font properties.
   - Materializes charts/unsupported classes as classified placeholders until their object coverage increments land.
   - Writes `rebuild-report.json` with unsupported object classifications and critical text failures.
 
@@ -109,10 +110,10 @@ native_tables: 0
 objects_with_group_id: 69
 ```
 
-Latest C3.6 visual comparison board:
+Latest C3.7 visual comparison board:
 
 ```text
-verification/cloner-visual-compare/dark-minimalist-business-c3-6-triptych.png
+verification/cloner-visual-compare/dark-minimalist-business-c3-7-triptych.png
 ```
 
 C3 gates:
@@ -157,20 +158,21 @@ object_count: 314
 unsupported_count: 0
 unsupported_by_type: none
 critical_failures: 0
-visual_score: 88.74
+visual_score: 88.65
 native_images: 8
 native_slide_backgrounds: 14
 native_picture_fill_shape_images: 24
 expanded_group_containers: 64
 skipped_empty_text_containers: 37
 native_tables: 1
+styled_table_cells: 18
 objects_with_group_id: 139
 ```
 
-Latest C3.6 visual comparison board:
+Latest C3.7 visual comparison board:
 
 ```text
-verification/cloner-visual-compare/it-software-sales-proposal-slides-c3-6-triptych.png
+verification/cloner-visual-compare/it-software-sales-proposal-slides-c3-7-triptych.png
 ```
 
 C3 gates:
@@ -202,7 +204,7 @@ Current C3 pass does **not** mean:
 - layout/component archetypes are ready for promotion;
 - a reusable template generator exists.
 
-The remaining fidelity gaps are now much more specific. C3.1 proves media relationship recovery works: image objects are now native picture objects, not placeholders. C3.2 proves slide-level solid background recovery works: dark/colored templates no longer collapse to white. C3.3 proves picture-fill shapes can be recovered from `<p:sp>`/`<a:blip>` material instead of becoming grey rectangles. C3.4 proves groups can be opened into traceable child objects instead of opaque placeholders. C3.5 proves empty/decorative text containers can be classified as metadata and skipped. C3.6 proves simple native tables can be rebuilt as editable PowerPoint tables. Remaining visual misses are concentrated in table styling, shape styling details, gradients/theme references, crop/mask/effect fidelity, and chart support.
+The remaining fidelity gaps are now much more specific. C3.1 proves media relationship recovery works: image objects are now native picture objects, not placeholders. C3.2 proves slide-level solid background recovery works: dark/colored templates no longer collapse to white. C3.3 proves picture-fill shapes can be recovered from `<p:sp>`/`<a:blip>` material instead of becoming grey rectangles. C3.4 proves groups can be opened into traceable child objects instead of opaque placeholders. C3.5 proves empty/decorative text containers can be classified as metadata and skipped. C3.6 proves simple native tables can be rebuilt as editable PowerPoint tables. C3.7 proves conservative table styling can be extracted and applied, but the slight `it-software` score dip shows that border/gradient/theme support must follow; partial native styling is diagnostic progress, not final visual acceptance. Remaining visual misses are concentrated in table borders/gradients/theme styling, shape styling details, gradients/theme references, crop/mask/effect fidelity, and chart support.
 
 ## Next Optimization Loop
 

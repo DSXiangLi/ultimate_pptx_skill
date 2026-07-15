@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Tuple
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE  # type: ignore
-from pptx.enum.text import MSO_ANCHOR  # type: ignore
+from pptx.enum.text import MSO_ANCHOR, PP_ALIGN  # type: ignore
 from pptx.util import Emu, Pt
 
 
@@ -177,9 +177,65 @@ def add_picture_fill_shape_as_image(slide, obj: Dict[str, Any], source_pptx: Pat
     return "native-picture-fill-shape-image"
 
 
+def apply_table_cell_style(cell, style: Dict[str, Any]) -> bool:
+    if not style:
+        return False
+    applied = False
+    fill_rgb = style.get("fill_rgb")
+    if fill_rgb:
+        try:
+            cell.fill.solid()
+            cell.fill.fore_color.rgb = rgb(fill_rgb)
+            applied = True
+        except Exception:
+            pass
+    try:
+        tf = cell.text_frame
+        for key in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+            value = style.get(key + "_emu")
+            if value is not None:
+                setattr(tf, key, Emu(int(value)))
+                applied = True
+        alignment = str(style.get("alignment") or "").upper()
+        if alignment and tf.paragraphs:
+            align_map = {
+                "LEFT": PP_ALIGN.LEFT,
+                "CENTER": PP_ALIGN.CENTER,
+                "RIGHT": PP_ALIGN.RIGHT,
+                "JUSTIFY": PP_ALIGN.JUSTIFY,
+            }
+            if alignment in align_map:
+                tf.paragraphs[0].alignment = align_map[alignment]
+                applied = True
+        font_style = style.get("font") or {}
+        if font_style and tf.paragraphs:
+            runs = tf.paragraphs[0].runs
+            if runs:
+                font = runs[0].font
+                if font_style.get("name"):
+                    font.name = str(font_style.get("name"))
+                    applied = True
+                if font_style.get("size_pt"):
+                    font.size = Pt(float(font_style.get("size_pt")))
+                    applied = True
+                if font_style.get("bold") is not None:
+                    font.bold = bool(font_style.get("bold"))
+                    applied = True
+                if font_style.get("italic") is not None:
+                    font.italic = bool(font_style.get("italic"))
+                    applied = True
+                if font_style.get("color_rgb"):
+                    font.color.rgb = rgb(font_style.get("color_rgb"))
+                    applied = True
+    except Exception:
+        pass
+    return applied
+
+
 def add_native_table(slide, obj: Dict[str, Any]) -> str:
     table_ref = obj.get("table_ref") or {}
     cells = table_ref.get("cells") or []
+    cell_styles = table_ref.get("cell_styles") or []
     rows = int(table_ref.get("row_count") or len(cells) or 0)
     cols = int(table_ref.get("column_count") or (len(cells[0]) if cells else 0) or 0)
     if rows <= 0 or cols <= 0:
@@ -187,9 +243,15 @@ def add_native_table(slide, obj: Dict[str, Any]) -> str:
     shape = slide.shapes.add_table(rows, cols, *box_emu(obj))
     shape.name = (str(obj.get("id") or "rebuilt_table") + "__table")[:250]
     table = shape.table
+    styled_count = 0
     for r, row in enumerate(cells[:rows]):
         for c, value in enumerate(row[:cols]):
-            table.cell(r, c).text = str(value or "")
+            cell = table.cell(r, c)
+            cell.text = str(value or "")
+            style = cell_styles[r][c] if r < len(cell_styles) and c < len(cell_styles[r]) else {}
+            if apply_table_cell_style(cell, style):
+                styled_count += 1
+    obj["_styled_table_cells"] = styled_count
     return "native-table"
 
 
@@ -294,6 +356,7 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
                 "classification": (obj.get("classification") or {}).get("kind", ""),
                 "table_rows": (obj.get("table_ref") or {}).get("row_count"),
                 "table_columns": (obj.get("table_ref") or {}).get("column_count"),
+                "styled_table_cells": obj.get("_styled_table_cells", 0),
                 "has_text": bool((obj.get("text") or "").strip()),
                 "editability_priority": (obj.get("editability") or {}).get("priority"),
                 "produced": produced,

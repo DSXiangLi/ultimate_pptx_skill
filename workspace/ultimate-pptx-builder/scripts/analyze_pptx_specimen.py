@@ -250,12 +250,56 @@ def table_summary(shape: Any) -> Dict[str, Any]:
     try:
         table = shape.table
         cells: List[List[str]] = []
+        cell_styles: List[List[Dict[str, Any]]] = []
         for row in table.rows:
-            cells.append([cell.text for cell in row.cells])
+            cell_texts: List[str] = []
+            row_styles: List[Dict[str, Any]] = []
+            for cell in row.cells:
+                cell_texts.append(cell.text)
+                style: Dict[str, Any] = {}
+                try:
+                    if str(cell.fill.type).startswith("SOLID") and getattr(cell.fill.fore_color, "rgb", None):
+                        style["fill_rgb"] = str(cell.fill.fore_color.rgb)
+                except Exception:
+                    pass
+                try:
+                    tf = cell.text_frame
+                    for key in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+                        value = getattr(tf, key, None)
+                        if value is not None:
+                            style[key + "_emu"] = int(value)
+                    if tf.paragraphs:
+                        para = tf.paragraphs[0]
+                        if para.alignment is not None:
+                            style["alignment"] = str(para.alignment).split()[0]
+                        for run in para.runs:
+                            font: Dict[str, Any] = {}
+                            if run.font.name:
+                                font["name"] = run.font.name
+                            if run.font.size:
+                                font["size_pt"] = round(float(run.font.size.pt), 3)
+                            if run.font.bold is not None:
+                                font["bold"] = bool(run.font.bold)
+                            if run.font.italic is not None:
+                                font["italic"] = bool(run.font.italic)
+                            try:
+                                if getattr(run.font.color, "rgb", None):
+                                    font["color_rgb"] = str(run.font.color.rgb)
+                            except Exception:
+                                pass
+                            if font:
+                                style["font"] = font
+                                break
+                except Exception:
+                    pass
+                row_styles.append(style)
+            cells.append(cell_texts)
+            cell_styles.append(row_styles)
         return {
             "row_count": len(table.rows),
             "column_count": len(table.columns),
             "cells": cells,
+            "cell_styles": cell_styles,
         }
     except Exception:
         return {}

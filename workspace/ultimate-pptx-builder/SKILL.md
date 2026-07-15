@@ -360,6 +360,7 @@ The visual/design critique starts at HTML preview time. If the HTML already show
 - [ ] `references/pptx-cloner-c3-group-recursion.md` is consulted when grouped icons/cards/decorative systems remain opaque placeholders; group containers should become traceable child objects before component mining.
 - [ ] `references/pptx-cloner-c3-empty-text-containers.md` is consulted when C3 reports unsupported `text` objects after group recursion; empty/decorative text containers should be classified or skipped rather than drawn as placeholders.
 - [ ] `references/pptx-cloner-c3-native-table-reconstruction.md` is consulted when C3 reports `table` placeholders; simple native tables should be extracted as structured `table_ref` IR and rebuilt with native editable PowerPoint tables before table styling is optimized.
+- [ ] `references/pptx-cloner-c3-table-styling.md` is consulted after native table reconstruction when editable tables lose font, fill, margin, alignment, border, or theme fidelity.
 - [ ] `references/pptx-cloner-acceptance-loop.md` is consulted for the phase-gated fail → diagnose → optimize → rerun contract; do not advance cloner phases unless the current loop report has `release_decision: pass`.
 - [ ] `references/pptx-template-research-library.md` defines the curated template library policy and first-batch clone candidates.
 - [ ] `references/acceptance-matrix.md` defines phase gates and blocking failures.

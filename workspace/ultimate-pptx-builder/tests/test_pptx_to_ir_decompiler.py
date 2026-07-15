@@ -51,6 +51,7 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             self.assertIn("shape", object_types)
             self.assertIn("image", object_types)
             self.assertIn("group", object_types)
+            self.assertIn("table", object_types)
 
             grouped = [obj for obj in slide["objects"] if obj.get("text") == "Grouped Insight"]
             self.assertTrue(grouped)
@@ -62,6 +63,14 @@ class PptxToIrDecompilerTests(unittest.TestCase):
             self.assertEqual(empty.get("classification", {}).get("kind"), "empty-text-container")
             self.assertEqual(empty["render_policy"], "skip")
             self.assertLessEqual(empty["editability"]["priority"], 1)
+
+            table = next(obj for obj in slide["objects"] if obj.get("source_shape_name") == "sample_native_table")
+            table_ref = table.get("table_ref") or {}
+            self.assertEqual(table_ref.get("row_count"), 2)
+            self.assertEqual(table_ref.get("column_count"), 2)
+            self.assertEqual(table_ref.get("cells", [])[0][0], "Driver")
+            self.assertEqual(table_ref.get("cells", [])[1][1], "High")
+            self.assertEqual(table.get("classification", {}).get("kind"), "native-table-candidate")
 
             image_objs = [obj for obj in slide["objects"] if obj["type"] == "image"]
             self.assertTrue(image_objs)

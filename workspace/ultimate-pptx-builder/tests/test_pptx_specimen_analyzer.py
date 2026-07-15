@@ -60,6 +60,13 @@ def make_sample_pptx(path: Path) -> None:
     empty = slide.shapes.add_textbox(Inches(4.2), Inches(3.4), Inches(1.2), Inches(0.4))
     empty.name = "sample_empty_text_container"
 
+    table_shape = slide.shapes.add_table(2, 2, Inches(4.2), Inches(4.1), Inches(2.4), Inches(0.9))
+    table_shape.name = "sample_native_table"
+    table_shape.table.cell(0, 0).text = "Driver"
+    table_shape.table.cell(0, 1).text = "Value"
+    table_shape.table.cell(1, 0).text = "Speed"
+    table_shape.table.cell(1, 1).text = "High"
+
     prs.save(str(path))
 
 

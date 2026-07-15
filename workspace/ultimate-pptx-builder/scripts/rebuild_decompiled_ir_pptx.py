@@ -177,6 +177,22 @@ def add_picture_fill_shape_as_image(slide, obj: Dict[str, Any], source_pptx: Pat
     return "native-picture-fill-shape-image"
 
 
+def add_native_table(slide, obj: Dict[str, Any]) -> str:
+    table_ref = obj.get("table_ref") or {}
+    cells = table_ref.get("cells") or []
+    rows = int(table_ref.get("row_count") or len(cells) or 0)
+    cols = int(table_ref.get("column_count") or (len(cells[0]) if cells else 0) or 0)
+    if rows <= 0 or cols <= 0:
+        raise ValueError("table_ref has no rows/columns")
+    shape = slide.shapes.add_table(rows, cols, *box_emu(obj))
+    shape.name = (str(obj.get("id") or "rebuilt_table") + "__table")[:250]
+    table = shape.table
+    for r, row in enumerate(cells[:rows]):
+        for c, value in enumerate(row[:cols]):
+            table.cell(r, c).text = str(value or "")
+    return "native-table"
+
+
 def add_placeholder_label(slide, obj: Dict[str, Any], label: str) -> None:
     # Keep label tiny and non-critical. It is diagnostic metadata, not source content.
     x, y, w, h = box_emu(obj)
@@ -241,6 +257,8 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
                     produced = add_native_image(slide, obj, source_pptx)
                 elif obj.get("fill_image_ref"):
                     produced = add_picture_fill_shape_as_image(slide, obj, source_pptx)
+                elif typ == "table" and obj.get("table_ref"):
+                    produced = add_native_table(slide, obj)
                 elif typ == "shape":
                     produced = add_native_shape(slide, obj)
                 else:
@@ -274,6 +292,8 @@ def rebuild(ir: Dict[str, Any], pptx_path: Path, report_path: Path) -> Dict[str,
                 "parent_group_name": obj.get("parent_group_name", ""),
                 "child_count": obj.get("child_count"),
                 "classification": (obj.get("classification") or {}).get("kind", ""),
+                "table_rows": (obj.get("table_ref") or {}).get("row_count"),
+                "table_columns": (obj.get("table_ref") or {}).get("column_count"),
                 "has_text": bool((obj.get("text") or "").strip()),
                 "editability_priority": (obj.get("editability") or {}).get("priority"),
                 "produced": produced,

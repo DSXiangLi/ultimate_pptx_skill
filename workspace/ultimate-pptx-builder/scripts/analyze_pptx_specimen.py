@@ -224,9 +224,9 @@ def style_summary(shape: Any) -> Dict[str, Any]:
 
 
 def font_summary(shape: Any) -> Dict[str, Any]:
-    if not getattr(shape, "has_text_frame", False):
-        return {}
     result: Dict[str, Any] = {}
+    if not getattr(shape, "has_text_frame", False):
+        return result
     try:
         for paragraph in shape.text_frame.paragraphs:
             for run in paragraph.runs:
@@ -242,6 +242,23 @@ def font_summary(shape: Any) -> Dict[str, Any]:
     except Exception:
         pass
     return result
+
+
+def table_summary(shape: Any) -> Dict[str, Any]:
+    if not getattr(shape, "has_table", False):
+        return {}
+    try:
+        table = shape.table
+        cells: List[List[str]] = []
+        for row in table.rows:
+            cells.append([cell.text for cell in row.cells])
+        return {
+            "row_count": len(table.rows),
+            "column_count": len(table.columns),
+            "cells": cells,
+        }
+    except Exception:
+        return {}
 
 
 def inventory_objects(pptx: Path) -> Dict[str, Any]:
@@ -281,6 +298,8 @@ def inventory_objects(pptx: Path) -> Dict[str, Any]:
             obj["group_id"] = parent_group.get("id", "")
             obj["parent_group_name"] = parent_group.get("name", "")
             obj["group_depth"] = depth
+        if obj["type"] == "table":
+            obj["table"] = table_summary(shape)
         if obj["type"] == "image":
             try:
                 obj["image_content_type"] = shape.image.content_type

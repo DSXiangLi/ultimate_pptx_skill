@@ -91,6 +91,12 @@ class PptxClonerLoopTests(unittest.TestCase):
                 any(item["type"] == "text" for item in rebuild_report["unsupported_objects"]),
                 "empty/decorative text containers should be classified and skipped, not placeholdered",
             )
+            table = next(item for item in rebuild_report["objects"] if item.get("source_shape_name") == "sample_native_table")
+            self.assertEqual(table["produced"], "native-table")
+            self.assertFalse(
+                any(item["type"] == "table" for item in rebuild_report["unsupported_objects"]),
+                "simple native tables should be reconstructed, not placeholdered",
+            )
             gate_ids = {gate["id"] for gate in data["gates"]}
             self.assertIn("C1-EVIDENCE-PACK", gate_ids)
             self.assertIn("C2-TEXT-RECALL", gate_ids)

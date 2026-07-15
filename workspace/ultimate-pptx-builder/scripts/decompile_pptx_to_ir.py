@@ -57,6 +57,11 @@ def classification_for(obj: Dict[str, Any]) -> Dict[str, Any]:
             "kind": "empty-text-container",
             "reason": "text-frame object has no source text; treat as structural/decorative metadata rather than a visual placeholder",
         }
+    if typ == "table" and obj.get("table"):
+        return {
+            "kind": "native-table-candidate",
+            "reason": "source object exposes native table rows, columns, and cell text",
+        }
     return {"kind": "source-object"}
 
 
@@ -107,6 +112,8 @@ def raw_ir_object(obj: Dict[str, Any]) -> Dict[str, Any]:
         out["group_depth"] = obj.get("group_depth", 0)
     if obj.get("child_count") is not None:
         out["child_count"] = obj.get("child_count")
+    if obj.get("type") == "table" and obj.get("table"):
+        out["table_ref"] = obj.get("table")
     if obj.get("fill_image_package_path"):
         out["fill_image_ref"] = {
             "relationship_id": obj.get("fill_image_relationship_id", ""),

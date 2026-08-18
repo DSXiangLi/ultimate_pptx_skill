@@ -178,9 +178,50 @@ def check_acceptance_language():
     ]
     for t in targets:
         txt = (ROOT / t).read_text(encoding="utf-8")
-        if "Acceptance" not in txt and "验收" not in txt and "Release" not in txt:
+        if not any(term in txt for term in ["Acceptance", "验收", "接受", "Release", "发布", "门禁"]):
             fail(f"{t} lacks acceptance/release criteria")
     print("PASS acceptance criteria present")
+
+
+def check_runtime_doc_conformance():
+    """Keep SKILL.md as an execution manual, not a rationale/checklist dump."""
+    content = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    frontmatter = content.split("---", 2)[1]
+    desc = re.search(r"description:\s*(.+)", frontmatter)
+    if not desc or not desc.group(1).strip().startswith("Use when "):
+        fail("SKILL.md description must be the only trigger surface and start with 'Use when '")
+
+    forbidden = [
+        "## When to Use",
+        "## 何时使用",
+        "## Verification Checklist",
+        "## 验证清单",
+        "## Learning Notes Rule",
+        "## 学习笔记规则",
+        "**Acceptance Gate",
+        "**验收门禁",
+        "- [ ]",
+    ]
+    found = [term for term in forbidden if term in content]
+    if found:
+        fail("SKILL.md contains stale manual/rationale/checklist sections: " + ", ".join(found))
+
+    required = [
+        "## 运行原则",
+        "## 输入归一化",
+        "## 路线选择",
+        "## 标准工作流",
+        "## 失败处理",
+        "## 技能维护规则",
+        "python3 scripts/validate_skill.py",
+        "python3 scripts/run_pptx_cloner_loop.py",
+        "manifest.json",
+        "release_decision",
+    ]
+    missing = [term for term in required if term not in content]
+    if missing:
+        fail("SKILL.md missing runtime-manual anchors: " + ", ".join(missing))
+    print("PASS runtime doc conformance")
 
 
 def load_json(path):
@@ -650,6 +691,7 @@ def check_finance_benchmark_corpus_tests():
 def main():
     check_required_files()
     check_skill_frontmatter()
+    check_runtime_doc_conformance()
     check_acceptance_language()
     check_json_files()
     check_ir_policy()

@@ -1,317 +1,115 @@
-# Narrative Kernel and Visual Anchor Expansion Roadmap
+# 叙事与视觉扩展运行契约
 
-## Purpose
+## 适用范围
 
-This roadmap guides Phase 1 expansion of `ultimate-pptx-builder` beyond the current `glass-fintech-pptx` benchmark.
+本文件约束 `ultimate-pptx-builder` 在扩展叙事能力和视觉锚点时的运行方式。它不是开发计划，也不记录方案选择历史。
 
-The goal is **not** to accumulate more slide templates or style names. The goal is to build a PPTX design compiler that captures superior human presentation patterns:
-
-```text
-Narrative Kernel → Narrative Rules → Visual Anchor → Controlled Visual Extension → PPTX Material Policy → QA Gates
-```
-
-A mature PPTX system should have an advantage in:
-
-- transmitting content clearly;
-- attracting and directing user attention;
-- maintaining a complete narrative chain;
-- creating strong opening, development, turn, and resolution rhythm;
-- preserving editability and Office reliability.
-
-## Core Thesis
-
-Phase 1 expansion should optimize around two ideas:
-
-1. **Narrative layer = kernel + rules**
-   - The kernel guides content generation.
-   - The rules check whether the generated deck follows superior presentation logic.
-
-2. **Visual layer = anchors + bounded extension space**
-   - A visual anchor should generate a family of decks, not one fixed template.
-   - Each anchor must define immutable DNA, mutable coordinates, mutation operators, and quality gates.
-
-## 1. Narrative Layer: Kernel, Not Template Enumeration
-
-Narrative topology is useful, but it is not the essence. The essence is a reusable communication kernel that answers:
+## 编译链路
 
 ```text
-What should the audience notice first?
-What should they believe next?
-What evidence earns that belief?
-Where is the turn or contrast?
-What decision/action should remain after the slide or deck ends?
+content_contract
+→ narrative_kernel
+→ narrative_rules
+→ visual_anchor
+→ controlled_visual_language
+→ pptx_material_policy
+→ executable_qa_gates
 ```
 
-### 1.1 Narrative Kernel
+## 必需产物
 
-The narrative kernel should guide generation with these principles:
+新增或修改叙事/视觉扩展时，同步维护以下文件：
 
-| Kernel Principle | Meaning | PPTX Implication |
+| 能力 | 产物 | 验证命令 |
 |---|---|---|
-| Audience job | Every deck serves a decision, understanding, persuasion, or memory task | Define audience, scenario, and desired after-state before layout |
-| One-slide one-job | Each slide performs one primary narrative function | Every slide needs `narrative_job`; no mixed-purpose clutter |
-| Claim-before-evidence | The title should state the point, not merely name the chart | Prefer conclusion titles over topic labels |
-| Attention path | The page must control first/second/third read | Establish dominant object, support, source/risk |
-| Cognitive load budget | The deck must reduce interpretation effort | Limit competing focal points; manage density deliberately |
-| Evidence sufficiency | Important claims require supporting data, comparison, or rationale | Check claim/evidence link, source, units, assumptions |
-| Contrast/turn | Strong decks contain tension: before/after, risk/opportunity, base/stress, trade-off | Encode comparison, scenario, or decision fork when needed |
-| Arc continuity | Slides should form a chain, not a pile | Deck has opening, development, turn, resolution/action |
-| Formal credibility | Finance decks require professional wording, risk/source visibility, no casual claims | Enforce risk rail, source note, compliance tone |
-| Memorable closure | The ending should leave decision/action/monitoring path | Final slides include action plan, owner, next checkpoint, or decision principle |
+| 叙事内核 | `references/narrative-kernel.md`, `schemas/narrative-kernel.schema.json`, `examples/narrative-kernel.finance.json` | `python3 scripts/check_narrative_safety.py <contract>` |
+| 视觉锚点 | `references/visual-anchor-system.md`, `schemas/visual-anchor.schema.json`, `examples/visual-anchors/*.anchor.json` | `python3 scripts/check_visual_anchor.py <anchor> <deck.ir.json>` |
+| 视觉语言差异 | `references/visual-variant-distinctiveness.md`, `examples/variants/*.contract.json` | `python3 scripts/check_narrative_visual_orthogonality.py && python3 scripts/validate_glass_variants.py` |
+| 多系统泛化 | `references/visual-system-generalization.md`, `examples/*style.json` | `python3 scripts/validate_visual_systems.py` |
 
-### 1.2 Narrative Rules
+## Narrative Kernel Contract
 
-The rules should check the generated deck. These should become `check_narrative_safety.py` gates.
+每个 deck contract 必须声明：
 
-Recommended blocking checks:
-
-| Rule | Blocking Failure |
-|---|---|
-| `MISSING_AUDIENCE_JOB` | Deck lacks audience/scenario/desired outcome |
-| `MISSING_NARRATIVE_JOB` | Slide lacks primary narrative job |
-| `TITLE_NOT_CLAIM` | Key slide title is only a topic label, not a conclusion or action-oriented claim |
-| `NO_DOMINANT_READ` | Slide has no clear first read |
-| `CLAIM_WITHOUT_EVIDENCE` | Slide title asserts a conclusion without data/rationale/source |
-| `EVIDENCE_WITHOUT_TAKEAWAY` | Data page shows chart/table but no interpretation |
-| `ARC_GAP` | Deck lacks opening, evidence, turn/risk, and resolution/action |
-| `BROKEN_TRANSITION` | Adjacent slides do not connect logically |
-| `UNRESOLVED_TENSION` | A risk/trade-off/scenario is introduced but never resolved |
-| `DUPLICATE_NARRATIVE_JOB` | Consecutive slides repeat the same job without adding information |
-| `GENERIC_AI_TITLE` | Title uses empty wording like “市场洞察/核心分析/总结展望” without real claim |
-| `MISSING_RISK_OR_SOURCE` | Finance claim lacks source/risk rail when required |
-| `WEAK_CLOSURE` | Deck ends without action, decision, or monitoring path |
-
-### 1.3 Narrative Forms as Secondary Layer
-
-Topology still matters, but it should implement the kernel rather than replace it.
-
-Examples:
-
-```text
-hero-thesis        = opening attention + thesis
-chart-focus        = claim + evidence + interpretation
-matrix             = compare + segment + recommendation
-scenario-cards     = tension + stress + trade-off
-process-roadmap    = resolution + execution path
-action-plan        = closure + next step
-compliance         = formal constraint + credibility
+```yaml
+audience_job: decision | understanding | persuasion | memory
+scenario: string
+expected_after_state: string
+slides:
+  - narrative_job: hero_thesis | chart_focus | matrix | scenario | process | action_plan | compliance
+    claim: string
+    evidence: list
+    takeaway: string
+    source_risk: list
 ```
 
-Phase 1 should keep topology compact and strengthen its rules.
+阻断代码由 `check_narrative_safety.py` 输出，包括但不限于：
 
-## 2. Visual Layer: Anchors, Not One-Off Templates
-
-A visual template is a fixed artifact. A visual anchor is a generative region.
-
-A style anchor must be able to answer:
-
-```text
-What cannot change, or the style is lost?
-What can vary, so the deck does not look repetitive?
-How far can it mutate before leaving the style family?
-Which visual moves are allowed for cover, data, appendix, dense table, and closing pages?
-Which effects are native/vector/raster under PPTX constraints?
-```
-
-### 2.1 Visual Anchor Model
-
-Each visual anchor should define:
-
-| Layer | Purpose |
+| Code | 含义 |
 |---|---|
-| Immutable DNA | The minimum features that make the style recognizable |
-| Mutable Coordinates | Controlled axes that can vary per deck/page |
-| Mutation Operators | Allowed transformations that create variety |
-| Density Modes | Rules for low, medium, high, appendix density |
-| Page Role Variants | Cover/data/process/table/compliance/closing behavior |
-| Material Policy | Native/vector/raster editability strategy |
-| Anti-Drift Rules | What would break the style or make it generic |
-| QA Rubric | How to judge if the anchor is expressed well |
+| `MISSING_AUDIENCE_JOB` | 缺少受众/场景/期望结果 |
+| `MISSING_NARRATIVE_JOB` | 幻灯片缺少主要叙事任务 |
+| `TITLE_NOT_CLAIM` | 关键页标题不是结论或行动主张 |
+| `CLAIM_WITHOUT_EVIDENCE` | 主张无数据、理由或来源支撑 |
+| `EVIDENCE_WITHOUT_TAKEAWAY` | 数据存在但缺少解读 |
+| `ARC_GAP` | deck 缺少开场、证据、转折/风险、解决/行动链路 |
+| `MISSING_RISK_OR_SOURCE` | 金融主张缺少来源或风险说明 |
 
-### 2.2 Visual Coordinates
+## Visual Anchor Contract
 
-Use coordinates instead of style enumeration:
-
-| Coordinate | Example Range |
-|---|---|
-| Authority tone | institutional / editorial / strategic / tech / luxury |
-| Structure | strict grid / modular cards / asymmetrical editorial / radial / timeline |
-| Surface | flat paper / glass / terminal / print / dimensional / map-like |
-| Depth | flat / layered / volumetric / atmospheric |
-| Color logic | monochrome+accent / semantic risk colors / heatmap / brand palette |
-| Typography | CN sans / editorial serif / condensed numerals / mono data |
-| Data grammar | axis chart / matrix / waterfall / decomposition / sparkline / map |
-| Motif | rules / orbs / atlas / seal / node graph / ticker / marginalia |
-| Rhythm | steady institutional / dramatic reveal / editorial pacing / dense appendix |
-| Density | low / medium / high / appendix |
-| Material strategy | native-only / native+vector / decorative raster allowed |
-
-### 2.3 Anchor Extension Example: `glass-fintech-pptx`
-
-Current anchor:
+每个视觉锚点必须声明：
 
 ```yaml
 id: glass-fintech-pptx
-immutable_dna:
-  - dark institutional finance surface
-  - translucent glass panels
-  - cyan/violet/gold accents
-  - editable native text
-  - editable vector chart/table
-  - visible risk/source rail
-mutable_coordinates:
-  luminosity: [sober, luminous]
-  panel_density: [sparse, medium, dense]
-  accent_energy: [quiet, balanced, high]
-  data_prominence: [metric-led, chart-led, table-led]
-  motif_variation: [orb, gridline, terminal, constellation]
-mutation_operators:
-  - swap panel split direction
-  - vary accent orb placement and scale
-  - alternate metric band/card treatment
-  - shift between chart-led and table-led layouts
-  - use stricter compliance mode on formal pages
-anti_drift:
-  - no random neon poster look
-  - no unreadable tiny finance text
-  - no screenshot-based critical data
-  - no same glass-card motif repeated on every page
+immutable_dna: []
+mutable_coordinates: {}
+mutation_operators: []
+density_modes: {}
+page_role_variants: {}
+material_policy: {}
+anti_drift_rules: []
+qa_gates: []
 ```
 
-This means the anchor can create many decks in one family without becoming a fixed template.
+最低接受标准：
 
-## 3. Phase 1 Optimized Implementation Goal
+| Gate | 发布条件 |
+|---|---|
+| anchor schema | JSON/schema 通过 |
+| immutable DNA | 删除任一核心 DNA 后样式可识别度下降 |
+| controlled coordinates | 视觉变化来自坐标，不来自业务场景改名 |
+| PPTX material policy | 关键文本和数据保持 native/editable |
+| rendered evidence | `.pptx` 渲染图显示可见差异 |
+| regression | layout/text/editability/visual gates 通过 |
 
-Phase 1 should be renamed from “expand topology/style library” to:
+## Controlled Variation Contract
+
+同一内容基础上验证至少三种视觉语言：
 
 ```text
-Build Narrative Kernel v1 + Visual Anchor System v1
+matte-institutional × same_narrative_intent
+luminous-glass × same_narrative_intent
+terminal-cockpit × same_narrative_intent
 ```
 
-### Goal A — Narrative Kernel v1
+固定项：slide count、拓扑序列、标题、正文、指标、图表数据、来源/风险、`narrative_intent`。
 
-Deliverables:
+可变项：`visual_language`、visual grammar、panel/material/typography/palette/motif/chart treatment/source-band treatment。
 
-```text
-references/narrative-kernel.md
-schemas/narrative-kernel.schema.json
-scripts/check_narrative_safety.py
-examples/narrative-kernel.finance.json
+## 发布命令
+
+```bash
+python3 scripts/check_narrative_safety.py examples/glass-fintech-benchmark.contract.json
+python3 scripts/check_visual_anchor.py examples/visual-anchors/glass-fintech-pptx.anchor.json build/validation-phase1.ir.json
+python3 scripts/check_narrative_visual_orthogonality.py
+python3 scripts/validate_glass_variants.py
+python3 scripts/validate_visual_systems.py
+python3 scripts/validate_skill.py
 ```
 
-Minimum capabilities:
+## 失败处理
 
-- define audience job;
-- define slide narrative job;
-- enforce claim/evidence/takeaway/source/risk relationships;
-- check deck arc: opening → evidence → contrast/turn → resolution/action;
-- detect generic titles, missing takeaways, unsupported claims, weak closure.
-
-Acceptance:
-
-```text
-check_narrative_safety.py examples/glass-fintech-benchmark.contract.json -> pass
-```
-
-### Goal B — Visual Anchor System v1
-
-Deliverables:
-
-```text
-references/visual-anchor-system.md
-schemas/visual-anchor.schema.json
-examples/visual-anchors/glass-fintech-pptx.anchor.json
-scripts/check_visual_anchor.py
-```
-
-Minimum capabilities:
-
-- define immutable DNA;
-- define mutable coordinates and allowed ranges;
-- define mutation operators;
-- define page-role variants;
-- define PPTX material strategy;
-- define anti-drift and anti-template-smell checks.
-
-Acceptance:
-
-```text
-check_visual_anchor.py examples/visual-anchors/glass-fintech-pptx.anchor.json build/.../deck.ir.json -> pass
-```
-
-### Goal C — Controlled Variation Benchmark
-
-The proof that a visual anchor is not a one-off template is not another style name. The proof is multiple decks in the same anchor with different coordinates.
-
-Create three variants from the same `glass-fintech-pptx` anchor:
-
-| Variant | Use Case | Coordinate Shift |
-|---|---|---|
-| sober-committee | 投委会正式版 | lower luminosity, stricter grid, higher compliance tone |
-| luminous-strategy | 策略会展示版 | stronger accent, chart-led pages, more visual energy |
-| dense-risk-review | 风险复盘版 | higher density, table/matrix-led pages, restrained decoration |
-
-All three should still be recognizably `glass-fintech-pptx`, but not look like the same PPT with text swapped.
-
-Acceptance:
-
-```text
-same anchor DNA score >= 4
-variant distinctiveness score >= 4
-layout safety pass
-narrative safety pass
-editability >= 95
-visual fidelity >= 90
-```
-
-## 4. What Not To Do
-
-Do not optimize by:
-
-- adding many one-off templates;
-- adding style names without anchor grammar;
-- calling every topology a template;
-- letting arbitrary visual effects override editability;
-- relying on visual fidelity as design acceptance;
-- fixing narrative problems by making slides prettier;
-- fixing visual repetition by randomizing colors only.
-
-## 5. Phase 1 Success Definition
-
-Phase 1 succeeds when the system can say:
-
-```text
-I know what makes a PPT narratively strong.
-I can check whether this deck follows that logic.
-I know what makes this visual anchor recognizable.
-I can extend the anchor within safe boundaries.
-I can prove the result is editable, readable, visually distinct, and Office-safe.
-```
-
-Concrete success target:
-
-```text
-1 narrative kernel spec
-1 narrative safety checker
-1 visual anchor schema
-1 visual anchor checker
-3 controlled glass-fintech variants
-all variants pass layout/text/narrative/visual/editability gates
-```
-
-## 6. Ultimate Target
-
-The ultimate target is a finance-grade PPTX design compiler:
-
-```text
-business content + audience + scenario + desired action
-  → narrative kernel planning
-  → deck arc construction
-  → visual anchor selection
-  → bounded visual variation
-  → editable PPTX realization
-  → narrative/layout/visual/Office QA
-  → self-improving rules
-```
-
-This is stronger than a template library because it captures the reason great decks work, not only their surface appearance.
+- 叙事失败：修复 content contract 或 narrative kernel，不通过视觉装饰掩盖缺失主张/证据/收束。
+- 视觉语言耦合：重命名或重建 `visual_language`，业务任务放入 `narrative_intent`。
+- 变体距离不足：修改组件语法、材料、排版、图表/表格处理或 source/risk band，而不是只换色。
+- 可编辑性失败：调整 material policy 或 exporter，关键文本/数据不进入 raster。

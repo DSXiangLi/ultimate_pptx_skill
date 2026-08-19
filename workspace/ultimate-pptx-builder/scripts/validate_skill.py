@@ -224,6 +224,44 @@ def check_runtime_doc_conformance():
     print("PASS runtime doc conformance")
 
 
+def check_reference_runtime_conformance():
+    """Keep high-traffic references as contracts, not roadmaps or essays."""
+    targets = [
+        "references/pptx-cloner.md",
+        "references/narrative-visual-expansion-roadmap.md",
+        "references/visual-variant-distinctiveness.md",
+        "references/style-glass-fintech-pptx.md",
+        "references/qa-loop.md",
+        "references/layout-text-safety.md",
+    ]
+    forbidden_terms = [
+        "## 为什么",
+        "## Why",
+        "## Background",
+        "## 背景",
+        "Rationale",
+        "Verification Checklist",
+        "验收清单",
+        "- [ ]",
+        "路线图",
+        "roadmap",
+        "Acceptance Gate",
+        "验收门禁",
+    ]
+    required_terms = ["命令", "发布", "阻断"]
+    for rel in targets:
+        txt = (ROOT / rel).read_text(encoding="utf-8")
+        found = [term for term in forbidden_terms if term in txt]
+        if found:
+            fail(f"{rel} contains stale runtime-reference language: " + ", ".join(found))
+        missing = [term for term in required_terms if term not in txt]
+        if missing:
+            fail(f"{rel} missing runtime contract terms: " + ", ".join(missing))
+        if txt.count("\n") + 1 > 220:
+            fail(f"{rel} is too long for a runtime reference; move history/research out of references")
+    print("PASS reference runtime conformance")
+
+
 def load_json(path):
     try:
         return json.loads((ROOT / path).read_text(encoding="utf-8"))
@@ -692,6 +730,7 @@ def main():
     check_required_files()
     check_skill_frontmatter()
     check_runtime_doc_conformance()
+    check_reference_runtime_conformance()
     check_acceptance_language()
     check_json_files()
     check_ir_policy()

@@ -44,3 +44,9 @@
 python3 scripts/validate_glass_showcase.py
 python3 scripts/validate_glass_benchmark.py
 ```
+
+## 发布与阻断
+
+发布条件：两个命令均返回 pass，且 `export-report.json`、`qa-report.json`、视觉保真报告存在。
+
+阻断条件：关键文本进入 raster、金融图表未按 priority 5 物化、视觉保真或可编辑性低于接受标准、showcase/benchmark 缺少正式报告。

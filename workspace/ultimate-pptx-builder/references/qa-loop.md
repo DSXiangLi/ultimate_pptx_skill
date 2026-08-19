@@ -1,89 +1,94 @@
-# QA Loop
+# QA 发布循环契约
 
-## Four Gates
+## 适用范围
 
-### Gate 1 — Fidelity
+本文件定义 PPTX 产物发布前的 QA 命令、报告和阻断条件。发布判定来自脚本报告，不来自人工 checklist。
 
-Compare HTML preview render with PPTX render.
+## 输入产物
 
-Checks:
+```text
+<workdir>/build/deck.ir.json
+<workdir>/build/deck.pptx
+<workdir>/verification/export-report.json
+<workdir>/verification/visual-fidelity-report.json
+<workdir>/verification/layout-report.json
+<workdir>/verification/qa-report.json
+```
 
-- object missing
-- object shifted
-- text wraps differently
-- overflow/cropping
-- font/color/weight drift
-- z-order drift
+## 必跑命令
 
-Release threshold: score ≥90 or documented accepted exceptions.
+```bash
+python3 scripts/check_pptx_package.py <workdir>/build/deck.pptx
 
-### Gate 2 — Editability
+python3 scripts/run_visual_fidelity.py \
+  <workdir>/build/deck.ir.json \
+  <workdir>/build/deck.pptx \
+  <workdir>/verification/visual-fidelity-report.json \
+  --workdir <workdir>/visual-fidelity
 
-Inspect PPTX object model or export report.
+python3 scripts/check_layout_safety.py \
+  <workdir>/build/deck.ir.json \
+  --report <workdir>/verification/layout-report.json
 
-Checks:
+python3 scripts/run_qa.py \
+  <workdir>/build/deck.ir.json \
+  <workdir>/verification/export-report.json \
+  <workdir>/verification/qa-report.json \
+  --pptx <workdir>/build/deck.pptx \
+  --visual-report <workdir>/verification/visual-fidelity-report.json
+```
 
-- priority ≥4 text is native text
-- finance chart/table is editable
-- risk/source is editable and readable
-- raster islands have source metadata
+复杂组件页追加：
 
-Release threshold: no critical editability failure.
+```bash
+python3 scripts/check_component_layout_contract.py \
+  <workdir>/build/deck.ir.json \
+  --report <workdir>/verification/component-layout-report.json
+```
 
-### Gate 3 — Layout and Text Safety
+## QA 报告字段
 
-Run `scripts/check_layout_safety.py` against the Slide IR before export acceptance.
+`qa-report.json` 必须匹配 `schemas/qa-report.schema.json`，至少包含：
 
-Checks:
+```yaml
+deck_id: string
+scores:
+  fidelity: number
+  editability: number
+  design: number
+  practicality: number
+blocking_issues: []
+objects_audited: []
+release_decision: pass | fail | pass_with_accepted_exceptions
+```
 
-- priority>=4 objects inside safe zones
-- bottom cards/footnotes/metrics outside the unsafe projection/export area
-- CJK-aware text-box capacity for title/body/metric/risk/table text
-- title/page-number decorative collisions
-- dense finance-table row/cell readability
-- oversized repeated page-number motifs that create AI-template smell
+## 发布门禁
 
-Release threshold: zero blocking layout/text issues, or explicit user-accepted exceptions in the validation record.
+| Gate | 发布条件 |
+|---|---|
+| package | Office package 结构通过 |
+| fidelity | 视觉保真报告存在，分数达到当前阈值或例外已记录 |
+| editability | priority>=4 文本和关键数据不被 rasterized |
+| layout/text | `layout-report.json.release_decision == pass` 且 `blocking_count == 0` |
+| design | 无阻断级视觉层级、拥挤、遮挡、组件错位问题 |
+| practicality | 来源/风险存在，字号、文件大小、对象数量适合 Office 工作流 |
+| manifest | final manifest 写入 PPTX、IR、render、report 路径和 release decision |
 
-### Gate 4 — Design Quality
+## 阻断代码族
 
-Critique using a design rubric:
+| Code family | 处理方式 |
+|---|---|
+| package/XML failure | 修复 exporter/package 关系后重跑全部 QA |
+| critical text rasterized | 修复 render policy/exporter，禁止用截图保真掩盖 |
+| visual fidelity drift | 读取 diff/crops，定位 IR/HTML/PPTX renderer 责任 |
+| layout/text blocker | 修复 IR/layout grammar 或对应 checker，不只改当前坐标 |
+| component contract failure | 修复 component contract、slot 或 density fallback |
+| missing source/risk | 回到 content contract 补齐业务字段 |
 
-- narrative clarity
-- first/second/third read hierarchy
-- spacing and alignment
-- motif consistency
-- deck rhythm
-- density control
-- professional finance tone
+## 修复并重新验证
 
-Release threshold: no blocking visual hierarchy or readability issue.
+每次修复后只接受同一命令链重新通过的产物。若修复改动影响 style program、IR schema、exporter、QA gate 或 runtime 文档，最后运行：
 
-### Gate 5 — Practicality
-
-Checks:
-
-- 16:9 slide size
-- Office-safe fonts or bundled fallback
-- min font size policy
-- file size / object count
-- source/risk text present
-- PDF export sanity
-
-Release threshold: no finance practicality blocker.
-
-## Required Fix-and-Reverify Loop
-
-For real deck output, one pass is not enough:
-
-1. Generate PPTX.
-2. Render and audit.
-3. Run layout/text safety.
-4. List issues.
-5. Fix at least one issue or explicitly document why no issue exists.
-6. Re-render affected slides.
-7. Accept only after no new blocking issues appear.
-
-## Acceptance Mechanism
-
-Every run should write `qa-report.json` matching `schemas/qa-report.schema.json` and, for long-form decks, a layout safety report from `scripts/check_layout_safety.py`.
+```bash
+python3 scripts/validate_skill.py
+```
